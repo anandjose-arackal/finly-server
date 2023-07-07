@@ -10,46 +10,23 @@ class ImportRecord < ApplicationRecord
   serialize :record_data, JSON
   serialize :processed_data, JSON
 
+  after_save :sync_data, unless: :skip_callback
+
   scope :with_status_id, ->(status_id) {
     where status_id: status_id
   }
 
-  # after_save :run_computations, unless: :skip_callback
-
-  # This method calculates the item related values for the first time
-  # This happens in FE automatically in normal cases but in imports this has to be done manually
-  # def run_computations
-  #   return unless self.import_job[:options]["route"] == "forms.invoices"
-  #   computed_items = []
-  #   return if self.processed_data["items"].nil?
-  #   self.processed_data["items"].each do |item|
-  #     item_record = Item.find(item['inventory_line_item_id'].to_i) rescue nil
-  #     return unless item_record
-  #     next if item_record.nil?
-  #
-  #     item_gross_amount = (item['rate'] * item['quantity']).round(2)
-  #     discount = item['discount']
-  #     discount_amount = self.processed_data['discount_type_id'] == 1 ? item_gross_amount * discount : discount
-  #     item_taxable_amount = item_gross_amount.to_f - discount_amount.to_f
-  #     tax_percentage = item_record.tax_rate&.rate.to_f
-  #     item_tax_amount = ((item_taxable_amount * tax_percentage)/100).to_f
-  #     computed_items << {
-  #       'item_number': item_record.item_number,
-  #       'unit_of_measurement': item_record.unit_of_measurement,
-  #       'item_gross_amount': item_gross_amount.to_f,
-  #       'item_discount_amount': discount_amount.to_f,
-  #       'item_taxable_amount': item_taxable_amount.to_f,
-  #       'tax_percentage': tax_percentage.to_f,
-  #       'item_tax_amount': item_tax_amount,
-  #       'item_tds_amount': (item['tds_applicable'] ? (processed_data['tds_percentage']*item_taxable_amount)/100 : 0).to_f,
-  #       'item_net_amount': (processed_data['rcm_enabled'] ? item_taxable_amount : item_taxable_amount + item_tax_amount).to_f,
-  #       'item_billable_amount': item_taxable_amount.to_f
-  #     }.stringify_keys.merge(item){|_key, old_value, new_value| new_value.present? ? new_value : old_value}
-  #   end
-  #   self.processed_data['items'] = computed_items
-  #   self.skip_callback = true
-  #   self.save
-  # end
+  def sync_data
+    if self.processed_data.present? && self.processed_data['invoice_number'].present?
+      self.record_data['Invoice Number*'] = self.processed_data['invoice_number']
+    end
+    if self.processed_data.present? && self.processed_data['invoice_attachments'].present?
+      data = self.processed_data['invoice_attachments'].reject{ |attachment| attachment['_destroy'] == true }
+      self.processed_data['invoice_attachments'] = data
+    end
+    self.skip_callback = true
+    self.save
+  end
 
   def data_with_attachments
     json_data = record_data

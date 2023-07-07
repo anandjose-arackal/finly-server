@@ -47,6 +47,8 @@ class GstinLocation < ApplicationRecord
 
   serialize :gstin_fetch_details, JSON
 
+  alias_attribute :name, :location
+
   def state_code
     self.state&.state_code
   end

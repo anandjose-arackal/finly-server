@@ -50,6 +50,10 @@ user:
       dashboard_config_api_trim: <%= DashboardConfigApiTrim.new(current_user).enabled? %>
       pr_api_improvements: <%= PrApiImprovementsToggle.new(current_user).enabled? %>
       clone_deep_removed: <%= FormsRemoveClonedeepToggle.new(current_user).enabled? %>
+      debounce_on_field: <%= FormsDebounceOnFieldToggle.new(current_user).enabled? %>
+      dynamic_autocomplete_choices: <%= FormsDynamicAutocompleteChoicesEnabled.new(current_user).enabled? %>
+      dashboard_card_expansion: <%= DashboardCardExpansionToggle.new(current_user).enabled? %>
+      dashboard_auto_expand_cards: <%= DashboardAutoExpandCardsToggle.new(current_user).enabled? %>
     currency_flags:
       amount_prop_only_load_enabled: <%= AmountPropOnlyLoadToggle.new(current_user).enabled? %>
       currency_comma_separation_enabled: <%= CurrencyCommaSeparationToggle.new(current_user).enabled? %>
@@ -58,6 +62,9 @@ user:
       user_bulk_upload_enabled: <%= UserWorkFlowBulkUploadEnabledToggle.new(current_user).enabled? %>
     global_search:
       forms_config_enabled: <%= GlobalSearchFormsConfigToggle.new(current_user).enabled? %>
+    vp_reports:
+      approval_tat_reports: <%= ApprovalTatReportsToggle.new(current_user).enabled? %>
+      approval_tat_reports_max_limit: <%= (ApprovalTatReportsToggle.new(current_user).max_limit.nil? || (ApprovalTatReportsToggle.new(current_user).max_limit)&.to_i == 0) ? 10000 : ApprovalTatReportsToggle.new(current_user).max_limit %>
 customer_specific:
   invoice_minimal_ui: <%=  MinimalInvoiceUiToggle.new(current_user).minimal_invoice_ui_enabled? %>
   dummy_bank_account: <%= current_company.yes_bank_vendors&.first&.id %>

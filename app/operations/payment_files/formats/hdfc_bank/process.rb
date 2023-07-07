@@ -26,6 +26,9 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
     self.headers = retrieve_hdfc_headers
     content = []
     self.payment_file_data.each do |payment|
+      if self.options[:transaction_type].nil?
+        self.transaction_type = (payment[:beneficiary_ifsc]&.include?("HDFC") ? "I" : "N")
+      end
       content << [
           self.transaction_type,
           payment[:receiving_user_name].present? ? payment[:receiving_user_name][0..7] : '',

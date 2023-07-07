@@ -19,6 +19,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
               :customer_param_value_3 => "Custom Param 3",
               :customer_param_value_4 => "Custom Param 4",
               :customer_param_value_5 => "Custom Param 5",
+              :expected_bill_day => "Expected Bill Day",
               :location => "Location*",
               :department => "Department",
               :cost_center => "Cost Center",
@@ -102,6 +103,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     params[:customer_param_key_5] = biller.biller_customer_params[4]&.dig('param_name')
     params[:subscription_pocs] = yield find_pocs(data[:poc], required: true)
     params[:reminder_before_days]= data[:reminder_before_days]
+    params[:expected_bill_day] = data[:expected_bill_day]
 
     Success(params)
   end

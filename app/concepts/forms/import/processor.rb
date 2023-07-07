@@ -102,11 +102,11 @@ class Forms::Import::Processor
           request.item_complete(false)
         end
 
-        add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
+        add_record_to_result_file(record_data[:record_data], {}, result[:model].id, message, worksheets, worksheets_length)
       rescue => exception
         message = "Unable to process, #{exception}"
         request.item_complete(false)
-        add_record_to_result_file(record_data[:record_data], nil, message, worksheets, worksheets_length)
+        add_record_to_result_file(record_data[:record_data],{}, nil, message, worksheets, worksheets_length)
       end
     end
 
@@ -154,6 +154,7 @@ class Forms::Import::Processor
         row_data = {}.with_indifferent_access
         row = sheet.row(index)
         row.each_with_index do |value, index|
+          next if sheet.row(1)[index].nil?
           if sheet.row(1)[index].include? '(Yes/No)'
             value = value == 'Yes' ? 'TRUE' : 'FALSE'
           end
@@ -208,6 +209,7 @@ class Forms::Import::Processor
           row_data = {}.with_indifferent_access
           row = sheet.row(index)
           row.each_with_index do |value, column_index|
+            next if sheet.row(1)[column_index].nil?
             if sheet.row(1)[column_index].include? '(Yes/No)'
               value = value == 'Yes' ? 'TRUE' : 'FALSE'
             end
@@ -258,6 +260,7 @@ class Forms::Import::Processor
       next if import_record.status_id == ImportRecordStatus.id_for(:in_progress)
 
       begin
+        RequestStoreUtil.set_current_user(user)
         import_record.status_id = ImportRecordStatus.id_for(:in_progress)
         import_record.save
         result = process_import_record(import_record)
@@ -273,7 +276,7 @@ class Forms::Import::Processor
         end
       rescue => exception
         import_job.item_complete(false)
-        import_record.update_status(false, ["Unable to process"].to_s, exception.message, exception.backtrace)
+        import_record.update_status(false, ["Unable to process, #{exception.message}"].to_s, exception.message, exception.backtrace)
       end
     end
     save_records(import_job, records_to_save)
@@ -289,35 +292,32 @@ class Forms::Import::Processor
       record.items&.each do |item|
         item.id = nil
       end
+      record.import_job_id = import_job.id
       if record.save
-        submit_params = { reviewal_document: record }
-        # document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(current_user, submit_params)
-        # unless document_reviewer_mappings_op.success?
-        #   return on_error context, document_reviewer_mappings_op.messages[:error]
-        # end
-        #
-        # next_level = model.dlrms.with_level_number(1).first&.level
-        # if next_level.present?
-        #   model.dlrms.with_level_id(next_level&.id).update_all(viewable: true)
-        #   model.update(controlling_level_id: next_level&.id)
-        # end
-
         if record.class == YesBankVendor
+          submit_params = { reviewal_document: record }
           op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
         elsif record.class == Invoice
-          op = Procurements::Invoices::Submit.(user, { id: record.id })
+          policy = record.policy
+          document_reviewer_mappings = policy.levels.non_deleted.with_entity_type('NonPoInvoiceProvider').reorder(:level_number).map{|x| {level_id: x.id}} rescue nil
+          submit_params = {
+            reviewal_document: record,
+            policy_id: record.policy_id,
+            document_reviewer_mappings: document_reviewer_mappings
+          }
+          op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: user)
         end
         if op&.success?
           import_record.update_status(true, ['Record created successfully'].to_s, '', '')
         else
-          import_record.update_status(true, ['Record created successfully But could not submit for approval'].to_s, '', '')
+          import_record.update_status(true, ['Record created successfully But could not submit for approval', op.messages[:errors].join(', ')].to_s, '', '')
         end
         import_record.document_id = record.id
         import_record.save
         import_job.item_complete(true)
       else
         import_job.item_complete(false)
-        import_record.update_status(false, ['Could not save record'].to_s, '', '')
+        import_record.update_status(false, record.errors.messages.values.flatten.to_s, '', '')
       end
     end
   end
@@ -329,10 +329,9 @@ class Forms::Import::Processor
     workbook = export_base[:workbook]
     worksheets = export_base[:worksheets]
     worksheets_length = Hash.new(0)
-    worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count, "Message")
 
     import_job.records.each do |import_record|
-      add_record_to_result_file(import_record.record_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
+      add_record_to_result_file(import_record.record_data, import_record.processed_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
     end
 
     workbook.close
@@ -342,14 +341,20 @@ class Forms::Import::Processor
     import_job.save
   end
 
-  def add_record_to_result_file(record_data, document_id, message, worksheets, worksheets_length)
+  def add_record_to_result_file(record_data, processed_data, document_id, message, worksheets, worksheets_length)
     self.headers.values.each do |sheet_data|
       sheet_name = sheet_data[:name]
       sheet_key = sheet_data[:key]
       if sheet_key == form.model.name
+        skipped_count = 0
         worksheets_length[sheet_key] += 1
         self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
-          column_data = record_data[self.headers[sheet_key][:headers][key][:name]]
+          if self.headers[sheet_key][:headers][key]["hide_in_sheet"]
+            skipped_count += 1
+            next
+          end
+          data = processed_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] rescue nil
+          column_data = data || record_data[self.headers[sheet_key][:headers][key][:name]]
           if key.to_s == 'id' and document_id.present?
             column_data = document_id
           end
@@ -360,15 +365,23 @@ class Forms::Import::Processor
           if self.headers[sheet_key][:headers][key][:name].include? '(Yes/No)'
             column_data = column_data == 'TRUE' ? 'Yes' : 'No'
           end
-          worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
+          worksheets[sheet_key].write(worksheets_length[sheet_key], header_index - skipped_count, column_data)
         end
-        worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count, message)
+        worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count - skipped_count, "Message")
+        worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count - skipped_count, message)
       else
+        skipped_count = 0
         parent_data = record_data
-        record_data[sheet_key]&.each do |child_data|
+        record_data[sheet_key]&.each_with_index do |child_data, child_index|
+          processed_child_data = sheet_key == "items_summary" ? processed_data : processed_data[sheet_key][child_index] rescue nil
           worksheets_length[sheet_key] += 1
           self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
-            column_data = child_data[self.headers[sheet_key][:headers][key][:name]]
+            if self.headers[sheet_key][:headers][key]["hide_in_sheet"]
+              skipped_count += 1
+              next
+            end
+            data = processed_child_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] rescue nil
+            column_data = data || child_data[self.headers[sheet_key][:headers][key][:name]]
             if key.to_s == 'parent_id'
               if document_id.present?
                 column_data = document_id
@@ -382,7 +395,7 @@ class Forms::Import::Processor
             if self.headers[sheet_key][:headers][key][:name].include? '(Yes/No)'
               column_data = column_data == 'TRUE' ? 'Yes' : 'No'
             end
-            worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
+            worksheets[sheet_key].write(worksheets_length[sheet_key], header_index - skipped_count, column_data)
           end
         end
       end
@@ -448,11 +461,11 @@ class Forms::Import::Processor
         end
         
         # running lookup fetch on all lookups
-        if header_data[:entity_type] == 'lookup' && header_data[:entity].choices_scope.present? && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
-          params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => form_data[header_data[:entity_key]]}
+        if header_data[:entity_type] == 'lookup' && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
+          params_hash = {:entity_path => header_data[:entity].entity_path, :route => "#{form.label.underscore.to_s}_import", :value => form_data[header_data[:entity_key]]}
           current_user = user
           lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data]
-          form_data = lookup_data.merge!(form_data)
+          form_data = lookup_data.merge(form_data)
         end
       else
         if row_data[header_data[:name]].present?
@@ -501,11 +514,11 @@ class Forms::Import::Processor
               params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
               current_user = user
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
-              if nested_row['Tax Rate'] == nil
-                # Preference goes to nil value provided by user
-                lookup_data = lookup_data.except('tax_rate_id', 'tax_rate_id_value', 'tax_percentage')
-              end
-              data = lookup_data.merge!(data)
+
+              # Tax percentage should be 0 if not provided in sheet, removing from lookup data
+              lookup_data = lookup_data.except('tax_percentage', 'tax_rate_id', 'tax_rate_id_value') if header_data[:entity_key] != 'tax_rate_id'
+              
+              data = data.merge(lookup_data)
             end
           else
             # Set value from sheet if lookup returned 0 or nil but sheet has data
@@ -550,6 +563,12 @@ class Forms::Import::Processor
 
     form_data = perform_form_calculations(form_data) if form.model == Invoice
 
+    dropdowns = headers[form.model.name][:headers].values.select{|header_value| header_value['entity_type'] == 'dropdown'}
+    dropdowns.each do |header_data|
+      choices = header_data[:entity].choices_scope.build.data
+      form_data["#{header_data[:entity_key]}_value"] = choices.select{|x| x['id'].to_i == form_data[header_data[:entity_key]].to_i}.first['name'] rescue nil
+    end
+
     form_data
   end
 
@@ -557,7 +576,7 @@ class Forms::Import::Processor
   def perform_form_calculations(form_data)
     form.entities.each do |entity|
       if entity.class.collection?
-        collection_data = form_data[entity.entity_key.to_s]
+        collection_data = form_data[entity.entity_key.to_s] || []
         next if collection_data.empty?
         child_results = []
         collection_data.each do |item|
@@ -580,7 +599,6 @@ class Forms::Import::Processor
   end
 
   def process_form_data(form_data, is_admin = false)
-
     form_data[:form] = form
     form_data[:is_import_process] = true
 
@@ -611,7 +629,7 @@ class Forms::Import::Processor
   end
 
   def get_id_from_value(raw_value, entity)
-    value_id_map[entity.gsub('*', '')][raw_value] rescue nil
+    value_id_map[entity.gsub('*', '')][raw_value.to_s] rescue nil
   end
 
   def get_dropdown_entity_value(raw_value, entity)

@@ -7,6 +7,12 @@ class TaxRates::Create < TaxRates::Base
     self.tax_params = tax_rate_params
   end
 
+  def validate
+    if self.tax_rate_params[:rate]&.to_i < 0
+      add_message :error, 'Tax value should not be negative'
+    end
+  end
+
   def process
     rate = self.company.tax_rates.build(self.tax_params)
     unless rate.save

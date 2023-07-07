@@ -153,7 +153,7 @@ class Forms::Export::Processor
 
       child_sheet_headers = {
         parent_sequence_number: {
-          name: "#{parent_sheet_label&.singularize} Sequence Number",
+          name: "Import Sequence Number",
           entity_key: 'parent_sequence_number',
           entity_type: 'text'
         },

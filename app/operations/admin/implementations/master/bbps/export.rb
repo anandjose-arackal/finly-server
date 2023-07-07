@@ -16,6 +16,7 @@ class Admin::Implementations::Master::BBPS::Export < Admin::Implementations::Pro
               :customer_param_value_3 => "Custom Param 3",
               :customer_param_value_4 => "Custom Param 4",
               :customer_param_value_5 => "Custom Param 5",
+              :expected_bill_day => "Expected Bill Day",
               :location => "Location*",
               :department => "Department",
               :cost_center => "Cost Center",
@@ -79,6 +80,10 @@ class Admin::Implementations::Master::BBPS::Export < Admin::Implementations::Pro
 
   def customer_param_value_5(subscription)
     subscription.customer_param_value_5
+  end
+
+  def expected_bill_day(subscription)
+    subscription.expected_bill_day
   end
 
   def location(subscription)

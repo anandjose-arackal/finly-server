@@ -217,11 +217,11 @@ class ExportManager::Master::Expenses::Index < ExportManager::Builders::Spreadsh
   end
 
   def reporting_currency(expense)
-    expense&.report.policy.base_currency.country_code
+    expense&.report&.policy&.base_currency&.country_code
   end
 
   def reporting_amount(expense)
-    expense&.report.total_amount
+    expense&.report&.total_amount
   end
 
   def conversion_rate(expense)

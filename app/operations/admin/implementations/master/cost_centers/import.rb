@@ -58,7 +58,7 @@ class Admin::Implementations::Master::CostCenters::Import < Admin::Implementatio
     parent_name= data[:parent_id]&.to_s
 
     if parent_name.present?
-      parent = company.cost_centers.find_by_name(parent_name)&.id
+      parent = company.cost_centers.unscoped.find_by_name(parent_name)&.id
       messages <<  "Parent Cost Center Not found" if parent.blank?
     end
 

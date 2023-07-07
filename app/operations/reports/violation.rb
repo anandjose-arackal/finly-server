@@ -322,7 +322,16 @@ class Reports::Violation < Reports::Base
       dates << expense.usage_date_start
     else
       # Both usage_date_start and usage_date_end is defined, so use all dates in the range for budget check
+      if expense.usage_date_type == 'hotel'
+        start_date = expense.usage_date_start.to_date
+        end_date = expense.usage_date_end.to_date
+        if start_date != end_date
+          end_date = end_date - 1.days
+        end
+        dates += (expense.usage_date_start.to_date..end_date).to_a
+      else
       dates += (expense.usage_date_start.to_date..expense.usage_date_end.to_date).to_a
+      end
     end
     dates.each do |date|
       start_date = nil

@@ -47,7 +47,7 @@ class Admin::Implementations::Master::Budgets::ImportCriteriaTemplate < Admin::I
 
       # getting the records of each model
 
-      records = sheet_name.constantize.where(company_id: company.id) rescue []
+      records = sheet_name.constantize.where(company_id: company.id).non_deleted rescue []
       contents = []
 
       worksheet = workbook.add_worksheet(sheet_name)

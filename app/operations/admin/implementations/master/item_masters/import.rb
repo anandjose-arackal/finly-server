@@ -17,6 +17,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
       :rate => "Rate",
       :tax_rate_id => "Tax Rate Id",
       :unit_of_measurement => "UOM",
+      :sku => "SKU",
       :destroy => "Destroy"
   })or :item_params
   def create_record(data)
@@ -77,6 +78,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
     item_expense_type_id = item_expense_types.where(name: data[:item_expense_type].to_s&.downcase)&.first&.id
     product_type_id = nil
     tax_rate_id = data[:tax_rate_id]&.to_f
+    sku = data[:sku]
     if data[:good_service].to_s.upcase == 'G'
       product_type = 'goods'
     elsif data[:good_service].to_s.upcase == 'S'
@@ -127,7 +129,8 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
          rate: rate,
          tds_applicable: tds_applicable,
          unit_of_measurement: unit_of_measurement,
-         tax_rate_id: tax_rate_id
+         tax_rate_id: tax_rate_id,
+         sku: sku
     }, messages]
   end
 

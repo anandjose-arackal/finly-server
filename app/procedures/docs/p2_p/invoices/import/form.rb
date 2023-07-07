@@ -25,7 +25,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2  }}",
       item_tds_amount: "{% if row.tds_applicable == 'true' %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100.00 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
-      item_net_amount: "{% if form.rcm_enabled == true %}{{ row.item_taxable_amount | default: 0 | round: 2 }}{% else %}{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}{% endif %}",
+      item_net_amount: "{% if form.rcm_enabled == true or form.rcm_enabled == 'TRUE' %}{{ row.item_taxable_amount | default: 0 | round: 2 }}{% else %}{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}{% endif %}",
       item_billable_amount:  "{{ row.item_taxable_amount| default: 0 | round: 2 }}", # todo - I2P will be different for PO invoice
 
         # CONVERTED VALUES
@@ -45,14 +45,14 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
       invoice_freight_amount: "{{ form.invoice_freight_amount | default: 0 | round: 2}}",
       # NET AMOUNT
-      invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}",
+      invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true or form.rcm_enabled == 'TRUE'  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}",
       # invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | default: 0 | round: 2}}",
       invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
 
       
       #### net payable amount 
       # invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != form.reporting_currency_id %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
-      invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ amount | default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}",
+      invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' or form.base_currency_id == #{Currency.id_for('INR')} %}{{ amount | default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}",
       invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.invoice_tds_amount | default: 0 | round: 2}}",
       
       #### net payable amount has roundoff value added
@@ -102,22 +102,22 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
   # INVOICE STATUS
   section :status do
-    lookup :invoice_status_id,
-           choices_scope: Choices[:lookup].('inward_invoice_statuses'),
-           # Choices[:enum].(InwardInvoiceStatus),
-           required: false, editable: false,
-           default_value: InwardInvoiceStatus.id_for(:open),
-           can_editable_be_changed: false
+    # lookup :invoice_status_id,
+    #        choices_scope: Choices[:lookup].('inward_invoice_statuses'),
+    #        # Choices[:enum].(InwardInvoiceStatus),
+    #        required: false, editable: false,
+    #        default_value: InwardInvoiceStatus.id_for(:open),
+    #        can_editable_be_changed: false
   end
 
   # INVOICE DETAILS
   section :invoice_details, title: "Invoice Details", associate_custom_fields: true do
     # lookup :credit_notes_presence, visible: false, editable: false, can_visible_be_changed: false, can_editable_be_changed: false
 
-    auto_number :invoice_id,
-                label: "Sequence Number",
-                editable: false,
-                sequence: { prefix: "INV", start_at: '00001' }
+    # auto_number :invoice_id,
+    #             label: "Sequence Number",
+    #             editable: false,
+    #             sequence: { prefix: "INV", start_at: '00001' }
 
     switch :form_migrated,
            default_value: true,
@@ -184,16 +184,17 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
 
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
-    # number :conversion_rate, editable: true, format: 'decimal', max_decimal_places: 5, default_value: 1, computed: Forms::Compute::Lookup('base_currency_id', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency_id}}"}), visible: true
+    number :conversion_rate, editable: true, format: 'decimal', max_decimal_places: 5, default_value: 1, computed: Forms::Compute::Lookup('base_currency_id', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency_id}}"}), visible: true, hide_in_import: true
   end
 
   # VENDOR DETAILS
   section :vendor_details, title: "Vendor Details", associate_custom_fields: true do
-    lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
+    lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('approved_vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false, display_key: true
 
     lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
-    lookup :vendor_country_id, editable: false, visible: false, choices_scope: Choices[:lookup].('countries')
+    text :vendor_country_id, editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id}}')
+    text :vendor_country_id_value, editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id_value}}')
 
     text :vendor_sequence_id, "Vendor ID", editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
@@ -209,8 +210,8 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
     switch :rcm_enabled, label: "RCM Enabled", editable: true, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.rcm_enabled}}'), default_value: true
 
-    # text :vendor_bank_account_number, editable: false, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
-    # text :vendor_bank_account_ifsc, editable: false, required: true, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
+    text :vendor_bank_account_number, editable: false, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}'), hide_in_import: true
+    text :vendor_bank_account_ifsc, editable: false, required: true, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}'), hide_in_import: true
     # text :vendor_bank_account_swift_code, editable: false, visible: false, required: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.swift_code}}')
   end
 
@@ -220,7 +221,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            filters: Rules::Builder['billable_location'].true, required: true
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), visible: false
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), visible: false
-    large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
+    large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}'), hide_in_import: true
     text :billing_state_name, computed: Forms::Compute::Lookup('location_id', '{{record.state_name}}'), visible: false
   end
 
@@ -230,7 +231,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            filters: Rules::Builder['shippable_location'].true, required: true
     text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}'), visible: false
     text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}'), visible: false
-    large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
+    large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}'), hide_in_import: true
   end
 
   # INVOICE ITEMS
@@ -250,42 +251,43 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration", size: FormEntity::SIZES[:medium], editable: false
-      text :item_number, label: "Item Code", editable: false,
+      text :item_number, label: "Item Code", editable: false, visible: false,
         computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
           size: FormEntity::SIZES[:small]
 
-      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
+      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
-      # lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
-      # lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
+      lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
+      lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}, size: FormEntity::SIZES[:medium]
+      lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), size: FormEntity::SIZES[:medium]
 
-      # text :gl_code, label: "GL Code", editable: false, visible: false,
-      #   computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
+      text :gl_code, label: "GL Code", editable: false, visible: false,
+        computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
       
-      # text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
-      #       computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), size: FormEntity::SIZES[:small]
+      text :hsn_sac, label: "HSN/SAC", editable: true, visible: false,
+            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), size: FormEntity::SIZES[:small]
 
-      # lookup :tds_applicable, visible: false, editable: false,
-      #        can_editable_be_changed: false,
-      #        can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
-      #        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), size: FormEntity::SIZES[:small]
+      lookup :tds_applicable, visible: false, editable: false,
+             can_editable_be_changed: false,
+             can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), size: FormEntity::SIZES[:small]
 
       # currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
       number :quantity, label: "Quantity", editable: false, visible: true, required: true, min_value: 1, default_value: 1, size: FormEntity::SIZES[:small] # todo - condition
 
       dropdown :unit_of_measurement, label: "Unit of Measurement",
                choices_scope: Choices[:list].(*Unit.all.map { |v| { id: v.value, name: v.name } }),
-               required: true, editable: false, visible: true,
-               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}'), size: FormEntity::SIZES[:medium]
+               required: true, editable: false, visible: true, size: FormEntity::SIZES[:medium]
 
       amount :item_rate,
              label: "Item Rate (Reporting Currency)",
+             label: "Item Rate (Reporting Currency)",
              computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
-             visible: true,
+             visible: false,
              editable: false,
-             size: FormEntity::SIZES[:small]
+             size: FormEntity::SIZES[:small],
+             hide_in_import: true
 
       amount :rate, label: "Rate (Base Currency)",
              can_editable_be_changed: false,
@@ -332,10 +334,10 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_taxable_amount]),
       #        size: FormEntity::SIZES[:small]
 
-      lookup :tax_rate_id, label: "Tax Rate", editable: false, visible: true, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
+      lookup :tax_rate_id, label: "Tax Rate", editable: false, visible: true, choices_scope: Choices[:lookup].('tax_rates')
 
       # tax # tax percentage
-      number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}'), size: FormEntity::SIZES[:small]
+      number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}'), size: FormEntity::SIZES[:small], hide_in_import: true
 
       amount :item_tax_amount, label: 'Item Tax Amount', editable: false, visible: true,
              can_editable_be_changed: false,
@@ -500,7 +502,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       #        can_editable_be_changed: false,
       #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_paid_outside_amount])
 
-      number :invoice_roundoff_amount, label: 'Roundoff Amount', visible: false, editable: false,
+      number :invoice_roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount]), hide_in_import: true # todo - changd name
 
       amount :reporting_invoice_roundoff_amount, label: 'Roundoff Amount(Reporting Currency)', editable: false, visible: false,
@@ -682,13 +684,12 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
   #   action :required, false
   # end
 
-  # condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
-  #   reference :entity, 'items.items_department_id'
-  #   rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
-  #   action :visible, true
-  #   action :required, true
-  #   action :editable, true
-  # end
+  condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
+    reference :entity, 'items.items_department_id'
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
+    action :visible, true
+    action :required, true
+  end
 
   condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'department_id'
@@ -698,13 +699,12 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     action :editable, false
   end
 
-  # condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
-  #   reference :entity, 'items.items_cost_center_id'
-  #   rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
-  #   action :visible, true
-  #   action :required, true
-  #   action :editable, true
-  # end
+  condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
+    reference :entity, 'items.items_cost_center_id'
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
+    action :visible, true
+    action :required, true
+  end
 
   condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'cost_center_id'
@@ -722,8 +722,8 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
   # condition condition_id: "Hide Roundoff for different currency" do
   #   reference :entity, 'items_summary.invoice_roundoff_amount'
-  #   rule Rules::Builder[:base_currency_id].eq(value: '1').and(Rules::Builder[:reporting_currency_id].eq(value: '1'))
-  #   action :visible, true
+  #   rule Rules::Builder[:base_currency_id].not_eq(value: '1')
+  #   action :visible, false
   # end
 
   # condition condition_id: "Hide Net Amount (Reporting Currency)" do

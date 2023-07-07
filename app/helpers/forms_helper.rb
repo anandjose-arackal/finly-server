@@ -89,6 +89,10 @@ module FormsHelper
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
         elsif form_entity.entity_type == 'dropdown'
           # form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_s})
+          if form_entity.entity_key == 'selected'
+            value = model.selected || 0
+            form_data.merge!({"#{form_entity.entity_key}" => value})
+          end
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
         elsif form_entity.entity_type == 'amount'|| form_entity.entity_type == 'number'
           max_decimal_place = (form_entity.entity_key == 'conversion_rate' ? 5 : 2)
