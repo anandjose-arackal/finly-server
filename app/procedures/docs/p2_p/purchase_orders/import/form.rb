@@ -529,7 +529,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
   condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
     reference :entity, 'vendor_bank_account_swift_code'
     rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, true
+    action :visible, false
     action :required, true
   end
 
@@ -703,11 +703,11 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: "Enable PR Number for POs from PR" do
-    reference :entity, 'items.pr_number'
-    rule Rules::Builder['row.purchase_request_item_id'].present.and(Rules::Builder['row.purchase_request_item_id'].not_eq(value: ''))
-    action :visible, true
-  end
+  # condition condition_id: "Enable PR Number for POs from PR" do
+  #   reference :entity, 'items.pr_number'
+  #   rule Rules::Builder['row.purchase_request_item_id'].present.and(Rules::Builder['row.purchase_request_item_id'].not_eq(value: ''))
+  #   action :visible, false
+  # end
 
   condition condition_id: "Items quantity  not be editable once unless in editable status" do
     reference :entity, 'items.quantity'
