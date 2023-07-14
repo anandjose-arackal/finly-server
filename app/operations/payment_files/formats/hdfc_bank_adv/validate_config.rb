@@ -14,4 +14,8 @@ class PaymentFiles::Formats::HdfcBankAdv::ValidateConfig < PaymentFiles::Formats
     self.options = (params[:options] or config.options)
   end
 
+  def validate
+
+  end
+
 end
