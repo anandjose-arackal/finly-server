@@ -139,11 +139,11 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
     dropdown :discount_type_id, label: "Discount Type", editable: false, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
     dropdown :gst_type_id, label: "Tax Type", editable: false, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } }), computed: Forms::Compute::Form(LIQUID_FORMULAE[:form][:tax_type]), hide_in_import: true
 
-    date :conversion_date, label: "Conversion Date", editable: true, visible: true, triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}, hide_in_import: true
-    lookup :reporting_currency_id, label: "Reporting Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: false, can_editable_be_changed: false, hide_in_import: true
+    date :conversion_date, label: "Conversion Date", editable: true, visible: false, triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}, hide_in_import: true
+    lookup :reporting_currency_id, label: "Reporting Currency", choices_scope: Choices[:lookup].('currencies'), visible: false, editable: false, can_editable_be_changed: false, hide_in_import: true
     lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: false
     # switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
-    number :conversion_rate, editable: true, format: 'decimal', max_decimal_places: 5, default_value: 1, computed: Forms::Compute::Lookup('base_currency_id', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency_id}}"}), visible: true, hide_in_import: true
+    number :conversion_rate, editable: true, format: 'decimal', max_decimal_places: 5, default_value: 1, computed: Forms::Compute::Lookup('base_currency_id', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency_id}}"}), visible: false, hide_in_import: true
   end
 
   # VENDOR DETAILS
@@ -151,39 +151,39 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
 
-    lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.user_id}}" }), hide_in_import: true
-    lookup :vendor_country_id, editable: false, visible: true, choices_scope: Choices[:lookup].('countries'), hide_in_import: true
+    text :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.user_id}}" }), hide_in_import: true
+    lookup :vendor_country_id, editable: false, visible: false, choices_scope: Choices[:lookup].('countries'), hide_in_import: true
 
-    text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}'), hide_in_import: true
+    text :vendor_sequence_id, "Vendor ID", editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}'), hide_in_import: true
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
-    text :vendor_gstin, "Vendor GSTIN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}'), hide_in_import: true # todo - condition
-    text :vendor_pan, "Vendor PAN", editable: false, hide_in_import: true # todo - add condition
-    text :vendor_state_name, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_name}}'), visible: false, hide_in_import: true
+    text :vendor_gstin, "Vendor GSTIN", editable: false, visible: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}'), hide_in_import: true # todo - condition
+    text :vendor_pan, "Vendor PAN", editable: false, visible: false, hide_in_import: true # todo - add condition
+    text :vendor_state_name, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_name}}'), visible: false, hide_in_import: true
 
     lookup :bank_account_id, label: "Bank Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
            editable: true, visible: true, required: true
 
-    text :vendor_poc_name, label: 'Poc Name', visible: true, editable: false, can_editable_be_changed: false,
+    text :vendor_poc_name, label: 'Poc Name', visible: false, editable: false, can_editable_be_changed: false,
            computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_name}}'), hide_in_import: true
-    text :vendor_poc_email, label: 'Poc Email', visible: true, editable: false, can_editable_be_changed: false,
+    text :vendor_poc_email, label: 'Poc Email', visible: false, editable: false, can_editable_be_changed: false,
            computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_email}}'), hide_in_import: true
-    text :vendor_poc_mobile_number, label: 'Poc Mobile Number', visible: true, editable: false, can_editable_be_changed: false,
+    text :vendor_poc_mobile_number, label: 'Poc Mobile Number', visible: false, editable: false, can_editable_be_changed: false,
            computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_mobile_number}}'), hide_in_import: true
 
     # need to add these fields as system fields
-    text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.account_number}}'), hide_in_import: true
-    text :vendor_bank_account_ifsc, editable: false, required: true, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.ifsc}}'), hide_in_import: true
-    text :vendor_bank_account_swift_code, editable: false, visible: false, required: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.swift_code}}'), hide_in_import: true
+    text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.account_number}}'), hide_in_import: true, visible: false
+    text :vendor_bank_account_ifsc, editable: false, required: true, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.ifsc}}'), hide_in_import: true, visible: false
+    text :vendor_bank_account_swift_code, editable: false, visible: false, required: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.swift_code}}'), hide_in_import: true, visible: false
   end
 
   # BILLING ADDRESS
   section :billing_address do
     lookup :location_id, label: 'Company Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
            filters: Rules::Builder['billable_location'].true, required: true
-    text :billing_address_name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), hide_in_import: true
-    text :billing_address_gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), hide_in_import: true
+    text :billing_address_name, editable: false, visible: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), hide_in_import: true
+    text :billing_address_gstin, editable: false, visible: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), hide_in_import: true
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}'), hide_in_import: true
     text :billing_state_name, computed: Forms::Compute::Lookup('location_id', '{{record.state_name}}'), visible: false, hide_in_import: true
   end
@@ -192,8 +192,8 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
   section :shipping_address do
     lookup :delivery_location_id, label: 'Delivery Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
            filters: Rules::Builder['shippable_location'].true, required: true
-    text :shipping_address_name, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}'), hide_in_import: true
-    text :shipping_address_gstin, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}'), hide_in_import: true
+    text :shipping_address_name, editable: false, visible: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}'), hide_in_import: true
+    text :shipping_address_gstin, editable: false ,visible: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}'), hide_in_import: true
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}'), hide_in_import: true
   end
 
@@ -221,10 +221,10 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
               computed: Forms::Compute::Lookup('items.purchase_request_item_id', "{{record.pr_number}}"), hide_in_import: true
 
       text :comment, label: "Narration"
-      text :item_number, label: "Item Code", editable: false, 
+      text :item_number, label: "Item Code", editable: false, visible: false,
         computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'), hide_in_import: true
 
-      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, hide_in_import: true
+      lookup :product_type_id, label: "Product Type", visible:false, choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, hide_in_import: true
 
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments')
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
@@ -232,13 +232,13 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
       lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
       # Prakash implemented this with items.category but for some reason it always return '' even if value is present in db
-      text :gl_code, label: "GL Code", editable: false, visible: true, 
+      text :gl_code, label: "GL Code", editable: false, visible: false,
           computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.gl_code}}'), hide_in_import: true
       
-      text :hsn_sac, label: "HSN/SAC", editable: false, visible: true,
+      text :hsn_sac, label: "HSN/SAC", editable: false, visible: false,
         computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), hide_in_import: true
 
-      lookup :tds_applicable, visible: true, editable: false, can_editable_be_changed: false, can_visible_be_changed: false, 
+      lookup :tds_applicable, visible: false, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
              choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), hide_in_import: true
 
@@ -249,7 +249,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
                required: true, editable: false, visible: true,
                computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
 
-      amount :item_rate, label: "Item Rate (Reporting Currency)", visible: true, editable: false,
+      amount :item_rate, label: "Item Rate (Reporting Currency)", visible: false, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_rate]), hide_in_import: true
 
       amount :rate, label: "Rate (Base Currency)",
@@ -258,11 +258,11 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency_id}}", reporting_currency_id: "{{form.reporting_currency_id}}", conversion_rate: "{{form.conversion_rate}}"})
 
       # # gross_amount = rate x quantity
-      amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: true,
+      amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: false,
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_gross_amount]), hide_in_import: true
 
-      amount :reporting_item_gross_amount, label: 'Item Gross Amount(Reporting Currency)', editable: false, visible: true,
+      amount :reporting_item_gross_amount, label: 'Item Gross Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_gross_amount]), hide_in_import: true
 
@@ -276,7 +276,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_discount_amount]), hide_in_import: true
 
-      amount :item_taxable_amount, label: 'Item Taxable Amount', editable: false, visible: true, can_editable_be_changed: false,
+      amount :item_taxable_amount, label: 'Item Taxable Amount', editable: false, visible: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount]), hide_in_import: true
 
       amount :reporting_item_taxable_amount, label: 'Item Taxable Amount(Reporting Currency)', editable: false, visible: false,
@@ -349,7 +349,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_sub_total_amount]) # todo - changd name
 
-      amount :reporting_po_sub_total_amount, label: 'Net Amount(Reporting Currency)', editable: false, visible: true,
+      amount :reporting_po_sub_total_amount, label: 'Net Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_sub_total_amount]) # todo - changd name
 
@@ -372,50 +372,11 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_balance_due])
 
-      amount :reporting_po_balance_due, label: "Balance Payable(Reporting Currency)", editable: false, visible: true,
+      amount :reporting_po_balance_due, label: "Balance Payable(Reporting Currency)", editable: false, visible: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_balance_due]),
              can_visible_be_changed: false, can_editable_be_changed: false
     end
   end
-
-  # Advance Payment
-  # section :document_advance, title: "Document Advance" do
-  #   dropdown :advance_amount_required, label: "Required ", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 'true', name: 'Yes' }, { id: 'false', name: 'No' }), default_value: 'false'
-      
-  #   amount :po_requested_advance_amount, label: "Amount", editable: false, visible: true,
-  #          can_editable_be_changed: false, can_visible_be_changed: false,
-  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_requested_advance_amount])
-
-  #   amount :reporting_po_requested_advance_amount, label: "Reporting Amount", editable: false, visible: true,
-  #          can_editable_be_changed: false,
-  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_requested_advance_amount])
-
-  #   lookup :advance_tds_slab_id, label: 'Tds Rate-(%)', choices_scope: Choices[:lookup].('tds_slabs'), 
-  #          visible: true, editable: false
-
-  #   number :po_advance_tds_percentage, internal: true, editable: false, visible: true,
-  #          can_editable_be_changed: false, can_visible_be_changed: false,
-  #          computed: Forms::Compute::Lookup('advance_tds_slab_id', '{{record.tds}}')
-
-  #   amount :po_advance_tds_amount, label: "Tds Amount", editable: false, visible: true,
-  #          can_editable_be_changed: false, can_visible_be_changed: false,
-  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_advance_tds_amount])
-    
-  #   amount :reporting_po_advance_tds_amount, label: "Reporting Tds Amount", editable: false, visible: true,
-  #          can_editable_be_changed: false, can_visible_be_changed: false,
-  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_tds_amount])
-
-  #   amount :po_advance_amount, label: "Net Advance Amount", editable: false, visible: true,
-  #          can_editable_be_changed: false, can_visible_be_changed: false,
-  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_advance_amount])
-
-  #   amount :reporting_po_advance_amount, label: "Reporting Net Advance Amount", editable: false, visible: true,
-  #          can_editable_be_changed: false, can_visible_be_changed: false,
-  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_amount])
-
-  #   lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
-  #          can_editable_be_changed: false, can_visible_be_changed: false
-  # end
 
   section :document_advance, title: "Document Advance" do
     switch :advance_amount_required, label: "Required", editable: true, visible: true, required: true, default_value: false
@@ -424,7 +385,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
            can_editable_be_changed: false, can_visible_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_requested_advance_amount])
 
-    amount :reporting_po_requested_advance_amount, label: "Reporting Amount", editable: false, visible: true,
+    amount :reporting_po_requested_advance_amount, label: "Reporting Amount", editable: false, visible: false,
            can_editable_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_requested_advance_amount]), hide_in_import: true
 
@@ -443,12 +404,12 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
            can_editable_be_changed: false, can_visible_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_advance_amount]), hide_in_import: true
 
-    amount :reporting_po_advance_amount, label: "Reporting Net Advance Amount", editable: false, visible: true,
+    amount :reporting_po_advance_amount, label: "Reporting Net Advance Amount", editable: false, visible: false,
            can_editable_be_changed: false, can_visible_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_amount]), hide_in_import: true
 
     date :advance_scheduled_date, label: "Scheduled Date", editable: true, visible: true, required: true
-    lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
+    lookup :advance_amount_status_id, label: 'Status', editable: false, visible: false,
            can_editable_be_changed: false, can_visible_be_changed: false, choices_scope: Choices[:lookup].('advance_amount_statuses'),
            default_value: AdvanceAmountStatus.id_for(:new), hide_in_import: true
        
@@ -660,11 +621,11 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
     action :editable, false
   end
 
-  condition condition_id: "Hide Conversion Rate for Indian currency" do
-    reference :entity, 'conversion_rate'
-    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
-    action :visible, false
-  end
+  # condition condition_id: "Hide Conversion Rate for Indian currency" do
+  #   reference :entity, 'conversion_rate'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+  #   action :visible, false
+  # end
 
   condition condition_id: "Hide Roundoff for different currency" do
     reference :entity, 'items_summary.po_roundoff_amount'
