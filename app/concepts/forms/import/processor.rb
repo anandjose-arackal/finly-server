@@ -289,10 +289,12 @@ class Forms::Import::Processor
     return if records_to_save.empty?
 
     records_to_save.each do |record, import_record|
-      record.items&.each do |item|
-        item.id = nil
+      if record.is_a? Invoice
+        record.items&.each do |item|
+          item.id = nil
+        end
+        record.import_job_id = import_job.id
       end
-      record.import_job_id = import_job.id
       if record.save
         if record.class == YesBankVendor
           submit_params = { reviewal_document: record }
