@@ -28,7 +28,7 @@ class Forms::Import::Ops::Create < Transactions::API
 
   def validate_attachments(context, params:, model:, **)
 
-    params['invoice_attachments'].reject! {|attachment| attachment['_destroy'] == true}
+    params['invoice_attachments'].reject! {|attachment| attachment['_destroy'] == true} if params['invoice_attachments'].present?
 
     if model.class == Invoice
       unless params['invoice_attachments'].present?
