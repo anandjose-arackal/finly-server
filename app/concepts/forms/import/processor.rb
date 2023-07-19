@@ -604,7 +604,8 @@ class Forms::Import::Processor
     form_data[:form] = form
     form_data[:is_import_process] = true
 
-    if form_data[:id].present?
+    record_id = form_data[:id] || form_data['id']
+    if record_id.present?
       form_data[:record_query] = { id: form_data[:id] }
     end
 
