@@ -91,7 +91,7 @@ class Forms::Import::Processor
 
     records_data = build_records_data(imported_sheet)
     records_data.each_with_index do |record_data, row_index|
-      begin
+      # begin
         form_data = build_form_data(record_data[:record_data], nil)
         result = process_form_data(form_data, true)
         if result.success?
@@ -103,11 +103,11 @@ class Forms::Import::Processor
         end
 
         add_record_to_result_file(record_data[:record_data], {}, result[:model].id, message, worksheets, worksheets_length)
-      rescue => exception
-        message = "Unable to process, #{exception}"
-        request.item_complete(false)
-        add_record_to_result_file(record_data[:record_data],{}, nil, message, worksheets, worksheets_length)
-      end
+      # rescue => exception
+      #   message = "Unable to process, #{exception}"
+      #   request.item_complete(false)
+      #   add_record_to_result_file(record_data[:record_data],{}, nil, message, worksheets, worksheets_length)
+      # end
     end
 
     workbook.close
