@@ -561,7 +561,7 @@ class Forms::Import::Processor
       end
     end
 
-    form_data = perform_form_calculations(form_data) if form.model == Invoice
+    form_data = perform_form_calculations(form_data) if [Invoice, PurchaseOrder].include? form.model
 
     dropdowns = headers[form.model.name][:headers].values.select{|header_value| header_value['entity_type'] == 'dropdown'}
     dropdowns.each do |header_data|
