@@ -268,7 +268,8 @@
           <th style="min-width: 140px;">Name/Description</th>
           <th>Comment</th>
           <th class="text-center">Qty</th>
-          <th class="text-center">Unit of Measure</th>
+          <th class="text-center">Unit of Measurement</th>
+          <th class="text-center ">HSN SAC</th>
           <th class="text-right">Rate</th>
           <th class="text-right">Discount</th>
           <th class="text-right">Tax
@@ -290,6 +291,7 @@
             <td class="font-light-gray"><div><%= item.comment %></div></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
             <td class="text-center font-light-gray"><%= item.unit_of_measurement %></td>
+            <td class="text-center font-light-gray"><%= item.hsn_sac %></td>
             <td class="text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.rate, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) %></td>
             <td class="text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
             <td class="text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
