@@ -568,19 +568,19 @@ class PurchaseOrder < ApplicationRecord
 
   # backward compatible fields
   def po_balance_due
-    forms_enabled ? self[:po_balance_due].to_f : self.balance_amount.value.to_f
+    forms_enabled ? self[:po_balance_due].to_f : self.balance_amount.value.to_f rescue 0
   end
 
   def reporting_po_balance_due
-    forms_enabled ? self[:reporting_po_balance_due].to_f : self.balance_amount.value.to_f
+    forms_enabled ? self[:reporting_po_balance_due].to_f : self.balance_amount.value.to_f resue 0
   end
 
   def po_sub_total_amount
-    forms_enabled ? self[:po_sub_total_amount].to_f : self.total_after_tax.value.to_f
+    forms_enabled ? self[:po_sub_total_amount].to_f : self.total_after_tax.value.to_f rescue 0
   end
 
   def reporting_po_sub_total_amount
-    forms_enabled ? self[:reporting_po_sub_total_amount].to_f : self.total_after_tax.value.to_f
+    forms_enabled ? self[:reporting_po_sub_total_amount].to_f : self.total_after_tax.value.to_f rescue 0
   end
 
   
