@@ -30,8 +30,7 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
 
     self.user_info = {}
     self.user_info[:email] = data[:email]
-    user = User.find_by(email: user_info[:email])
-
+    user = User.where(active: true).find_by(email: user_info[:email])
     fail_with_event :on_blank_username, "Invalid username"
     if user.present?
       self.user_info[:user] = user
