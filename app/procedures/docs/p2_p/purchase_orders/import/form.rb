@@ -129,6 +129,13 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
          visible: true, required: true, editable: false
 
     switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false, editable: false
+
+    switch :form_migrated,
+           default_value: true,
+           visible: false,
+           editable: false,
+           can_editable_be_changed: false,
+           can_visible_be_changed: false
   end
 
   # ACCOUNTING DETAILS
@@ -152,25 +159,26 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
 
     text :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.user_id}}" }), hide_in_import: true
-    lookup :vendor_country_id, editable: false, visible: false, choices_scope: Choices[:lookup].('countries'), hide_in_import: true
+    text :vendor_country_id, editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id}}')
+    text :vendor_country_id_value, editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id_value}}')
 
     text :vendor_sequence_id, "Vendor ID", editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}'), hide_in_import: true
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, "Vendor GSTIN", editable: false, visible: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}'), hide_in_import: true # todo - condition
-    text :vendor_pan, "Vendor PAN", editable: false, visible: false, hide_in_import: true # todo - add condition
+    # text :vendor_pan, "Vendor PAN", editable: false, visible: false, hide_in_import: true # todo - add condition
     text :vendor_state_name, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_name}}'), visible: false, hide_in_import: true
 
     lookup :bank_account_id, label: "Bank Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
            editable: true, visible: true, required: true
 
-    text :vendor_poc_name, label: 'Poc Name', visible: false, editable: false, can_editable_be_changed: false,
-           computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_name}}'), hide_in_import: true
-    text :vendor_poc_email, label: 'Poc Email', visible: false, editable: false, can_editable_be_changed: false,
-           computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_email}}'), hide_in_import: true
-    text :vendor_poc_mobile_number, label: 'Poc Mobile Number', visible: false, editable: false, can_editable_be_changed: false,
-           computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_mobile_number}}'), hide_in_import: true
+    # text :vendor_poc_name, label: 'Poc Name', visible: false, editable: false, can_editable_be_changed: false,
+    #        computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_name}}'), hide_in_import: true
+    # text :vendor_poc_email, label: 'Poc Email', visible: false, editable: false, can_editable_be_changed: false,
+    #        computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_email}}'), hide_in_import: true
+    # text :vendor_poc_mobile_number, label: 'Poc Mobile Number', visible: false, editable: false, can_editable_be_changed: false,
+    #        computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_mobile_number}}'), hide_in_import: true
 
     # need to add these fields as system fields
     text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.account_number}}'), hide_in_import: true, visible: false
@@ -529,55 +537,54 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
   condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
     reference :entity, 'vendor_bank_account_swift_code'
     rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
     action :required, true
   end
 
   condition condition_id: "Disable Vendor Location > No Location for International Vendors" do
     reference :entity, 'gstin_location_id'
     rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
+    # action :visible, false
     action :required, false
   end
 
   condition condition_id: "Disable Vendor Gstin > No Gstin for International Vendors" do
     reference :entity, 'vendor_gstin'
     rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
+    # action :visible, false
     action :required, false
   end
 
-  condition condition_id: "Disable Vendor Pan > No Pan for International Vendors" do
-    reference :entity, 'vendor_pan'
-    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
-    action :required, false
-  end
+  # condition condition_id: "Disable Vendor Pan > No Pan for International Vendors" do
+  #   reference :entity, 'vendor_pan'
+  #   rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+  #   action :visible, false
+  #   action :required, false
+  # end
 
-  condition condition_id: "Disable Vendor POC name for international vendors" do
-    reference :entity, 'vendor_poc_name'
-    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
-  end
+  # condition condition_id: "Disable Vendor POC name for international vendors" do
+  #   reference :entity, 'vendor_poc_name'
+  #   rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+  #   action :visible, false
+  # end
 
-  condition condition_id: "Disable Vendor POC email for international vendors" do
-    reference :entity, 'vendor_poc_email'
-    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
-  end
+  # condition condition_id: "Disable Vendor POC email for international vendors" do
+  #   reference :entity, 'vendor_poc_email'
+  #   rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+  #   action :visible, false
+  # end
 
-  condition condition_id: "Disable Vendor POC mobile for international vendors" do
-    reference :entity, 'vendor_poc_mobile_number'
-    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
-  end
+  # condition condition_id: "Disable Vendor POC mobile for international vendors" do
+  #   reference :entity, 'vendor_poc_mobile_number'
+  #   rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+  #   action :visible, false
+  # end
 
-  condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
-    reference :entity, 'vendor_bank_account_ifsc'
-    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
-    action :required, false
-  end
+  # condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
+  #   reference :entity, 'vendor_bank_account_ifsc'
+  #   rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+  #   action :visible, false
+  #   action :required, false
+  # end
 
   condition condition_id: "Disable HSN/SAC for international vendor" do
     reference :entity, 'items.hsn_sac'

@@ -81,7 +81,7 @@
 #
 
 class PurchaseOrder < ApplicationRecord
-  attr_accessor :skip_callback
+  attr_accessor :skip_callback, :vendor_country_id_value
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include Concerns::ErpSyncConcern
   include LiquidDroppable
@@ -182,7 +182,6 @@ class PurchaseOrder < ApplicationRecord
   accepts_nested_attributes_for :custom_fields
   # accepts_nested_attributes_for :requested_advance_amount
   # accepts_nested_attributes_for :advance_payments
-
 
   validates :purchase_order_status_id, presence: true
 
@@ -572,7 +571,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def reporting_po_balance_due
-    forms_enabled ? self[:reporting_po_balance_due].to_f : self.balance_amount.value.to_f resue 0
+    forms_enabled ? self[:reporting_po_balance_due].to_f : self.balance_amount.value.to_f rescue 0
   end
 
   def po_sub_total_amount
@@ -582,7 +581,6 @@ class PurchaseOrder < ApplicationRecord
   def reporting_po_sub_total_amount
     forms_enabled ? self[:reporting_po_sub_total_amount].to_f : self.total_after_tax.value.to_f rescue 0
   end
-
   
   def set_currency
     self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 

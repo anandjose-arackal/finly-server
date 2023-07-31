@@ -289,18 +289,22 @@ class Forms::Import::Processor
     return if records_to_save.empty?
 
     records_to_save.each do |record, import_record|
-      if record.is_a? Invoice
+      if [Invoice, PurchaseOrder].include? form.model
         record.items&.each do |item|
           item.id = nil
         end
         record.import_job_id = import_job.id
+        if form.model == PurchaseOrder
+          record.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
+          record.form_migrated = true
+        end
       end
       if record.save
+        policy = record.policy
         if record.class == YesBankVendor
           submit_params = { reviewal_document: record }
           op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
         elsif record.class == Invoice
-          policy = record.policy
           document_reviewer_mappings = policy.levels.non_deleted.with_entity_type('NonPoInvoiceProvider').reorder(:level_number).map{|x| {level_id: x.id}} rescue nil
           submit_params = {
             reviewal_document: record,
@@ -308,6 +312,14 @@ class Forms::Import::Processor
             document_reviewer_mappings: document_reviewer_mappings
           }
           op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: user)
+        elsif record.class == PurchaseOrder
+          document_reviewer_mappings = policy.levels.non_deleted.with_entity_type('PurchaseOrderProvider').reorder(:level_number).map{|x| {level_id: x.id}} rescue nil
+          submit_params = {
+            reviewal_document: record,
+            policy_id: record.policy_id,
+            document_reviewer_mappings: document_reviewer_mappings
+          }
+          op = Docs::I2P::PurchaseOrders::Ops::Submit.(params: submit_params, current_user: user)
         end
         if op&.success?
           import_record.update_status(true, ['Record created successfully'].to_s, '', '')
