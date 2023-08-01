@@ -143,7 +143,7 @@ class Docs::P2P::CreditNotes::Index < IndexBuilder::API
     end
 
     # Processing
-    counter.add CreditNoteStatus.id_for(:awaiting_approval), "Processing", counts[CreditNoteStatus.id_for(:processing)].to_i
+    counter.add CreditNoteStatus.id_for(:awaiting_approval), "Processing", counts[CreditNoteStatus.id_for(:awaiting_approval)].to_i
 
     # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
     counter.add 92, 'Pending Adjustment', (

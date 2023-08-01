@@ -104,7 +104,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   def gstin_master_params(response_body)
 
     if response_body.dig(:data, :pradr, :addr).present?
-      addr_array = response_body[:data][:pradr][:addr].values.reject {|i| i.empty?}
+      addr_array = response_body[:data][:pradr][:addr]&.except(:lt, :lg)&.values&.reject {|i| i.empty?}
     else
       addr_array = []
     end
