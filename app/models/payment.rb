@@ -878,7 +878,7 @@ include Searchkick::Api
   def reset_status
     case self.parent_type
     when 'Invoice'
-      parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
+      parent_details = self.parent
       options = {}
       if parent_details.payments.all_except_failed.joins(:amount).sum(:value).round(2) < parent_details.balance_due.value.to_f
         options = {invoice_status_id: InwardInvoiceStatus.id_for(:unpaid), payable: true}
@@ -888,7 +888,7 @@ include Searchkick::Api
 
       parent_details.update options
     when 'PurchaseOrder'
-      parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+      parent_details = self.parent
       parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
     when "BbpsBill"
       parent = self.parent
