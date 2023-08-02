@@ -140,7 +140,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
 
   # ACCOUNTING DETAILS
   section :accounting_details, title: "Accounting Details", associate_custom_fields: true do
-    lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:purchase_order_initiator]), required: true, editable: false
+    lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:purchase_order_initiator, :po_bulk_importer]), required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     dropdown :discount_type_id, label: "Discount Type", editable: false, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
@@ -155,7 +155,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
 
   # VENDOR DETAILS
   section :vendor_details, title: "Vendor Details", associate_custom_fields: true do
-    lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
+    lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('approved_vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
 
     text :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.user_id}}" }), hide_in_import: true
@@ -387,7 +387,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
   end
 
   section :document_advance, title: "Document Advance" do
-    switch :advance_amount_required, label: "Required", editable: true, visible: true, required: true, default_value: false
+    switch :advance_amount_required, label: "Advance Required", editable: true, visible: true, required: true, default_value: false
 
     amount :po_requested_advance_amount, label: "Amount", editable: false, visible: true, required: true,
            can_editable_be_changed: false, can_visible_be_changed: false,
@@ -634,35 +634,35 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
   #   action :visible, false
   # end
 
-  condition condition_id: "Hide Roundoff for different currency" do
-    reference :entity, 'items_summary.po_roundoff_amount'
-    rule Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id").and(Rules::Builder[:base_currency_id].not_eq(value: Currency.id_for('INR')))
-    action :visible, false
-  end
+  # condition condition_id: "Hide Roundoff for different currency" do
+  #   reference :entity, 'items_summary.po_roundoff_amount'
+  #   rule Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id").and(Rules::Builder[:base_currency_id].not_eq(value: Currency.id_for('INR')))
+  #   action :visible, false
+  # end
 
-  condition condition_id: "Hide Net Amount (Reporting Currency)" do
-    reference :entity, 'items_summary.reporting_po_sub_total_amount'
-    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
-    action :visible, false
-  end
+  # condition condition_id: "Hide Net Amount (Reporting Currency)" do
+  #   reference :entity, 'items_summary.reporting_po_sub_total_amount'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+  #   action :visible, false
+  # end
 
-  condition condition_id: "Hide Reporting Balance Payable for Indian Currency" do
-    reference :entity, 'items_summary.reporting_po_balance_due'
-    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
-    action :visible, false
-  end
+  # condition condition_id: "Hide Reporting Balance Payable for Indian Currency" do
+  #   reference :entity, 'items_summary.reporting_po_balance_due'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+  #   action :visible, false
+  # end
 
-  condition condition_id: "Hide Reporting Advance Amount for Indian Currency" do
-    reference :entity, 'reporting_po_requested_advance_amount'
-    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
-    action :visible, false
-  end
+  # condition condition_id: "Hide Reporting Advance Amount for Indian Currency" do
+  #   reference :entity, 'reporting_po_requested_advance_amount'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+  #   action :visible, false
+  # end
 
-  condition condition_id: "Hide Reporting Advance payable amount for Indian Currency" do
-    reference :entity, 'reporting_po_advance_amount'
-    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
-    action :visible, false
-  end
+  # condition condition_id: "Hide Reporting Advance payable amount for Indian Currency" do
+  #   reference :entity, 'reporting_po_advance_amount'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+  #   action :visible, false
+  # end
 
   condition condition_id: "make advance editable and required for document advance true" do
     reference :entity, 'po_requested_advance_amount'
