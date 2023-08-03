@@ -1410,7 +1410,7 @@ class PurchaseOrder < ApplicationRecord
 
   def purchase_request_tasks
     parameters = RequestStore.store[:params]
-    if parameters[:associated_resource] == "purchase_request_item"
+    if self.import_job_id.blank? && parameters[:associated_resource] == "purchase_request_item"
       # Initially when PO is created from PR, then cost allocation item is line_item by default
       update_po_cost_allocation_items
       item_ids = self.filter_purchase_request_item_ids(parameters, user)
