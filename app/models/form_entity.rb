@@ -136,7 +136,7 @@ class FormEntity < ApplicationRecord
       'Docs::P2P::PurchaseOrders::Import::Form'
     ].include? form.klass_name
 
-    import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.downcase}_import")&.name).first
+    import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.underscore.downcase}_import")&.name).first
     return if import_form.nil?
 
     import_section = import_form.sections.where(section_id: self.section.section_id).first
