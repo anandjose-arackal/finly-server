@@ -237,7 +237,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments')
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
+      lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories')s
 
       # Prakash implemented this with items.category but for some reason it always return '' even if value is present in db
       text :gl_code, label: "GL Code", editable: false, visible: false,
@@ -254,8 +254,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
 
       dropdown :unit_of_measurement, label: "Unit of Measurement",
                choices_scope: Choices[:list].(*Unit.all.map { |v| { id: v.value, name: v.name } }),
-               required: true, editable: false, visible: true,
-               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
+               required: true, editable: false, visible: true
 
       amount :item_rate, label: "Item Rate (Reporting Currency)", visible: false, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_rate]), hide_in_import: true
@@ -291,7 +290,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_taxable_amount]), hide_in_import: true
 
-      lookup :tax_rate_id, label: "Tax Rate", editable: false, visible: true, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
+      lookup :tax_rate_id, label: "Tax Rate", editable: false, visible: true, choices_scope: Choices[:lookup].('tax_rates')
       number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}'), hide_in_import: true
 
       # tax_amount = taxable_amount x tax / 100
