@@ -156,9 +156,9 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
   # VENDOR DETAILS
   section :vendor_details, title: "Vendor Details", associate_custom_fields: true do
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('approved_vendors'), required: true, editable: false,
-           can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
+           can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false, display_key: true
 
-    text :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.user_id}}" }), hide_in_import: true
+    text :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.user_id}}" }), hide_in_import: true, display_key: true
     text :vendor_country_id, editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id}}')
     text :vendor_country_id_value, editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id_value}}')
 
@@ -237,7 +237,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments')
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories')s
+      lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories')
 
       # Prakash implemented this with items.category but for some reason it always return '' even if value is present in db
       text :gl_code, label: "GL Code", editable: false, visible: false,
