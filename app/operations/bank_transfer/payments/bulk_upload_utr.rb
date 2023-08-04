@@ -74,42 +74,10 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         next
       end
 
-      if payment.reference_resources.present? && payment.receiving_account_type == "BankAccount"
-        # payment.reference_resource.update(bank_reference_number: utr)
-        reference_resource = payment.reference_resources.first
-        # setting the utr of this transaction irrespective of the type of the transaction
-        # so if the particular class has "bank_reference_number" as an attribute, then set that,
-        # otherwise set the attribute "utr"
-        if reference_resource&.class&.column_names&.include?("bank_reference_number")
-          reference_resource.bank_reference_number = utr
-        else
-          reference_resource.utr = utr
-        end
-        payment.utr  = utr
-        payment.processed_at = credited_at
-        payments << payment
-        payment.save
-        existing_transactions << reference_resource
-      else
-        # create a bank transaction for this particular payment
-        amount = Amount.create(value: payment.amount_value, currency_id: 1)
-        if bank_transaction_class&.column_names&.include?("bank_reference_number")
-          new_transactions << bank_transaction_class.new(transfer_type: payment.payment_mode,
-                                                       bank_reference_number: utr,
-                                                       company_id: user.company_id,
-                                                       transfer_status_id: BankTransferStatus.id_for(:completed),
-                                                       bank_transaction_type_id: BankTransactionType.id_for(:outside_finly),
-                                                       beneficiary_bank_account_id: payment.receiving_account&.id,
-                                                       reference_payment_id: payment.id,
-                                                       amount_id: amount.id,
-                                                       created_at: credited_at)
-          end
-
-        payment.utr  = utr
-        payment.processed_at = credited_at
-        payment.save
-        payments << payment
-      end
+      #removed reference resources updating logic, only updating payment object in case uploading UTR
+      payment.utr  = utr
+      payment.processed_at = credited_at
+      payments << payment
       # add a success message to the result array
       file_payments.push(payment)
       self.result_array[index] << "Success!"
@@ -140,45 +108,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def update_details
-    # it will update the existing bank transactions with the bank_reference_number if present
-    if bank_transaction_class&.column_names&.include?("bank_reference_number")
-      exec_statement self.existing_transactions, true, [:bank_reference_number]
-    else
-      exec_statement self.existing_transactions, true, [:utr]
-    end
-    # will insert new records into bank transactions
-    exec_statement self.new_transactions
-    exec_statement self.payments, true, [:utr]
-    # payments_without_transactions = payment_details
-    # updating_transactions = payment_details
-    # exec_statement updating_transactions, true, [:reference_payment_id]
-    # exec_statement payments_without_transactions, true, [:reference_resource_id, :reference_resource_type]
+    exec_statement self.payments, true, [:utr,:processed_at]
   end
-
-  # def payment_details
-  #   transactions = []
-  #   utrs = self.new_transactions.pluck :bank_reference_number
-  #   newly_created_transactions = YesBankTransaction.where bank_reference_number: utrs
-  #
-  #   transactions = []
-  #   utrs.each do |utr|
-  #     transactions << newly_created_transactions.find {|transaction| transaction if transaction.bank_reference_number == utr}
-  #   end
-  #   return false if transactions.blank?
-  #
-  #   updating_transactions = []
-  #   # payments = []
-  #   transactions.each_with_index do |transaction, index|
-  #     next if transaction.blank?
-  #     payment = self.update_payments.find {|payment| payment if payment.reference_resource.bank_reference_number == transaction.bank_reference_number}
-  #     transaction.reference_payment_id = payment.id
-  #     # payment.reference_resource_type = 'YesBankTransaction'
-  #     # payment.reference_resource_id = transaction.id
-  #     updating_transactions << transaction
-  #     # payments << payment
-  #   end
-  #   updating_transactions
-  # end
 
   def exec_statement(batch, update=false, keys=[])
     if batch.blank?
