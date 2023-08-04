@@ -96,6 +96,8 @@ class FormEntity < ApplicationRecord
   has_many :choice_controlling_entities, through: :choice_dependencies, class_name: 'FormEntity', source: :controlling_entity
 
   before_save :sanitize
+  after_save :sync_with_import_form
+  after_destroy :delete_import_form_entity
 
   STATUS_ENTITIES = %w[purchase_order_status_id purchase_request_status_id invoice_status_id]
 
@@ -126,6 +128,68 @@ class FormEntity < ApplicationRecord
   scope :with_compute_type, -> (compute_type_id) { where compute_type_id: compute_type_id }
 
   serialize :filters, Rules::Adapters::Store
+
+  def sync_with_import_form
+    return if ["Docs::P2P::Invoices::Import::Form", "Masters::Vendors::Form"].include? form.klass_name
+    import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.downcase}_import")&.name).first
+    return if import_form.nil?
+
+    import_section = import_form.sections.where(section_id: self.section.section_id).first
+    import_parent = nil
+    if self.parent.present?
+      import_parent = import_form.entities.where(entity_key: self.parent.entity_key).first
+    end
+    return if import_section.nil?
+
+    if import_form.entities.where(entity_key: self.entity_key).present?
+      import_entity = import_form.entities.where(entity_key: self.entity_key).first
+      import_entity.attributes = self.attributes.except('id', 'form_section_id', 'form_id')
+      import_entity.form_section_id = import_section.uuid
+      import_entity.form_id = import_form.uuid
+      import_entity.parent_id = import_parent&.uuid
+      if self.parent&.class&.collection?
+        import_entity.editable = false
+      end
+      import_entity.save
+      self.choices.each do |choice|
+        next import_entity.choices.pluck(:name).include? choice.name
+        dup_choice = choice.dup
+        dup_choice.form_section_id = import_section.uuid
+        dup_choice.form_id = import_form.uuid
+        dup_choice.form_entity_id = import_entity.id
+        dup_choice.save
+      end
+    else
+      import_entity = self.dup
+      import_entity.id = nil
+      import_entity.form_section_id = import_section.uuid
+      import_entity.form_id = import_form.uuid
+      import_entity.parent_id = import_parent&.uuid
+      if self.parent&.class&.collection?
+        import_entity.editable = false
+      end
+      import_entity.save
+      self.choices.each do |choice|
+        dup_choice = choice.dup
+        dup_choice.form_section_id = import_section.uuid
+        dup_choice.form_id = import_form.uuid
+        dup_choice.form_entity_id = import_entity.id
+        dup_choice.save
+      end
+    end
+  end
+
+  def delete_import_form_entity
+    return if ['Docs::P2P::Invoices::Import::Form'].include? form.klass_name
+
+    import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.downcase}_import")&.name).first
+    return if import_form.nil?
+
+    if import_form.entities.where(entity_key: self.entity_key).present?
+      import_entity = import_form.entities.where(entity_key: self.entity_key).first
+      import_entity.destroy
+    end
+  end
 
   def populate_if_empty
     val = super()
@@ -278,7 +342,7 @@ class FormEntity < ApplicationRecord
       choices: choices_data,
       choices_scope: choices_scope_config,
     }
-  
+
     data_card = self.data_card_route
     data[:data_card] = data_card if data_card.present?
     data

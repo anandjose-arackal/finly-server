@@ -1,5 +1,6 @@
 class ImportRecord < ApplicationRecord
   include UUIDHelper
+  attr_accessor :skip_callback
 
   belongs_to :company
   belongs_to :import_job
@@ -9,9 +10,23 @@ class ImportRecord < ApplicationRecord
   serialize :record_data, JSON
   serialize :processed_data, JSON
 
+  after_save :sync_data, unless: :skip_callback
+
   scope :with_status_id, ->(status_id) {
     where status_id: status_id
   }
+
+  def sync_data
+    if self.processed_data.present? && self.processed_data['invoice_number'].present?
+      self.record_data['Invoice Number*'] = self.processed_data['invoice_number']
+    end
+    if self.processed_data.present? && self.processed_data['invoice_attachments'].present?
+      data = self.processed_data['invoice_attachments'].reject{ |attachment| attachment['_destroy'] == true }
+      self.processed_data['invoice_attachments'] = data
+    end
+    self.skip_callback = true
+    self.save
+  end
 
   def data_with_attachments
     json_data = record_data

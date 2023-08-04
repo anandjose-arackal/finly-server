@@ -176,13 +176,14 @@ class InvoiceLineItem < ApplicationRecord
   accepts_nested_attributes_for :billable_amount
   # ####
 
-  validates :description, presence: true
+
   validates :quantity, presence: true
   validates :rate, presence: true
 
-  # removing for now
+  # removing for now, these are not used in newer forms
   # validates_presence_of :unit_of_measurement
   # validates_presence_of :department, if: :check_outward_invoice?
+  # validates :description, presence: true
   
   # Updating this for forms, due to some unknown issue 
   before_save :set_tds_applicable

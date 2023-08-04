@@ -1,11 +1,15 @@
 class NonPoInvoiceMigrator
-  def self.perform(company_id)
+  def self.perform(company_id, invoice_ids = [])
 
     result = []
     company = Company.find company_id
     
     ActsAsTenant.with_tenant(company) do
-      documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
+      documents = if invoice_ids.present?
+                    Invoice.where(id: invoice_ids)
+                  else
+                    Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
+                  end
 
       # FormCustomField.where(company_id: company_id).destroy_all
       form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
@@ -50,7 +54,9 @@ class NonPoInvoiceMigrator
   def self.update_custome_fields form, document, company
     document.custom_fields.each do |custom_field|
       field_name = custom_field.field_configuration.field_name.split(" ").join("_").underscore
-
+      if form.entities.system_fields.pluck(:entity_key).include? field_name
+        field_name+='1'
+      end
       form_custom_field = document.form_custom_fields.where(field_key: field_name).order(updated_at: :asc).last
 
       if form_custom_field.present?
@@ -59,7 +65,7 @@ class NonPoInvoiceMigrator
 
         entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
 
-        form_entity = form.entities.where(entity_key: entity_key).first
+        form_entity = form.entities.custom_fields.where(entity_key: entity_key).first
         if form_entity.blank?
           if custom_field.value_type == 'FieldText'
             form_entity = create_text_custom_field(form, custom_field, company)
@@ -87,6 +93,9 @@ class NonPoInvoiceMigrator
     active = custom_field.field_configuration.enabled
     lable = custom_field.field_configuration.field_name
     entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
+    if form.entities.pluck(:entity_key).include? entity_key
+      entity_key += '1' # Renaming entity key if a system field has same name
+    end
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
     # is_active = !custom_field.field_configuration.deleted?
 
@@ -126,6 +135,9 @@ class NonPoInvoiceMigrator
     active = custom_field.field_configuration.enabled
     lable = custom_field.field_configuration.field_name
     entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
+    if form.entities.pluck(:entity_key).include? entity_key
+      entity_key += '1' # Renaming entity key if a system field has same name
+    end
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
     # is_active = !custom_field.field_configuration.deleted?
 

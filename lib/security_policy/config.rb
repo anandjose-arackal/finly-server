@@ -204,7 +204,8 @@ class SecurityPolicy::Config
     credit_note_auditor: :high,
     agreement_invoice_initiator: :low,
     agreement_invoice_reviewer: :medium,
-    agreement_invoice_auditor: :high
+    agreement_invoice_auditor: :high,
+    invoice_bulk_importer: :medium
   }.with_indifferent_access.freeze
 
   # ROLE_LEVELS = {

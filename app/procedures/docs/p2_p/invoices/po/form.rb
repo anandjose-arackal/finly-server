@@ -168,7 +168,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     auto_number :invoice_id, label: 'Sequence Number', editable: false, visible: true,
                              sequence: { prefix: 'INV', start_at: '00001' }
 
-    text :invoice_number, label: 'Invoice Number', required: true, unique: true
+    text :invoice_number, label: 'Invoice Number', required: true
 
     text :po_number, label: 'Po Number', required: true, editable: false
 

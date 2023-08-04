@@ -20,7 +20,7 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
   attribute :invoice_type_id, label: "Type", type: :dropdown, simple: true, choices: Choices[:list].(*INVOICE_TYPES)
   attribute :base_currency_id, label: 'Base Currency', type: :dropdown, choices: Choices[:lookup].("currencies"), active: :is_accessable
   attribute :invoice_status_id, label: 'Status', type: :dropdown, choices: Choices[:lookup].('inward_invoice_statuses')
-  attribute :policy_id, type: :dropdown, simple: false, choices: Choices[:lookup].('policies')
+  attribute :policy_id, type: :dropdown, simple: true, choices: Choices[:lookup].('policies')
   attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown, choices: Choices[:lookup].("vendors")
   attribute :vendor_vendor_id, label: "Vendor ID", simple: false
   attribute :location_id, label: "Billing Location", type: :dropdown, choices: Choices[:lookup].("locations")

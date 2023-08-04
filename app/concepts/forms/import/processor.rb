@@ -1,5 +1,5 @@
 class Forms::Import::Processor
-  attr_accessor :form, :user, :export_processor, :is_import_submission_stage, :model
+  attr_accessor :form, :user, :export_processor, :is_import_submission_stage, :model, :value_id_map
 
   BATCH_SIZE = Rails.application.config_for(:bulk_import)['batch_size'].freeze
 
@@ -9,6 +9,7 @@ class Forms::Import::Processor
     self.model = form.model
     self.export_processor = Forms::Export::Processor.(form, user)
     self.is_import_submission_stage = false
+    self.value_id_map = export_processor.lookup_content.map{|data| [data[:name], data[:data][:choices].map{ |choice| [choice[:name], choice[:id]]}.to_h]}.to_h
   end
 
   def self.call(form, user)
@@ -22,6 +23,10 @@ class Forms::Import::Processor
   def lookup_content
     export_processor.lookup_content
   end
+  #
+  # def lookup_labels
+  #   @lookup_labels || lookup_content.pluck(:name)
+  # end
 
   def form_sections
     @form_sections ||= form.sections.includes(entities: { entities: { entities: { entities: :entities } } })
@@ -97,11 +102,11 @@ class Forms::Import::Processor
           request.item_complete(false)
         end
 
-        add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
+        add_record_to_result_file(record_data[:record_data], {}, result[:model].id, message, worksheets, worksheets_length)
       rescue => exception
         message = "Unable to process, #{exception}"
         request.item_complete(false)
-        add_record_to_result_file(record_data[:record_data], nil, message, worksheets, worksheets_length)
+        add_record_to_result_file(record_data[:record_data],{}, nil, message, worksheets, worksheets_length)
       end
     end
 
@@ -149,9 +154,13 @@ class Forms::Import::Processor
         row_data = {}.with_indifferent_access
         row = sheet.row(index)
         row.each_with_index do |value, index|
+          next if sheet.row(1)[index].nil?
           if sheet.row(1)[index].include? '(Yes/No)'
             value = value == 'Yes' ? 'TRUE' : 'FALSE'
           end
+          # if lookup_labels.include? sheet.row(1)[index].gsub('*', '')
+          #   row_data["#{worksheet_headers[index].gsub('*', '')} ID"] = get_id_from_value(value, sheet.row(1)[index])
+          # end
           row_data[worksheet_headers[index]] = value
         end
 
@@ -200,9 +209,14 @@ class Forms::Import::Processor
           row_data = {}.with_indifferent_access
           row = sheet.row(index)
           row.each_with_index do |value, column_index|
+            next if sheet.row(1)[column_index].nil?
             if sheet.row(1)[column_index].include? '(Yes/No)'
               value = value == 'Yes' ? 'TRUE' : 'FALSE'
             end
+
+            # if lookup_labels.include? sheet.row(1)[column_index].gsub('*', '')
+            #   row_data["#{worksheet_headers[column_index].gsub('*', '')} ID"] = get_id_from_value(value, sheet.row(1)[column_index])
+            # end
             row_data[worksheet_headers[column_index]] = value
           end
 
@@ -246,6 +260,7 @@ class Forms::Import::Processor
       next if import_record.status_id == ImportRecordStatus.id_for(:in_progress)
 
       begin
+        RequestStoreUtil.set_current_user(user)
         import_record.status_id = ImportRecordStatus.id_for(:in_progress)
         import_record.save
         result = process_import_record(import_record)
@@ -261,7 +276,7 @@ class Forms::Import::Processor
         end
       rescue => exception
         import_job.item_complete(false)
-        import_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
+        import_record.update_status(false, ["Unable to process, #{exception.message}"].to_s, exception.message, exception.backtrace)
       end
     end
     save_records(import_job, records_to_save)
@@ -274,20 +289,35 @@ class Forms::Import::Processor
     return if records_to_save.empty?
 
     records_to_save.each do |record, import_record|
+      record.items&.each do |item|
+        item.id = nil
+      end
+      record.import_job_id = import_job.id
       if record.save
-        submit_params = { reviewal_document: record }
-        op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
-        if op.success?
-          import_record.update_status(true, 'Record created successfully', '', '')
+        if record.class == YesBankVendor
+          submit_params = { reviewal_document: record }
+          op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
+        elsif record.class == Invoice
+          policy = record.policy
+          document_reviewer_mappings = policy.levels.non_deleted.with_entity_type('NonPoInvoiceProvider').reorder(:level_number).map{|x| {level_id: x.id}} rescue nil
+          submit_params = {
+            reviewal_document: record,
+            policy_id: record.policy_id,
+            document_reviewer_mappings: document_reviewer_mappings
+          }
+          op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: user)
+        end
+        if op&.success?
+          import_record.update_status(true, ['Record created successfully'].to_s, '', '')
         else
-          import_record.update_status(true, 'Record created successfully But could not submit for approval', '', '')
+          import_record.update_status(true, ['Record created successfully But could not submit for approval', op.messages[:errors].join(', ')].to_s, '', '')
         end
         import_record.document_id = record.id
         import_record.save
         import_job.item_complete(true)
       else
         import_job.item_complete(false)
-        import_record.update_status(false, op.messages[:errors].to_s, '', '')
+        import_record.update_status(false, record.errors.messages.values.flatten.to_s, '', '')
       end
     end
   end
@@ -299,10 +329,9 @@ class Forms::Import::Processor
     workbook = export_base[:workbook]
     worksheets = export_base[:worksheets]
     worksheets_length = Hash.new(0)
-    worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count, "Message")
 
     import_job.records.each do |import_record|
-      add_record_to_result_file(import_record.record_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
+      add_record_to_result_file(import_record.record_data, import_record.processed_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
     end
 
     workbook.close
@@ -312,14 +341,20 @@ class Forms::Import::Processor
     import_job.save
   end
 
-  def add_record_to_result_file(record_data, document_id, message, worksheets, worksheets_length)
+  def add_record_to_result_file(record_data, processed_data, document_id, message, worksheets, worksheets_length)
     self.headers.values.each do |sheet_data|
       sheet_name = sheet_data[:name]
       sheet_key = sheet_data[:key]
       if sheet_key == form.model.name
+        skipped_count = 0
         worksheets_length[sheet_key] += 1
         self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
-          column_data = record_data[self.headers[sheet_key][:headers][key][:name]]
+          if self.headers[sheet_key][:headers][key]["hide_in_sheet"]
+            skipped_count += 1
+            next
+          end
+          data = processed_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] rescue nil
+          column_data = data || record_data[self.headers[sheet_key][:headers][key][:name]]
           if key.to_s == 'id' and document_id.present?
             column_data = document_id
           end
@@ -330,15 +365,23 @@ class Forms::Import::Processor
           if self.headers[sheet_key][:headers][key][:name].include? '(Yes/No)'
             column_data = column_data == 'TRUE' ? 'Yes' : 'No'
           end
-          worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
+          worksheets[sheet_key].write(worksheets_length[sheet_key], header_index - skipped_count, column_data)
         end
-        worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count, message)
+        worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count - skipped_count, "Message")
+        worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count - skipped_count, message)
       else
+        skipped_count = 0
         parent_data = record_data
-        record_data[sheet_key]&.each do |child_data|
+        record_data[sheet_key]&.each_with_index do |child_data, child_index|
+          processed_child_data = sheet_key == "items_summary" ? processed_data : processed_data[sheet_key][child_index] rescue nil
           worksheets_length[sheet_key] += 1
           self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
-            column_data = child_data[self.headers[sheet_key][:headers][key][:name]]
+            if self.headers[sheet_key][:headers][key]["hide_in_sheet"]
+              skipped_count += 1
+              next
+            end
+            data = processed_child_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] rescue nil
+            column_data = data || child_data[self.headers[sheet_key][:headers][key][:name]]
             if key.to_s == 'parent_id'
               if document_id.present?
                 column_data = document_id
@@ -352,7 +395,7 @@ class Forms::Import::Processor
             if self.headers[sheet_key][:headers][key][:name].include? '(Yes/No)'
               column_data = column_data == 'TRUE' ? 'Yes' : 'No'
             end
-            worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
+            worksheets[sheet_key].write(worksheets_length[sheet_key], header_index - skipped_count, column_data)
           end
         end
       end
@@ -397,13 +440,37 @@ class Forms::Import::Processor
       if ['attachment'].include?(header_data[:entity_type])
         form_data[header_data[:entity_key]] = get_attachment_entity_value(row_data[header_data[:name]], row_data['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
       elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-        choice_data = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
-        if choice_data.present?
-          form_data[header_data[:entity_key]] = choice_data[:id]
-          form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+        choice_id = row_data[header_data[:name]].nil? ? nil : get_id_from_value(row_data[header_data[:name]], header_data[:name])
+        if choice_id.present?
+          form_data[header_data[:entity_key]] = choice_id
+          form_data["#{header_data[:entity_key]}_value"] = row_data[header_data[:name]]
+        else
+          choice_data = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
+          if choice_data.present?
+            form_data[header_data[:entity_key]] = choice_data[:id]
+            form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+          end
+        end
+
+        if header_data[:entity_key] == 'vendor_id'
+          form.entities.where(entity_key: ['receiving_account_id', 'gstin_location_id']).each do |field|
+            filter = field.entity_key == 'gstin_location_id' ? { vendor_id_in: [form_data['vendor_id']]} : {account_owner_id_in: [form_data['vendor_id']] }
+            value_id_map.delete(field.label)
+            value_id_map[field.label] = form.entities.where(entity_key: field.entity_key).first.choices_scope.build(user: self.user, params: { paginate: false, q: filter }).as_json[:choices].map{ |x| [x[:name], x[:id]] }.to_h
+          end
+        end
+        
+        # running lookup fetch on all lookups
+        if header_data[:entity_type] == 'lookup' && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
+          params_hash = {:entity_path => header_data[:entity].entity_path, :route => "#{form.label.underscore.to_s}_import", :value => form_data[header_data[:entity_key]]}
+          current_user = user
+          lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data]
+          form_data = lookup_data.merge(form_data)
         end
       else
-        form_data[header_data[:entity_key]] = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
+        if row_data[header_data[:name]].present?
+          form_data[header_data[:entity_key]] = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
+        end
       end
     end
 
@@ -430,13 +497,34 @@ class Forms::Import::Processor
           if ['attachment'].include?(header_data[:entity_type])
             data[header_data[:entity_key]] = get_attachment_entity_value(nested_row[header_data[:name]], nested_row['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
           elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-            choice_data = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
-            if choice_data.present?
-              data[header_data[:entity_key]] = choice_data[:id]
-              data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+            choice_id = nested_row[header_data[:name]].nil? ? nil : get_id_from_value(nested_row[header_data[:name]], header_data[:name])
+            if choice_id.present?
+              data[header_data[:entity_key]] = choice_id
+              data["#{header_data[:entity_key]}_value"] = nested_row[header_data[:name]]
+            else
+              choice_data = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
+              if choice_data.present?
+                data[header_data[:entity_key]] = choice_data[:id]
+                data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+              end
+            end
+
+            # running lookup fetch on all lookups
+            if header_data[:entity_type] == 'lookup' && data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
+              params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
+              current_user = user
+              lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
+
+              # Tax percentage should be 0 if not provided in sheet, removing from lookup data
+              lookup_data = lookup_data.except('tax_percentage', 'tax_rate_id', 'tax_rate_id_value') if header_data[:entity_key] != 'tax_rate_id'
+              
+              data = data.merge(lookup_data)
             end
           else
-            data[header_data[:entity_key]] = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
+            # Set value from sheet if lookup returned 0 or nil but sheet has data
+            if nested_row[header_data[:name]].present?
+              data[header_data[:entity_key]] = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
+            end
           end
         end
 
@@ -446,10 +534,8 @@ class Forms::Import::Processor
           data[:id] = UUIDTools::UUID.timestamp_create.to_s.upcase
           data[:collection_id] = data[:id]
         end
-
         form_nested_data << data
       end
-
       # if form_data is generated before submission process and existing nested records are missing in excel sheet, add them to form data to show them in Review page of bulk import process
       # if form_data is generated during submission process, we don't need to explicitly add existing records as they will be kept as it is.
       unless self.is_import_submission_stage
@@ -468,15 +554,51 @@ class Forms::Import::Processor
           end
         end
       end
+      if nested_entity.entity_key == 'items_summary'
+        form_data.merge!(form_nested_data[0]) if form_nested_data[0]
+      else
+        form_data[nested_entity.entity_key] = form_nested_data
+      end
+    end
 
-      form_data[nested_entity.entity_key] = form_nested_data
+    form_data = perform_form_calculations(form_data) if form.model == Invoice
+
+    dropdowns = headers[form.model.name][:headers].values.select{|header_value| header_value['entity_type'] == 'dropdown'}
+    dropdowns.each do |header_data|
+      choices = header_data[:entity].choices_scope.build.data
+      form_data["#{header_data[:entity_key]}_value"] = choices.select{|x| x['id'].to_i == form_data[header_data[:entity_key]].to_i}.first['name'] rescue nil
     end
 
     form_data
   end
 
-  def process_form_data(form_data, is_admin = false)
+  # Specific use case for invoices and PO items
+  def perform_form_calculations(form_data)
+    form.entities.each do |entity|
+      if entity.class.collection?
+        collection_data = form_data[entity.entity_key.to_s] || []
+        next if collection_data.empty?
+        child_results = []
+        collection_data.each do |item|
+          result = {}
+          entity.entities.each do |child_entity|
+            next unless child_entity.compute_enabled && child_entity.compute_type_id == 1
+            result[child_entity.entity_key] = LiquidHelper.interpolate(child_entity.compute_formula, {'form'=>form_data, 'row'=>item})
+            item[child_entity.entity_key] = result[child_entity.entity_key]
+          end
+          child_results << item
+        end
+        form_data[entity.entity_key.to_s] = child_results
+      else
+        next unless entity.compute_enabled && entity.compute_type_id == 1
+        next if entity.parent.present? && entity.parent.class.collection? # This is already computed in the if block
+        form_data[entity.entity_key.to_s] = LiquidHelper.interpolate(entity.compute_formula, {'form'=>form_data})
+      end
+    end
+    form_data
+  end
 
+  def process_form_data(form_data, is_admin = false)
     form_data[:form] = form
     form_data[:is_import_process] = true
 
@@ -506,8 +628,13 @@ class Forms::Import::Processor
     end
   end
 
+  def get_id_from_value(raw_value, entity)
+    value_id_map[entity.gsub('*', '')][raw_value.to_s] rescue nil
+  end
+
   def get_dropdown_entity_value(raw_value, entity)
     return unless raw_value
+    return unless entity
 
     choice = entity.choices_scope.find_by_id(raw_value, user: user)
     return unless choice.present?
@@ -528,6 +655,7 @@ class Forms::Import::Processor
 
   def get_lookup_entity_value(raw_value, entity)
     return unless raw_value
+    return unless entity
 
     choice = entity.choices_scope.find_by_id(raw_value, user: user)
     return unless choice.present?
@@ -538,9 +666,8 @@ class Forms::Import::Processor
     elsif choice.respond_to?(:display_name)
       choice_value = choice.display_name
     end
-
     {
-      id: parse_value(choice.id, entity),
+      id: parse_value(choice[:id], entity),
       value: choice_value,
     }.with_indifferent_access
   end

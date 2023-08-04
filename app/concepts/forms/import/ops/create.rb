@@ -4,6 +4,8 @@ class Forms::Import::Ops::Create < Transactions::API
   step AssignModelUser(key: :created_by)
   step Forms::Contracts::Build()
   step Contract::Validate()
+  step :create_procurements
+  step :validate_attachments
   step Contract::Persist(method: :sync)
   # step :set_approval_workflow!
   step Transactions::Messages::SuccessMessage('Record Saved')
@@ -14,9 +16,33 @@ class Forms::Import::Ops::Create < Transactions::API
     true
   end
 
+  # Invoices and Purchase Orders needs procurements
+  def create_procurements(context, form:, params:, current_user:, **)
+    return true if form.model == YesBankVendor
+    unless context[:model].procurement_id.present?
+      proc = Procurement.create({name: "#{params['invoice_number']}"})
+      context[:model].procurement_id = proc.id
+    end
+    return true
+  end
+
+  def validate_attachments(context, params:, model:, **)
+
+    params['invoice_attachments'].reject! {|attachment| attachment['_destroy'] == true}
+
+    if model.class == Invoice
+      unless params['invoice_attachments'].present?
+        return on_error context, :invoice,'attachments cannot be blank'
+      end
+    end
+
+    return true
+  end
+
   def find_or_new_model(context, form:, params:, current_user:, **)
     context[:model] = if params[:record_query].present?
-                        form.model.find_by(params[:record_query])
+                        model = form.model.find_by(params[:record_query])
+                        model.nil? ? form.model.new : model
                       else
                         form.model.new
                       end

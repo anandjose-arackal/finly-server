@@ -23,8 +23,8 @@ class ApprovalTatReports::TatExport < Transactions::API
       builder.resolve(context, paginate: false)
       context[:spreadsheet_data] = export_report(context['model.records'], params.dig(:route), optimize_tat_report)
     rescue StandardError => e
-      Rails.logger.info "Error occurred: #{e}"
-      Rails.logger.info "Stack trace: #{e.backtrace.join("\n")}"
+      Rails.logger.info "APPROVAL_TAT_REPORT_ERROR_MESSAGE: #{e}"
+      Rails.logger.info "APPROVAL_TAT_REPORT_STACK_TRACE: #{e.backtrace.join("\n")}"
       return false
     end
     true

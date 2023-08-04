@@ -268,7 +268,8 @@
           <th style="min-width: 140px;">Name/Description</th>
           <th>Comment</th>
           <th class="text-center">Qty</th>
-          <th class="text-center">Unit of Measure</th>
+          <th class="text-center">HSN SAC</th>
+          <th class="text-center">Unit of Measurement</th>
           <th class="text-right">Rate</th>
           <th class="text-right">Discount</th>
           <th class="text-right">Tax
@@ -289,6 +290,7 @@
             <td class="font-dark-gray fw-bold"><%= item.description %></td>
             <td class="font-light-gray"><div><%= item.comment %></div></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
+            <td class="text-center font-light-gray"><%= item.hsn_sac %></td>
             <td class="text-center font-light-gray"><%= item.unit_of_measurement %></td>
             <td class="text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.rate, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) %></td>
             <td class="text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
@@ -387,6 +389,7 @@
   <div class="text-center font-dark-small" style="margin-top: 50%; padding-top: 80%">
     Please refer the next page for the terms and conditions
   </div>
+  <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
   <p style="page-break-after:always;"></p>
 
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
@@ -421,6 +424,7 @@
           </li>
         </ul>
       <% end %>
+      <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
     </div>
   </div>
 </div>

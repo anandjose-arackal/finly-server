@@ -72,23 +72,28 @@ class ImportUtil
     else
       file_name = File.extname(file.original_filename)
     end
-
+    list = []
     case file_name
     when '.xlsx' then
-      # do nothing for now
-    else
-      raise "Please upload a '.xlsx' file. Unknown file type: #{file.original_filename}"
-    end
-
-    list = []
-    Saxlsx::Workbook.open file.path do |excel|
-      sheet = excel.sheets.first
-      sheet.rows.each_with_index do |row, index|
+      Saxlsx::Workbook.open file.path do |excel|
+        sheet = excel.sheets.first
+        sheet.rows.each_with_index do |row, index|
+          next if index == 0
+          new_hash = header.zip(row).to_h
+          new_hash.update(new_hash) { |key, value| val = cleanup_account_number(key, value); cleanup_email(val)}
+          list << new_hash
+        end
+      end
+    when '.xls'
+      input = Roo::Spreadsheet.open(file.path)
+      input.each_with_index do |row, index|
         next if index == 0
         new_hash = header.zip(row).to_h
         new_hash.update(new_hash) { |key, value| val = cleanup_account_number(key, value); cleanup_email(val)}
         list << new_hash
       end
+    else
+      raise "Please upload a '.xlsx or xls' file. Unknown file type: #{file.original_filename}"
     end
     list
   end

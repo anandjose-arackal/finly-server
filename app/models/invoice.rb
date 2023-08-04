@@ -154,7 +154,7 @@
 #
 
 class Invoice < ApplicationRecord
-  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds, :net_po_advance, :prev_adjusted_advance_tds, :advance_paid
+  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds, :net_po_advance, :prev_adjusted_advance_tds, :advance_paid, :vendor_country_id_value
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -186,6 +186,11 @@ class Invoice < ApplicationRecord
   #   currency_code = Currency.find(self.base_currency)&.country_code rescue nil
   #   Currency.currency_for(currency_code || "INR")
   # end
+
+  
+  def vendor_country_id_value
+    self.vendor_country&.name
+  end
 
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
@@ -776,7 +781,7 @@ class Invoice < ApplicationRecord
   ransack_scopes :with_status_ids
 
   def form_klass
-    invoice_type = self.invoice_type.name.to_sym
+    invoice_type = self.invoice_type&.name&.to_sym || :non_po_invoice
     Forms::Router.klass(invoice_type)&.name
   end
 
@@ -1756,6 +1761,10 @@ class Invoice < ApplicationRecord
   end
 
   def set_defaults
+    if self.import_job_id.present?
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:open))
+    end
+
     if self.invoice_status.blank?
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
       self.update_invoice_status
