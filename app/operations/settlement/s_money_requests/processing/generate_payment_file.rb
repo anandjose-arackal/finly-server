@@ -47,6 +47,7 @@ class Settlement::SMoneyRequests::Processing::GeneratePaymentFile < Settlement::
     self.group_mappings.include_for_payment_file&.each do |mapping|
       ifsc = mapping.processor_accountable&.ifsc
       ifsc_prefix =( ifsc.present? ? ifsc[0..3].upcase : '')
+      mapping.money_requests.sort do |money_request|
       payment_params << {
           beneficiary_account_name: BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name,
           beneficiary_account_number: mapping.processor_accountable.account_number,
@@ -59,9 +60,24 @@ class Settlement::SMoneyRequests::Processing::GeneratePaymentFile < Settlement::
           email: mapping.user.email,
           receiving_mobile_number: mapping.user.mobile_number,
           note: mapping.note,
+          approved_by: retrieve_approved_by(money_request)
       }
-    end
+      end
+      end
     self.response = PaymentFiles::Generate.(user, payment_file: payment_params, resources: self.group_mappings)
+  end
+
+  def retrieve_approved_by(money_request)
+    return '' if money_request&.dlrms.blank?
+    dlrm = report.dlrms.where(action_id: TrailAction.id_for(:approve)).first
+    if dlrm&.taken_control_by_id&.present?
+      return dlrm.taken_control_by&.name
+    elsif dlrm&.forwarded_by_id&.present?
+      return dlrm&.forwarded_by&.name
+    elsif dlrm&.reviewer_id.present?
+      return dlrm.reviewer&.name
+    end
+    ''
   end
 
 end
