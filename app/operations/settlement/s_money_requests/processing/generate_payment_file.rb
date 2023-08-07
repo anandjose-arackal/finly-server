@@ -69,7 +69,7 @@ class Settlement::SMoneyRequests::Processing::GeneratePaymentFile < Settlement::
 
   def retrieve_approved_by(money_request)
     return '' if money_request&.dlrms.blank?
-    dlrm = report.dlrms.where(action_id: TrailAction.id_for(:approve)).first
+    dlrm = money_request.dlrms.where(action_id: TrailAction.id_for(:approve)).first
     if dlrm&.taken_control_by_id&.present?
       return dlrm.taken_control_by&.name
     elsif dlrm&.forwarded_by_id&.present?
