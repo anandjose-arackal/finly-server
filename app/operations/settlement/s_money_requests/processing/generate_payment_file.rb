@@ -47,7 +47,7 @@ class Settlement::SMoneyRequests::Processing::GeneratePaymentFile < Settlement::
     self.group_mappings.include_for_payment_file&.each do |mapping|
       ifsc = mapping.processor_accountable&.ifsc
       ifsc_prefix =( ifsc.present? ? ifsc[0..3].upcase : '')
-      mapping.money_requests.sort do |money_request|
+      mapping.money_requests.each do |money_request|
       payment_params << {
           beneficiary_account_name: BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name,
           beneficiary_account_number: mapping.processor_accountable.account_number,
