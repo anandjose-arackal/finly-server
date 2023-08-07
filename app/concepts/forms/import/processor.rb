@@ -297,6 +297,9 @@ class Forms::Import::Processor
         if form.model == PurchaseOrder
           record.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
           record.form_migrated = true
+          record.quotations.each do |quote|
+            quote.id = nil
+          end
         end
       end
       if record.save
