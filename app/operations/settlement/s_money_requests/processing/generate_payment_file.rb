@@ -52,7 +52,7 @@ class Settlement::SMoneyRequests::Processing::GeneratePaymentFile < Settlement::
           beneficiary_account_name: BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name,
           beneficiary_account_number: mapping.processor_accountable.account_number,
           receiving_user_name: mapping.user.name,
-          amount: mapping.amount.value,
+          amount: money_request.total_amount,
           payment_mode: 'NEFT',
           date: Date.today,
           beneficiary_ifsc: mapping.processor_accountable.ifsc,
