@@ -134,3 +134,7 @@ end
 # every '0,15,30,45 * * * *', roles: [:whenever_cron] do
 #   runner 'AnalyticsDashboard::Scheduler.perform'
 # end
+
+every 1.day, at: '8:30 am', roles: [:whenever_cron] do
+  runner "UnapprovedTransactionReminders.perform"
+end

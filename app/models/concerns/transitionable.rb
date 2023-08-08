@@ -12,6 +12,10 @@ module Transitionable
     has_many :dlrms, class_name: "DocumentLevelReviewerMapping", as: :document_reviewer_mappable
     has_many :trails, as: :parent
 
+    [self].each do |current_model|
+      has_many :dlrm_with_level, -> { where(arel_table[:level_id].eq(current_model.arel_table[:controlling_level_id])) }, class_name: "DocumentLevelReviewerMapping", as: :document_reviewer_mappable
+    end
+
     def document_owner_id
       self.send(self.class.document_owner_attribute)
     end
@@ -653,9 +657,9 @@ module Transitionable
     end
 
     def awaiting_action_items(user)
-
-
-
+      
+      
+      
       if user.instance_of?(User)
         # Do nothing
       elsif (user.is_a?(Integer) || user.to_i.to_s == user)
@@ -734,59 +738,62 @@ module Transitionable
       #     where(document_reviewer_mappable_id: document_ids))
       #
       # self.where("#{table_name}.id" => ids.select("document_reviewer_mappable_id"))
-
-
-
+      
+      
+      
       #
       #
       #
       admin = user.admin? || user.vendor_payment_admin?
 
-      # Find all level ids where user is a reviewer & is NOT forwarded
-      all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:level_id).uniq
-
-      document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false)
-
-      if admin
-        taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:level_id).uniq
-        taken_control_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id)
+      if OptimizedAwaitingActionItemsToggle.new(user).enabled?
+        optimized_awaiting_action_items(user, admin)
+      else
+        exisitng_awaiting_action_items(user, admin)
       end
+    end
 
-      forwarded_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:level_id).uniq
-      forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id)
-
+    def exisitng_awaiting_action_items(user, admin)
       if self.column_names.include? 'company_id'
-        # nosqli - Substituted values are from AR object, and not user provided input
-        document_ids = self.where("#{table_name}.id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where(company_id: user.company_id).with_controlling_level_id(all_level_ids.uniq).pluck(:id).uniq
-        # Find controlling level of all those documents
-        controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id).uniq
-
-        if admin
-          # nosqli - Substituted values are from AR object, and not user provided input
-          taken_control_document_ids = self.where(company_id: user.company_id).where("#{table_name}.id IN (#{taken_control_document_ids_from_dlrms.select('document_reviewer_mappable_id').to_sql})").with_controlling_level_id(taken_control_level_ids)
-          taken_control_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id).uniq
-        end
-        # nosqli - Substituted values are from AR object, and not user provided input
-        forwarded_document_ids = self.where(company_id: user.company_id).where("#{table_name}.id IN (#{forwarded_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").with_controlling_level_id(forwarded_level_ids).pluck(:id)
-        forwarded_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id).uniq
+        query = self.where(company_id: user.company_id)
       else
         user_ids = user.company.users.pluck(:id)
-        document_ids = self.where("#{table_name}.id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:id)
-        # Find controlling level of all those documents
-        controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id).uniq
-
-        if admin
-          # nosqli - Substituted values are from AR object, and not user provided input
-          taken_control_document_ids = self.where("#{table_name}.id in (#{taken_control_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
-          # nosqli - Substituted values are from AR object, and not user provided input
-          taken_control_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id).uniq
-        end
-        # nosqli - Substituted values are from AR object, and not user provided input
-        forwarded_document_ids = self.where("#{table_name}.id IN (#{forwarded_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids)
-        # nosqli - Substituted values are from AR object, and not user provided input
-        forwarded_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id).uniq
+        query = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
       end
 
+      current_doc_type = DocumentLevelReviewerMapping
+                          .with_document_type(self.name)
+                          .select(:level_id, :document_reviewer_mappable_id)
+      
+      # Find all level ids where user is a reviewer & is NOT forwarded
+      reviewers_and_levels  = current_doc_type.with_reviewer_id(user.id).where(forwarded: false)
+      reviewer_level_ids    = reviewers_and_levels.collect(&:level_id).uniq.compact
+      reviewer_doc_ids      = reviewers_and_levels.collect(&:document_reviewer_mappable_id).uniq.compact
+
+      control_query         = query.with_controlling_level_id(reviewer_level_ids)
+      document_ids          = control_query.where(id: reviewer_doc_ids).pluck(:id).uniq
+      controlling_level_ids = control_query.pluck(:controlling_level_id).uniq
+
+      # Find all level ids where user has taken control
+      if admin
+        taken_control_reviewers_and_levels    = current_doc_type.where(taken_control_by_id: user.id)
+        taken_control_level_ids               = taken_control_reviewers_and_levels.collect(&:level_id).uniq.compact
+        taken_control_document_ids_from_dlrms = taken_control_reviewers_and_levels.collect(&:document_reviewer_mappable_id).uniq.compact
+
+        taken_query                           = query.with_controlling_level_id(taken_control_level_ids)
+        taken_control_document_ids            = taken_query.where(id: taken_control_document_ids_from_dlrms).pluck(:id).uniq
+        taken_control_controlling_level_ids   = taken_query.pluck(:controlling_level_id).uniq
+      end
+
+      # Find all level ids where user has forwarded the docs
+      forwarded_document_reviewers_and_levels = current_doc_type.where(forwarded: true, forwarded_to_id: user.id)
+      forwarded_level_ids                     = forwarded_document_reviewers_and_levels.collect(&:level_id).uniq.compact
+      forwarded_document_ids_from_dlrms       = forwarded_document_reviewers_and_levels.collect(&:document_reviewer_mappable_id).uniq.compact
+
+      forwarded_query                         = query.with_controlling_level_id(forwarded_level_ids)
+      forwarded_document_ids                  = forwarded_query.where(id: forwarded_document_ids_from_dlrms).pluck(:id).uniq
+      forwarded_controlling_level_ids         = forwarded_query.pluck(:controlling_level_id).uniq
+      
       # final list of document ids
       ids = DocumentLevelReviewerMapping.none
 
@@ -821,6 +828,114 @@ module Transitionable
       self.where("#{table_name}.id in (#{ids.select("document_reviewer_mappable_id").to_sql})")
     end
 
+    def optimized_awaiting_action_items(user, admin)
+      dlrm_at = DocumentLevelReviewerMapping.arel_table
+
+      base_condition          = dlrm_at[:viewable].eq(true).and(dlrm_at[:action_taken_by_id].eq(nil))
+      
+      reviewer_condition      = dlrm_at[:reviewer_id].eq(user.id).and(dlrm_at[:forwarded].eq(false).and(dlrm_at[:taken_control].eq(false)))
+      forwarded_condition     = dlrm_at[:forwarded].eq(true).and(dlrm_at[:forwarded_to_id].eq(user.id))
+      taken_control_condition = dlrm_at[:taken_control_by_id].eq(user.id).and(dlrm_at[:taken_control].eq(true))
+      
+      final_condition         = dlrm_at.grouping(reviewer_condition).or(dlrm_at.grouping(forwarded_condition))
+      final_condition         = final_condition.or(dlrm_at.grouping(taken_control_condition)) if admin
+
+      query = self.joins(:dlrm_with_level).where(dlrm_at.grouping(base_condition).and(final_condition))
+
+      if self.column_names.include? 'company_id'
+        query = query.where(company_id: user.company_id)
+      else
+        user_ids = user.company.users.select(:id).to_sql
+        query = query.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+      end
+
+      self.where("#{table_name}.id in (#{query.select(:id).to_sql})")
+    end
+
+    def awaiting_records_without_users
+      records = awaiting_action_items_without_users
+      create_count_for_awaiting_action_items_without_users(records)
+    end
+
+    def awaiting_action_items_without_users
+      dlrm_at = DocumentLevelReviewerMapping.arel_table
+
+      base_condition          = dlrm_at[:viewable].eq(true).and(dlrm_at[:action_taken_by_id].eq(nil))
+      
+      reviewer_condition      = dlrm_at[:reviewer_id].not_eq(nil).and(dlrm_at[:forwarded].eq(false).and(dlrm_at[:taken_control].eq(false)))
+      forwarded_condition     = dlrm_at[:forwarded].eq(true).and(dlrm_at[:forwarded_to_id].not_eq(nil))
+      taken_control_condition = dlrm_at[:taken_control_by_id].not_eq(nil).and(dlrm_at[:taken_control].eq(true))
+      
+      final_condition         = dlrm_at.grouping(reviewer_condition).or(dlrm_at.grouping(forwarded_condition))
+      # THIS IS ADMIN CONDITION
+      final_condition         = final_condition.or(dlrm_at.grouping(taken_control_condition)) if true # if admin
+
+      status_condition  = case self.name
+                          when PurchaseRequest.name
+                            self.arel_table[:purchase_request_status_id].eq(PurchaseRequestStatus.id_for(:awaiting_approval))
+                          when PurchaseOrder.name
+                            self.arel_table[:purchase_order_status_id].eq(PurchaseOrderStatus.id_for(:processing))
+                          when Invoice.name
+                            self.arel_table[:invoice_status_id].eq(InwardInvoiceStatus.id_for(:processing))
+                          when BbpsBill.name
+                            self.arel_table[:status_id].eq(BbpsBillStatus.id_for(:awaiting_approval))
+                          when BankPaymentRequest.name
+                            self.arel_table[:status_id].eq(BankPaymentRequestStatus.ids_for(:processing))
+                          when YesBankVendor.name
+                            self.arel_table[:status_id].not_eq(VendorStatus.id_for(:auto_approved))
+                          when PaymentAgreement.name
+                            self.arel_table[:status_id].eq(PaymentAgreementStatus.id_for(:awaiting_approval))
+                          when BbpsBillerSubscription.name
+                            self.arel_table[:status_id].eq(BbpsBillerSubscriptionStatus.id_for(:awaiting_approval))
+                          end
+
+      query = self.select(
+                %Q{
+                  `#{table_name}`.`id` AS `record_id`,
+                  CASE
+                    WHEN (`document_level_reviewer_mappings`.`taken_control` = TRUE)
+                      THEN (`document_level_reviewer_mappings`.`taken_control_by_id`)
+                  END AS `tc_id`,
+                  CASE
+                    WHEN (`document_level_reviewer_mappings`.`forwarded`= TRUE)
+                      THEN(`document_level_reviewer_mappings`.`forwarded_to_id`)
+                  END AS `fwd_id`,
+                  CASE
+                    WHEN (`document_level_reviewer_mappings`.`forwarded`= FALSE AND `document_level_reviewer_mappings`.`taken_control` = FALSE)
+                      THEN (`document_level_reviewer_mappings`.`reviewer_id`)
+                  END AS `rw_id`
+                }
+              )
+              .distinct
+              .unscope(:order)
+              .joins(:dlrm_with_level)
+              .where(dlrm_at.grouping(base_condition).and(final_condition))
+      
+      status_condition.present? ? query.where(status_condition) : query
+    end
+    
+    def create_count_for_awaiting_action_items_without_users(records)
+      users_count = []
+
+      records.each do |record|
+        if record.tc_id.present? && record.fwd_id.present?
+          # if taken control then forwarded OR forearded then taken control, add both users
+          users_count << [record.tc_id, record.record_id]
+          users_count << [record.fwd_id, record.record_id]
+        elsif record.tc_id.present? && record.fwd_id.blank?
+          # if taken control but not forwarded
+          users_count << [record.tc_id, record.record_id]
+        elsif record.tc_id.blank? && record.fwd_id.present?
+          # if forwarded but not taken control
+          users_count << [record.fwd_id, record.record_id]
+        elsif record.tc_id.blank? && record.fwd_id.blank? && record.rw_id.present?
+          # if neither taken control nor forwarded but reviewer is present
+          users_count << [record.rw_id, record.record_id]
+        end
+      end
+
+      users_count.uniq.group_by(&:first).transform_values(&:count)
+    end
 
     def admin_associated_items(user)
       if user.instance_of?(User)
