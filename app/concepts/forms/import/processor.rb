@@ -289,10 +289,12 @@ class Forms::Import::Processor
     return if records_to_save.empty?
 
     records_to_save.each do |record, import_record|
-      record.items&.each do |item|
-        item.id = nil
+      if record.is_a? Invoice
+        record.items&.each do |item|
+          item.id = nil
+        end
+        record.import_job_id = import_job.id
       end
-      record.import_job_id = import_job.id
       if record.save
         if record.class == YesBankVendor
           submit_params = { reviewal_document: record }
@@ -602,8 +604,9 @@ class Forms::Import::Processor
     form_data[:form] = form
     form_data[:is_import_process] = true
 
-    if form_data[:id].present?
-      form_data[:record_query] = { id: form_data[:id] }
+    record_id = form_data[:id] || form_data['id']
+    if record_id.present?
+      form_data[:record_query] = { id: record_id }
     end
 
     #ToDo: use same operation once batch saving is resolved
