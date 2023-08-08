@@ -394,6 +394,10 @@ include Searchkick::Api
     'PaymentAgreementProvider'
   end
 
+  def self.initiator_associated_status_ids
+    PaymentAgreementStatus.ids_for(:approved, :auto_approved, :awaiting_approval, :closed, :invoice_created, :payment_ticket_created, :terminated, :revised)
+  end
+
   def self.status_ids(*statuses)
     status_ids = []
     statuses.each do |status|
