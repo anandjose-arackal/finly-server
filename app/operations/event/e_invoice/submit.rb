@@ -68,7 +68,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   end
 
   def mailer_subject(user)
-    if user.id == invoice.created_by.id
+    if user.id == invoice.created_by_user_id
       "Invoice submitted : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
       "#{self.invoice.created_by.name} has submitted Invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is currently awaiting your approval"
@@ -76,7 +76,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   end
 
   def mailer_body(user)
-    if user.id == invoice.created_by.id
+    if user.id == invoice.created_by_user_id
       "Congratulations, you have successfully submitted the invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
       "#{self.invoice.created_by.name} has submitted invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is currently awaiting your approval."

@@ -16,7 +16,6 @@ class Event::EInvoice::Base < Event::SetNotifier
   end
 
   def action_name
-
   end
 
   def init
@@ -39,9 +38,25 @@ class Event::EInvoice::Base < Event::SetNotifier
 
   def send_mailer(user)
     return if user.blank?
+
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    ProcurementMailer.delay(queue: 'procurements_notification').send_invoice_mail(Event::EInvoice::Base::MailerPresenter.new(user, params))
+
+    ProcurementMailer.delay(queue: 'procurements_notification').send_invoice_mail(user.id, mail_presenter_params)
+    # ProcurementMailer.send_invoice_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def mail_presenter_params
+    {
+      invoice_id: params[:invoice].id,
+      body: params[:body],
+      subject: params[:subject],
+      button_name: params[:button_name],
+      event_id: params[:event_id],
+      action_name: params[:action_name],
+      comment_body: params[:comment_body],
+      email_based_approval: params[:email_based_approval]
+    }
   end
 
   def mailer_subject(user)
@@ -87,6 +102,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     if users.present?
       users.each do |user|
         next if user.blank? # or not user.is_a?(User)
+
         user_event_configuration = load_configuration(user)
         if allow_mailer(user, user_event_configuration) && user.email.present?
           send_mailer(user)
@@ -111,6 +127,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     if users.present?
       users.each do |user|
         next if user.blank? # or not user.is_a?(User)
+
         set_notification(user)
       end
     end
@@ -133,7 +150,7 @@ class Event::EInvoice::Base < Event::SetNotifier
       self.company = user.company
       self.to_name = user.name
       self.email_approval_mail = params[:email_based_approval]
-      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || "") + "@approval.email.finly.io"
+      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || '') + Constants::EMAIL_APPROVAL_MAIL_ID # EMAIL_APPROVAL_MAIL_ID = '@approval.email.finly.io'
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
       #   action_url = generate_action_url(user, role_id)
@@ -143,17 +160,13 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def generate_url
-      #Determine view - Temporary, as views will be eliminated
+      # Determine view - Temporary, as views will be eliminated
 
-      if invoice.created_by.id == user.id
-        view = 'initiator'
-      else
-        view = 'reviewer'
-      end
+      # view = invoice.created_by_id == user.id ? 'initiator' : 'reviewer'
       if NonPoInvoiceToggle.new(user).enabled?
         suffix = URI.escape("\"procurement_id\":\"#{invoice.procurement.id}\",\"procurement_type\":\"non_po_invoice\"")
         path = "procure_invoices/#{invoice.id}/params={"
-        url = Constants::BASE_URL_VP + path + suffix + "}"
+        url = Constants::BASE_URL_VP + path + suffix + '}'
       else
         suffix = URI.escape("{\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}")
         # path = "reports/#{report.id}"
@@ -161,32 +174,6 @@ class Event::EInvoice::Base < Event::SetNotifier
         url = Constants::BASE_URL_VP + path + suffix
       end
     end
-
-    # def generate_action_url(user, role_id)
-    #   view = ""
-    #   case role_id
-    #     when 3
-    #       view = "\"manager\""
-    #     when 2
-    #       view = "\"finance_manager\""
-    #     when 1
-    #       view = "\"admin\""
-    #     else
-    #       view = "\"personal\""
-    #   end
-    #
-    #   url = nil
-    #   if report.controlling_user_id == user.id
-    #     # token = params[:email_authorization]
-    #
-    #     # suffix = "/params={\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}"
-    #     path = "report/#{report.id}"
-    #     path = "payments#procurements/#{invoice.procurement.id}"
-    #
-    #     url = Constants::BASE_URL_AUTHORIZER + path + suffix
-    #   end
-    #   url
-    # end
 
     def validate
       self.user.present? and self.invoice.present?
@@ -201,7 +188,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def set_email_approval_mail
-      self.email_approval_mail && invoice.status.processing? && self.body_val.include?("awaiting your approval") && invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice") && NonPoInvoiceToggle.new(user).enabled?
+      self.email_approval_mail && invoice.status.processing? && self.body_val.include?('awaiting your approval') && invoice.invoice_type.id == InwardInvoiceType.id_for('non_po_invoice') && NonPoInvoiceToggle.new(user).enabled?
     end
 
     def body
@@ -211,7 +198,5 @@ class Event::EInvoice::Base < Event::SetNotifier
     def button_name
       self.button_val
     end
-
   end
-
 end
