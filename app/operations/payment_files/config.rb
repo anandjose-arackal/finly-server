@@ -24,7 +24,8 @@ class PaymentFiles::Config
         {name: 'Citi Bank', key: :citi_bank, operation: PaymentFiles::Formats::CitiBank::Process, validator: PaymentFiles::Formats::CitiBank::ValidateConfig},
         {name: 'Stanza Payment', key: :stanza, operation: PaymentFiles::Formats::Stanza::Process, validator: PaymentFiles::Formats::Stanza::ValidateConfig},
         {name: 'HSBC', key: :hsbc_bank, operation: PaymentFiles::Formats::HsbcBank::Process, validator: PaymentFiles::Formats::HsbcBank::ValidateConfig},
-        {name: 'DBS', key: :dbs_bank, operation: PaymentFiles::Formats::DbsBank::Process, validator: PaymentFiles::Formats::DbsBank::ValidateConfig}
+        {name: 'DBS', key: :dbs_bank, operation: PaymentFiles::Formats::DbsBank::Process, validator: PaymentFiles::Formats::DbsBank::ValidateConfig},
+        {name: 'Generic', key: :generic, operation: PaymentFiles::Formats::Generic::Process, validator: PaymentFiles::Formats::Generic::ValidateConfig }
 
     ]
   end
