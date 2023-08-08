@@ -1,5 +1,9 @@
 json.success true
-json.otp_verified @user.otp_verified
+if @token.authentication_type == 'sso'
+  json.otp_verified true
+else
+  json.otp_verified @user.otp_verified
+end
 json.kyc_required @user.company.kyc_required?
 
 if  @token.authentication_type == 'password'

@@ -1,6 +1,10 @@
 json.success true
 # @user = User.find 18 # todo - temporary for testing anf building the frontend
-json.otp_verified @user.otp_verified
+if @token.authentication_type == 'sso'
+  json.otp_verified true
+else
+ json.otp_verified @user.otp_verified
+end
 json.kyc_required @user.company.kyc_required?
 json.data do
   json.access_token @token.token
