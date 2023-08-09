@@ -30,13 +30,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def pre_process
-    payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order, :utility_bill_payment)).pluck(:id)
-    self.all_payments = Payment.with_payment_order_id(payment_order_ids).to_a
-    if bank_transaction_class&.column_names&.include?("bank_reference_number")
-      self.all_transactions = bank_transaction_class.where(company_id: user.company_id).pluck(:bank_reference_number)
-    else
-      self.all_transactions = bank_transaction_class.where(company_id: user.company_id).pluck(:utr)
-    end
+    payment_order_ids = user.company.payment_orders.where('created_at > ?', (Date.today - 6.month)).with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order, :utility_bill_payment)).pluck(:id)
+    self.all_payments = Payment.where(payment_status_id: [1,2,8]).with_payment_order_id(payment_order_ids).to_a
   end
 
   def process
