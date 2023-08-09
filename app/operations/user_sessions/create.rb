@@ -42,6 +42,12 @@ class UserSessions::Create < BaseOperation
       end
     end
 
+    toggle = AuthenticationToggle.new(self.user)
+    unless toggle.password_enabled?
+      add_message :error, "Please use the Single Sign-On feature to login "
+      return
+    end
+
     # if self.params[:username].blank?
     #   add_message :error, 'Username not found'
     #   return
