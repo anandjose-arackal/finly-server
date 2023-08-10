@@ -214,7 +214,6 @@ class FormEntity < ApplicationRecord
     base_class = model.system_field ? Forms::Entities::Contracts::SystemFormEntity : Forms::Entities::Contracts::CustomFormEntity
 
     option_validation_proc = self.respond_to?(:option_validation) ? self.option_validation : nil
-    params[:paginate] = true
 
     dynamic_contract = Class.new(base_class) do
 
