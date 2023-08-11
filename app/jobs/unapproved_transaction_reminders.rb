@@ -26,7 +26,8 @@ class UnapprovedTransactionReminders < BaseJob
     return @reminders_enabled[user.company_id] if @reminders_enabled[user.company_id].present?
 
     first_user = user.company.users.first # fetch the first user of the company
-    @reminders_enabled[user.company_id] = UnapprovedTransactionRemindersToggle.new(first_user).enabled?
+    status = UnapprovedTransactionRemindersToggle.new(first_user).enabled?
+    @reminders_enabled[user.company_id] = status ? "send" : "not send"
   end
 
   def self.extract_users
@@ -66,7 +67,7 @@ class UnapprovedTransactionReminders < BaseJob
 
   def self.trigger_mailer_event
     @users.each do |user|
-      if user.email.present? && check_if_reminders_enabled(user)
+      if user.email.present? && check_if_reminders_enabled(user) == "send"
         params = @awaiting_users_with_count[user.id]
         Event::EReminders::UnapprovedTransaction.(user, params)
       end
