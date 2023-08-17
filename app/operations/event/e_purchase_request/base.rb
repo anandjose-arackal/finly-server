@@ -20,7 +20,6 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
     self.purchase_request = params[:purchase_request]
     self.workflow_output = params[:workflow_output]
     self.email_approval_needed = params[:email_approval_needed]
-    self.reply_to = approval_uuid + Constants::EMAIL_APPROVAL_MAIL_ID # EMAIL_APPROVAL_MAIL_ID = '@approval.email.finly.io'
   end
 
   def last_trail
@@ -84,7 +83,7 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
 
   def mail_presenter_params
     {
-      bodd: params[:body],
+      body: params[:body],
       subject: params[:subject],
       action_name: params[:action_name],
       action_url: params[:action_url],

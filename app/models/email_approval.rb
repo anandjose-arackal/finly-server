@@ -16,7 +16,7 @@ class EmailApproval < ApplicationRecord
     new_approval
   end
 
-  def self.create_for_purachse_request(document)
+  def self.create_for(document)
     EmailApproval.create!(approval_uuid: SecureRandom.uuid, documentable: document)
   end
 

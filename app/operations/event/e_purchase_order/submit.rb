@@ -8,50 +8,17 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
   end
 
   def affected_users
-    # [self.report.user, self.report.reload.controlling_user]
-    # users = []
-    # users.push self.purchase_order.user
-
-    # level = ReviewalLevel.find_by id: workflow_output[:modified_level_id]
-
-    # if level.present?
-    #   user_selected_reviewer = purchase_order.document_level_reviewer_mappings.with_level_ids(level.id).last
-    #   if user_selected_reviewer.present?
-    #     self.controlling_users.push(user_selected_reviewer.reviewer)
-    #     users.push(user_selected_reviewer.reviewer)
-    #   else
-    #     amount = purchase_order.balance_amount.value
-    #     reviewers_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
-    #     reviewers = User.with_id(reviewers_ids)
-    #     reviewers.each do |reviewer|
-    #       users.push(reviewer)
-    #       self.controlling_users.push(reviewer)
-    #     end
-    #   end
-    # end
-    # users
-    affected_user = self.purchase_order.affected_users(:submit)
+    users = self.purchase_order.affected_users(:submit)
     if purchase_order.purchase_request_items.present?
-      affected_user += purchase_request_creator
+      users += purchase_request_creator
     end
+
+    users
   end
-
-  # def get_token(user)
-  #   email_authorization = params[:email_authorization]
-  #   email_authorization.token
-  # end
-
 
   def notification_affected_users
     self.purchase_order.notification_affected_users(:submit)
   end
-
-  # def send_push_notification(user)
-  #   return if user.id == report.user.id
-  #   message = "#{self.report.user.name} has submitted the report: #{self.report.name}"
-  #   view = UserRole.name_for(report.controlling_user_role_id)
-  #   GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
-  # end
 
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:purchase_order),
@@ -69,28 +36,33 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
   end
 
   def mailer_subject(user)
-    if user.id == purchase_order.user.id
-      "Purchase Order submitted : #{self.purchase_order.po_number}"
+    if user.id == po_user.id
+      "Purchase Order submitted : #{po_number}"
     else
-      "#{self.purchase_order.user.name} has submitted Purchase Order : #{self.purchase_order.po_number}"
+      "#{po_user_name} has submitted Purchase Order : #{po_number}"
     end
   end
 
   def mailer_body(user)
-    if user.id == purchase_order.user.id
-      "Congratulations, you have successfully submitted the purchase order : #{self.purchase_order.po_number}"
+    binding.pry
+    if user.id == po_user.id
+      "Congratulations, you have successfully submitted the purchase order : #{po_number}"
     elsif purchase_request_creator.present? && purchase_request_creator.include?(user)
-      "#{self.purchase_order.user.name} has submitted purchase order: #{self.purchase_order.po_number} and is currently awaiting approval."
+      "#{po_user_name} has submitted purchase order: #{po_number} and is currently awaiting approval."
     else
-      "#{self.purchase_order.user.name} has submitted purchase order: #{self.purchase_order.po_number} and is currently awaiting your approval."
+      "#{po_user_name} has submitted purchase order: #{po_number} and is currently awaiting your approval."
     end
   end
 
-  # def report_view_role(user)
-  #   if user.id == report.user_id
-  #     return nil
-  #   elsif user.id == report.controlling_user_id
-  #     return report.controlling_user_role_id
-  #   end
-  # end
+  def po_user
+    @po_user ||= purchase_order.user
+  end
+
+  def po_user_name
+    @po_user_name ||= po_user.name
+  end
+
+  def po_number
+    @po_number ||= purchase_order.po_number
+  end
 end

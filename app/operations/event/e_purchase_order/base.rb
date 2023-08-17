@@ -16,7 +16,6 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
   end
 
   def action_name
-
   end
 
   def init
@@ -37,15 +36,105 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     end
   end
 
-  # def get_token(user)
-  #
-  # end
+  def last_trail
+    @last_trail ||= purchase_order.trails.last
+  end
+
+  def last_action
+    @last_action ||= last_trail.action
+  end
+
+  def last_action_name
+    @last_action_name ||= last_action.name
+  end
+
+  def last_action_user
+    @last_action_user ||= last_trail.action_user
+  end
+
+  def approving_user
+    return nil if last_action.name == 'submit'
+
+    last_action_user
+  end
+
+  def approval_uuid
+    purchase_order.email_approvals.last&.approval_uuid&.to_s || ''
+  end
 
   def send_mailer(user)
     return if user.blank?
+
     set_presenter_params(user)
-    return unless params[:subject].present? and params[:body].present?
-    ProcurementMailer.delay(queue: 'procurements_notification').send_purchase_order_mail(Event::EPurchaseOrder::Base::MailerPresenter.new(user, params))
+    return unless params[:subject].present? && params[:body].present?
+
+    if last_action_name == 'submit'
+      send_submit_mails(user)
+    elsif last_action_name == 'retract'
+      send_retract_mails(user)
+    elsif last_action_name == 'approve'
+      send_approval_mails(user)
+    elsif last_action_name == 'reject'
+      send_reject_mails(user)
+    elsif last_action_name == 'take_control'
+      send_take_control_mails(user)
+    else
+      send_mails(user)
+    end
+  end
+
+  def send_mails(user)
+    if user.id == purchase_order.created_by_id || user.id == approving_user&.id
+      PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
+      PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+    else
+      PurchaseOrderMailer.delay(queue: 'default').send_po_approval_mail(user.id, mail_presenter_params)
+      PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
+    end
+  end
+
+  def send_take_control_mails(user)
+    if user.id == purchase_order.created_by_id || user.id == approving_user&.id
+      PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
+      PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
+    else
+      PurchaseOrderMailer.delay(queue: 'default').send_po_approval_mail(user.id, mail_presenter_params)
+      PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+    end
+  end
+
+  def send_submit_mails(user)
+    if user.id == purchase_order.created_by_id
+      PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
+      PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+    else
+      PurchaseOrderMailer.delay(queue: 'default').send_po_approval_mail(user.id, mail_presenter_params)
+      PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
+    end
+  end
+
+  def send_retract_mails(user)
+    PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
+    PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def send_approval_mails(user)
+    if user.id == purchase_order.created_by_id || user.id == approving_user&.id
+      PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
+      PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+    else
+      PurchaseOrderMailer.delay(queue: 'default').send_po_approval_mail(user.id, mail_presenter_params)
+      PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
+    end
+  end
+
+  def send_reject_mails(user)
+    PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
+    PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def in_creator_actions?
+    ['submit', 'reject', 'retract'].include? last_action.name
   end
 
   def mailer_subject(user)
@@ -55,68 +144,51 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
   end
 
   def mailer_button_name(user)
-    # if report.controlling_user_id.present? and
-    #     user.id == purchase_order.controlling_user_id and not user.id == report.user.id
-    #   'Review Purchase Order'
-    # else
     'View Purchase Order'
-    # end
   end
 
-  # def report_view_role(user)
-  # end
+  def mail_presenter_params
+    {
+      body: params[:body],
+      subject: params[:subject],
+      action_name: params[:action_name],
+      action_url: params[:action_url],
+      purchase_order_id: params[:purchase_order].id,
+      email_approval_needed: params[:email_approval_needed]
+    }
+  end
 
   def set_presenter_params(user)
-    params[:subject] = self.mailer_subject(user)
-    params[:body] = self.mailer_body(user)
-    params[:button_name] = self.mailer_button_name(user)
+    params[:subject] = mailer_subject(user)
+    params[:body] = mailer_body(user)
+    params[:button_name] = mailer_button_name(user)
     params[:event_id] = event_id
     params[:action_name] = action_name
-    params[:include_attachments] = self.include_attachments
-    # params[:role_id] = report_view_role(user)
-    # if params[:email_authorization]
-    #   params[:action_url_token] = get_token(user)
-    # end
+    params[:include_attachments] = include_attachments
   end
 
   def allow_mailer(user, configuration)
-    # val = super(user, configuration)
-    # val and (user.manager_summary_mail_configs.reports.blank? or report.user == user)
     true
   end
 
   def process
-    # sending mailers
-    users = mailer_affected_users
-    if users.present?
-      users.each do |user|
-        next if user.blank? # or not user.is_a?(User)
-        user_event_configuration = load_configuration(user)
-        if allow_mailer(user, user_event_configuration) && user.email.present?
-          send_mailer(user)
-        end
-      end
+    send_mails_to_users
+    send_notifications_to_users
+  end
+
+  def send_mails_to_users
+    (mailer_affected_users || []).each do |user|
+      next if user.blank?
+
+      send_mailer(user) if user.email.present?
     end
+  end
 
-    # sending push notifications
-    # users = push_notification_affected_users
-    # if users.present?
-    #   users.each do |user|
-    #     next if user.blank?# or not user.is_a?(User)
-    #     user_event_configuration = load_configuration(user)
-    #     if allow_push_notification(user, user_event_configuration)
-    #       send_push_notification(user)
-    #     end
-    #   end
-    # end
+  def send_notifications_to_users
+    (notification_affected_users || []).each do |user|
+      next if user.blank?
 
-    # sending notifications
-    users = notification_affected_users
-    if users.present?
-      users.each do |user|
-        next if user.blank? # or not user.is_a?(User)
-        set_notification(user)
-      end
+      set_notification(user)
     end
   end
 
@@ -136,67 +208,44 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
       self.view_url = generate_url.html_safe
       self.company = user.company
       self.include_attachments = params[:include_attachments]
-      # if params[:action_url_token]
-      #   self.action_url_token = params[:action_url_token]
-      #   action_url = generate_action_url(user, role_id)
-      #   self.action_url = action_url.html_safe if action_url.present?
-      #   # self.action_url = generate_action_url(user, role_id).html_safe
-      # end
     end
 
     def generate_url
-      suffix = URI.escape("{\"show\":\"purchase_order\"}")
-      # path = "reports/#{report.id}"
+      suffix = URI.escape('{"show":"purchase_order"}')
       path = "procurements/#{purchase_order.procurement.id}/params="
       url = Constants::BASE_URL_VP + path + suffix
     end
 
-    # def generate_action_url(user, role_id)
-    #   view = ""
-    #   case role_id
-    #     when 3
-    #       view = "\"manager\""
-    #     when 2
-    #       view = "\"finance_manager\""
-    #     when 1
-    #       view = "\"admin\""
-    #     else
-    #       view = "\"personal\""
-    #   end
-    #
-    #   url = nil
-    #   if report.controlling_user_id == user.id
-    #     # token = params[:email_authorization]
-    #
-    #     # suffix = "/params={\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}"
-    #     path = "report/#{report.id}"
-    #     path = "payments#procurements/#{purchase_order.procurement.id}"
-    #
-    #     url = Constants::BASE_URL_AUTHORIZER + path + suffix
-    #   end
-    #   url
-    # end
-
     def validate
-      self.user.present? and self.purchase_order.present?
+      user.present? and purchase_order.present?
     end
 
     def to
-      self.user.email
+      user.email
+    end
+
+    def to_name
+      user&.name
     end
 
     def subject
-      self.subject_val
+      subject_val
     end
 
     def body
-      self.body_val
+      body_val
     end
 
     def button_name
-      self.button_val
+      button_val
     end
 
-  end
+    def reply_to
+      approval_uuid + Constants::EMAIL_APPROVAL_MAIL_ID # EMAIL_APPROVAL_MAIL_ID = '@approval.email.finly.io'
+    end
 
+    def approval_uuid
+      purchase_order.email_approvals.last&.approval_uuid&.to_s || ''
+    end
+  end
 end

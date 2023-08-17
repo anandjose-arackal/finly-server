@@ -84,7 +84,7 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   end
 
   def create_email_approval_for_purachse_request(purchase_request)
-    EmailApproval.create_for_purachse_request(purchase_request)
+    EmailApproval.create_for(purchase_request)
   end
 
   def success

@@ -1,4 +1,4 @@
-class Email::Pr_Approval_Service
+class Email::PrApprovalService
   attr_reader :user, :purchase_request, :mail_from, :logger, :email_body
 
   def initialize(user, purchase_request, mail_from, email_body, error_logger = nil)
@@ -63,7 +63,7 @@ class Email::Pr_Approval_Service
       if purchase_request.approved?
         after_approval
       elsif purchase_request.awaiting_approval?
-        EmailApproval.create_for_purachse_request(purchase_request)
+        EmailApproval.create_for(purchase_request)
       end
     else
       logger.error("purchase_request #{purchase_request.id} failed to approve by #{mail_from} because #{@result.inspect}")

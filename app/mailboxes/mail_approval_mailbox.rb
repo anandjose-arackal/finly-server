@@ -9,7 +9,9 @@ class MailApprovalMailbox < ApplicationMailbox
     return if no_email_body? && log_no_email_body
 
     if document_type == PurchaseRequest
-      Email::Pr_Approval_Service.new(@user, document, mail.from, email_body, error_logger).process
+      Email::PrApprovalService.new(@user, document, mail.from, email_body, error_logger).process
+    elsif document_type == PurchaseOrder
+      Email::PoApprovalService.new(@user, document, mail.from, email_body, error_logger).process
     else
       return if no_invoice? && log_no_invoice
       return if invoice_not_in_processing? && log_invoice_not_in_processing
@@ -84,7 +86,10 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def email_body
-    mail.text_part&.decode_body.to_s
+    body = mail.text_part&.decode_body.to_s
+    return body if body.present?
+
+    mail.decoded
   end
 
   def email_approval
