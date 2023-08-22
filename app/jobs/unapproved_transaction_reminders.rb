@@ -1,7 +1,7 @@
 class UnapprovedTransactionReminders < BaseJob
   def self.perform_job
     @logger = Logger.new "#{Rails.root}/log/reminders.log"
-    @logger.info "#{self.name} => Job run started at #{Time.now}"
+    # @logger.info "#{self.name} => Job run started at #{Time.now}"
     
     # to store whether a company has enabled to send the reminders
     @reminders_enabled = Hash.new
@@ -15,7 +15,7 @@ class UnapprovedTransactionReminders < BaseJob
       @logger.info "#{self.name} => No users found for any pending actions at #{Time.now}"
     end
     
-    @logger.info "#{self.name} => Job run ended at #{Time.now}"
+    # @logger.info "#{self.name} => Job run ended at #{Time.now}"
   end
 
   private

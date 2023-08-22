@@ -67,7 +67,7 @@ class Event::EInvoice::Credit < Event::EInvoice::Base
   end
 
   def mailer_body(user)
-    "Payment of &#8377;#{payment.amount.value} has been processed by #{crediting_user.name} against your invoice number #{invoice.invoice_number}."
+    "Payment of #{invoice&.base_currency&.country_code} #{payment.amount.value} has been processed by #{crediting_user.name} against your invoice number #{invoice.invoice_number}."
   end
 
   def allow_mailer(user, configuration, which_super: nil)

@@ -104,7 +104,7 @@ class ProcurementMailer < ApplicationMailer
       # )
 
       @payment = @data.payment
-      @currency_symbol = @invoice&.base_currency&.symbol
+      @currency_symbol = @invoice&.base_currency&.country_code
 
       invoice_data  = if @invoice&.forms_enabled
                         {
