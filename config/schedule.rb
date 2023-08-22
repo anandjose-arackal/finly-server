@@ -127,7 +127,7 @@ every :hour, roles: [:whenever_cron] do
   runner "RemoveDuplicateSequence.perform"
 end
 
-every :hour, roles: [:whenever_cron] do
+every 1.day, at: '8:00 am' roles: [:whenever_cron] do
   runner "BbpsReminders.perform"
 end
 

@@ -1,0 +1,72 @@
+<% content_for :body do %>
+  <head>
+    <title>@data.action_name</title>
+  </head>
+  <body style="background-color: #f3f3f3; height: auto;">
+    <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table; margin-bottom: 20px;">
+      <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;">
+        <%= @data.action_name %>
+      </p>
+    </div>
+    <div style="font-size: 18px; height: auto; margin: auto; background-color: white; text-align: left; padding: 14px;">
+      <p style="margin-top: 0;">Dear Sir/Mam,</p>
+      
+      <p>
+        This is a reminder that the payment for your
+        <strong><%= @data.payload[:utility_title] %></strong>
+        bill due on 
+        <strong><%= localize(@data.payload[:due_date], format: "%d/%m/%Y") %></strong>.
+        <br>
+        Below are the additional Details of the bill.
+      </p>
+
+      <table>
+        <tbody>
+          <tr>
+            <td>Bill type</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @data.payload[:bill_type] %></td>
+          </tr>
+          <tr>
+            <td>Operator/Vendor</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @data.payload[:utility_operator_or_vendor] %></td>
+          </tr>
+          <tr>
+            <td>Bill amount</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @data.payload[:currency_country_code] %> <%= @data.payload[:bill_amount] %></td>
+          </tr>
+          <tr>
+            <td>Invoice No</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @data.payload[:bill_number] %></td>
+          </tr>
+          <tr>
+            <td>Department</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @data.payload[:department] %></td>
+          </tr>
+          <tr>
+            <td>Cost Center</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @data.payload[:cost_center] %></td>
+          </tr>
+          <tr>
+            <td>Location</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @data.payload[:location] %></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        <a href="<%= @url %>" target="_blank" style="text-decoration: none; color: #1aa44e;">Click Here</a> for more Details.
+      </p>
+
+      <p style="margin-bottom: 0;">If you have already submitted your payment, please disregard this reminder.</p>
+    </div>
+  </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>
