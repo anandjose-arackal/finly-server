@@ -47,7 +47,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
       
 
       #Advance Calculation
-      po_requested_advance_amount: "{% if form.advance_amount_required == false %}{{ 0 }}{% else %}{{ form.po_requested_advance_amount | default: 0 | round: 2}}{% endif %}",
+      po_requested_advance_amount: "{% if form.advance_amount_required == false or form.advance_amount_required == 'FALSE' %}{{ 0 }}{% else %}{{ form.po_requested_advance_amount | default: 0 | round: 2}}{% endif %}",
 
       po_advance_tds_amount: "{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | divided_by: 100.00 | default: 0 | ceil }}",
       # find the max amount on which tds is applicable. 
