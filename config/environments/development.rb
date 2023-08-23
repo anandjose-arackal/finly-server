@@ -141,12 +141,11 @@ Rails.application.configure do
   #   hash.as_json
   # end
 
-  # config.mailer_config = config_for(:mailer_config)
-  # config.action_mailer.deliver_later_queue_name = 'mailer_queue'
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3001 }
-  config.action_mailer.delivery_method = :letter_opener
-  config.action_mailer.perform_deliveries = true
-  # config.action_mailer.smtp_settings = { address: "localhost", port: 1025 }
+  config.mailer_config = config_for(:mailer_config)
+  config.action_mailer.deliver_later_queue_name = 'mailer_queue'
+  config.action_mailer.default_url_options = { host: config.mailer_config['host'] }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = { address: "localhost", port: 1025 }
   # config.action_mailer.smtp_settings = {
   #     address: config.mailer_config['address'],
   #     port: config.mailer_config['port'],

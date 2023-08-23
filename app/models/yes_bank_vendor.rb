@@ -416,9 +416,9 @@ class YesBankVendor < ApplicationRecord
   end
 
   def self.awaiting_records user
-    # user_id = user.id
-    if user.present?
-      self.awaiting_action_items(user).where.not(status_id: VendorStatus.id_for(:auto_approved))
+    user_id = user.id
+    if user_id.present?
+      self.awaiting_action_items(user_id).where.not(status_id: VendorStatus.id_for(:auto_approved))
     end
   end
 

@@ -70,7 +70,6 @@ class Payment < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
-  include UtrEmailable
   # include SearchIndex::Concerns::Document
 include Searchkick::Api
 

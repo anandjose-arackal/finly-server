@@ -85,11 +85,11 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def post_process
-    # self.file_payments.each do |payment|
-    #   if send_email_if_valid?(payment)
-    #     BackgroundJobs::UtrUpdateEmail::SendInvoiceEmailOnUtrUpdateBackground.perform_async(payment&.id)
-    #   end
-    # end
+    self.file_payments.each do |payment|
+      if send_email_if_valid?(payment)
+        BackgroundJobs::UtrUpdateEmail::SendInvoiceEmailOnUtrUpdateBackground.perform_async(payment&.id)
+      end
+    end
   end
 
   def success

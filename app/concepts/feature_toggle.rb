@@ -10,7 +10,7 @@ class FeatureToggle
     if Rails.env.production?
       15.minutes
     else
-      1.second
+      1.minute
     end
   end
 
@@ -39,9 +39,7 @@ class FeatureToggle
   end
 
   def value(key, default = nil)
-    current_flags = flags
-    return default if current_flags.blank?
-    flag = current_flags[normalize_key(key)]
+    flag = flags[normalize_key(key)]
     return default if flag.nil?
 
     flag[:value]

@@ -501,9 +501,9 @@ include Searchkick::Api
 
   def self.awaiting_records user
     # awaiting approval
-    # user_id = user&.id
-    if user.present?
-      where("#{table_name}.status_id": PaymentAgreementStatus.id_for(:awaiting_approval)).awaiting_action_items(user)
+    user_id = user&.id
+    if user_id.present?
+      where("#{table_name}.status_id": PaymentAgreementStatus.id_for(:awaiting_approval)).awaiting_action_items(user_id)
     else
       self.none
     end

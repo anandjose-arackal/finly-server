@@ -138,9 +138,3 @@ end
 every 1.day, at: '8:30 am', roles: [:whenever_cron] do
   runner "UnapprovedTransactionReminders.perform"
 end
-
-# whenever --update-crontab --set environment='development'
-set :environment, 'development'
-every '* * * * *', roles: [:whenever_cron] do
-  runner "BbpsReminders.perform"
-end

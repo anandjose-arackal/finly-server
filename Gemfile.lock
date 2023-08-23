@@ -435,10 +435,6 @@ GEM
     jwt (2.4.1)
     kalc (1.7.0)
       parslet (~> 1.8.2)
-    launchy (2.5.2)
-      addressable (~> 2.8)
-    letter_opener (1.8.1)
-      launchy (>= 2.2, < 3)
     lightgbm (0.2.6)
       ffi
     liquid (4.0.3)
@@ -933,7 +929,6 @@ DEPENDENCIES
   json_logic (~> 0.4)
   jwt (~> 2.2)
   kalc
-  letter_opener
   liquid (~> 4.0.1)
   listen (>= 3.0.5, < 3.2)
   lograge (~> 0.10.0)
