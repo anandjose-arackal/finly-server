@@ -96,6 +96,8 @@ class BbpsReminders < BaseJob
   end
 
   def self.find_users
+    return unless @bills_by_users.present?
+
     user_ids = []
     
     @bills_by_users.each do |bill_id, user_ids_list|
@@ -119,6 +121,8 @@ class BbpsReminders < BaseJob
   end
 
   def self.trigger_mailer_event
+    return unless @bills_by_users.present?
+
     @bills_by_users.each do |bill_id, user_ids_list|
 
       bill = @bills_due[bill_id]
