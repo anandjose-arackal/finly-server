@@ -303,7 +303,7 @@ include Searchkick::Api
   end
 
   def self.awaiting_records user
-    where("#{table_name}.status_id": BbpsBillerSubscriptionStatus.id_for(:awaiting_approval)).awaiting_action_items(user&.id)
+    where("#{table_name}.status_id": BbpsBillerSubscriptionStatus.id_for(:awaiting_approval)).awaiting_action_items(user)
   end
 
   # display_name  used  in  payment  file  creation method to  print the  beneficiary name

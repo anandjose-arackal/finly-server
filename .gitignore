@@ -122,3 +122,14 @@ coverage
 /config/sso_provider_credentials.yml
 
 storage/
+
+
+# my ignores
+.ruby-gemset
+config/bills.yml
+config/bullet_train.yml
+config/database.yml.bak2
+config/mattermost_config.yml
+config/message_service.yml
+config/nohout.out
+config/secrets.yml

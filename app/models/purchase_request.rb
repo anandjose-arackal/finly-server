@@ -304,9 +304,9 @@ class PurchaseRequest < ApplicationRecord
   end
 
   def self.awaiting_records user
-    user_id = user.id
-    if user_id.present?
-      where("#{table_name}.purchase_request_status_id": PurchaseRequestStatus.id_for(:awaiting_approval)).awaiting_action_items(user_id)
+    # user_id = user.id
+    if user.present?
+      where("#{table_name}.purchase_request_status_id": PurchaseRequestStatus.id_for(:awaiting_approval)).awaiting_action_items(user)
     end
   end
 

@@ -746,7 +746,8 @@ module Transitionable
       #
       admin = user.admin? || user.vendor_payment_admin?
 
-      if OptimizedAwaitingActionItemsToggle.new(user).enabled?
+      # if OptimizedAwaitingActionItemsToggle.new(user).enabled?
+      if true
         optimized_awaiting_action_items(user, admin)
       else
         exisitng_awaiting_action_items(user, admin)

@@ -828,9 +828,9 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.awaiting_records user
-    user_id = user.id
-    if user_id.present?
-      where("#{table_name}.purchase_order_status_id": PurchaseOrderStatus.id_for(:processing)).awaiting_action_items(user_id)
+    # user_id = user.id
+    if user.present?
+      where("#{table_name}.purchase_order_status_id": PurchaseOrderStatus.id_for(:processing)).awaiting_action_items(user)
     end
   end
 

@@ -578,7 +578,7 @@ class BbpsBill < ApplicationRecord
   end
 
   def self.awaiting_records user
-    where("#{table_name}.status_id": BbpsBillStatus.id_for(:awaiting_approval)).awaiting_action_items(user&.id)
+    where("#{table_name}.status_id": BbpsBillStatus.id_for(:awaiting_approval)).awaiting_action_items(user)
   end
 
   def payable?
