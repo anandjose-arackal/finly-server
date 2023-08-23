@@ -44,7 +44,6 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
   end
 
   def mailer_body(user)
-    binding.pry
     if user.id == po_user.id
       "Congratulations, you have successfully submitted the purchase order : #{po_number}"
     elsif purchase_request_creator.present? && purchase_request_creator.include?(user)

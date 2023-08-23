@@ -6,7 +6,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
       add_message :error, 'User not found'
       return
     end
-    if params.blank? or params[:purchase_order].blank?
+    if params.blank? || params[:purchase_order].blank?
       add_message :error, 'Purchase Order not found'
       return
     end
@@ -62,79 +62,73 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     purchase_order.email_approvals.last&.approval_uuid&.to_s || ''
   end
 
-  def send_mailer(user)
-    return if user.blank?
-
-    set_presenter_params(user)
-    return unless params[:subject].present? && params[:body].present?
-
-    if last_action_name == 'submit'
-      send_submit_mails(user)
-    elsif last_action_name == 'retract'
-      send_retract_mails(user)
-    elsif last_action_name == 'approve'
-      send_approval_mails(user)
-    elsif last_action_name == 'reject'
-      send_reject_mails(user)
-    elsif last_action_name == 'take_control'
-      send_take_control_mails(user)
-    else
-      send_mails(user)
-    end
+  def taken_control?(user)
+    purchase_order.document_level_reviewer_mappings.with_level_id(purchase_order.controlling_level_id.to_i - 1)
+                  .pluck(:taken_control_by_id).include? user.id
   end
 
-  def send_mails(user)
-    if user.id == purchase_order.created_by_id || user.id == approving_user&.id
-      PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
-      PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
-    else
-      PurchaseOrderMailer.delay(queue: 'default').send_po_approval_mail(user.id, mail_presenter_params)
-      PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
-    end
+  def is_approver?(user)
+    user.id == approving_user&.id
   end
 
-  def send_take_control_mails(user)
-    if user.id == purchase_order.created_by_id || user.id == approving_user&.id
-      PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
-      PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
-    else
-      PurchaseOrderMailer.delay(queue: 'default').send_po_approval_mail(user.id, mail_presenter_params)
-      PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
-    end
+  def is_creator?(user)
+    user.id == purchase_order.created_by_id
   end
+
+  def approved?
+    purchase_order.approved?
+  end
+
+  def new_ui_enabled?(user)
+    PurchaseOrderToggle.new(user).enabled?
+  end  
 
   def send_submit_mails(user)
-    if user.id == purchase_order.created_by_id
-      PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
-      PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+    if is_creator?(user) || !new_ui_enabled?(user)
+      PurchaseOrderMailer.delay(queue: 'procurements_notification').send_purchase_order_mail(user.id, mail_presenter_params)
+      # PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
     else
-      PurchaseOrderMailer.delay(queue: 'default').send_po_approval_mail(user.id, mail_presenter_params)
-      PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
+      PurchaseOrderMailer.delay(queue: 'procurements_notification').send_po_approval_mail(user.id, mail_presenter_params)
+      # PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
     end
   end
 
   def send_retract_mails(user)
-    PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
-    PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+    PurchaseOrderMailer.delay(queue: 'procurements_notification').send_purchase_order_mail(user.id, mail_presenter_params)
+    # PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
   end
 
-  def send_approval_mails(user)
-    if user.id == purchase_order.created_by_id || user.id == approving_user&.id
-      PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
-      PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+  def send_take_control_mails(user)
+    if (is_creator?(user) || is_approver?(user)) && new_ui_enabled?(user)
+      PurchaseOrderMailer.delay(queue: 'procurements_notification').send_po_approval_mail(user.id, mail_presenter_params)
+      # PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
     else
-      PurchaseOrderMailer.delay(queue: 'default').send_po_approval_mail(user.id, mail_presenter_params)
-      PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
+      PurchaseOrderMailer.delay(queue: 'procurements_notification').send_purchase_order_mail(user.id, mail_presenter_params)
+      # PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
     end
   end
 
-  def send_reject_mails(user)
-    PurchaseOrderMailer.delay(queue: 'default').send_purchase_order_mail(user.id, mail_presenter_params)
-    PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+  def send_approval_mails(user)
+    send_mails(user)
   end
 
-  def in_creator_actions?
-    ['submit', 'reject', 'retract'].include? last_action.name
+  def send_reject_mails(user)
+    PurchaseOrderMailer.delay(queue: 'procurements_notification').send_purchase_order_mail(user.id, mail_presenter_params)
+    # PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def send_mails(user)
+    # if is_approver?(user) && taken_control?(user)
+    #   PurchaseOrderMailer.delay(queue: 'procurements_notification').send_po_approval_mail(user.id, mail_presenter_params)
+    #   PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
+    # els
+    if is_approver?(user) || (is_creator?(user) && approved?) || !new_ui_enabled?(user)
+      PurchaseOrderMailer.delay(queue: 'procurements_notification').send_purchase_order_mail(user.id, mail_presenter_params)
+      # PurchaseOrderMailer.send_purchase_order_mail(user.id, mail_presenter_params).deliver_later
+    else
+      PurchaseOrderMailer.delay(queue: 'procurements_notification').send_po_approval_mail(user.id, mail_presenter_params)
+      # PurchaseOrderMailer.send_po_approval_mail(user.id, mail_presenter_params).deliver_later
+    end
   end
 
   def mailer_subject(user)
@@ -211,8 +205,10 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     end
 
     def generate_url
-      suffix = URI.escape('{"show":"purchase_order"}')
-      path = "procurements/#{purchase_order.procurement.id}/params="
+      # suffix = URI.escape('{"show":"purchase_order"}')
+      # path = "procurements/#{purchase_order.procurement.id}/params="
+      suffix = URI.escape("{\"procurement_id\":\"#{purchase_order.procurement.id}\",\"forms_enabled\":\"true\"}")
+      path = "procure_purchase_orders/#{purchase_order.id}/params="
       url = Constants::BASE_URL_VP + path + suffix
     end
 

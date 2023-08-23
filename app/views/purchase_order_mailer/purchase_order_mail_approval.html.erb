@@ -35,8 +35,32 @@
                 </div>
                 <p style="margin: 5px 0 10px 0; font-size: 14px; line-height: 20px;">
                     <span style="font-size: 14px;font-weight: 600;"><%= %></span>
-                    <%= %> This invoice is waiting on your approval <a style="color: #2D9DE7;" href="<%= @data.view_url%>" target="_blank"><%= @data.purchase_order.po_number %></a> in Finly. Below is the summary for the same,
+                    <%= %> This purchase order is waiting on your approval <a style="color: #2D9DE7;" href="<%= @data.view_url%>" target="_blank"><%= @data.purchase_order.po_number %></a> in Finly. Below is the summary for the same,
                 </p>
+                <div class="email-body--invoice-details">   
+                        <table style="width:100%;font-weight: 400;border-collapse: collapse;">
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">PO Initiator</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.purchase_order.created_by.name%></td>
+                            </tr>
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">PO Number</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.purchase_order.po_number%></td>
+                            </tr>
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">PO Date</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.purchase_order.created_at.strftime("%b %d, %Y")%></td>
+                            </tr>
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">PO Advance Amount</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.purchase_order.advance_amount.value%></td>
+                            </tr>
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">Total PO Amount</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.purchase_order.total_after_tax.value.round%></td>
+                            </tr>
+                          </table>
+                </div>
                 <div class="more-details-section" style="width:100%; margin-top: 20px;">
                     <table style="width:100%;font-weight: 400; border-collapse: collapse;">
                         <tr style="font-weight: 400;">
@@ -44,7 +68,7 @@
                                 More details on purchase order can be viewed on <span style="font-weight: 600;padding: 0;margin: 0;">Finly</span>
                             </th>
                             <td style="font-size: 14px; width:150px;white-space: nowrap; text-align: right;font-weight: 600;">
-                                <a style="font-size:14px ;color: #143B52; background:#F7F7FB; width: 70px;height: 35px ;border-radius: 2px;text-decoration: none;padding: 12px 5px 12px 5px;border: none;"class="btn view-invoice" href="<%= @data.view_url%>" target="_blank">View Purchase Request </a>
+                                <a style="font-size:14px ;color: #143B52; background:#F7F7FB; width: 70px;height: 35px ;border-radius: 2px;text-decoration: none;padding: 12px 5px 12px 5px;border: none;"class="btn view-invoice" href="<%= @data.view_url%>" target="_blank">View Purchase Order </a>
                             </td>
                         </tr>
                     </table>

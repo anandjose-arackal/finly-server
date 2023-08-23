@@ -78,6 +78,10 @@ class Email::PoApprovalService
     purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:po_approved))
   end
 
+  def reject_purchase_request_items
+    purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:po_approved))
+  end
+
   def purchase_request_items
     @purchase_request_items ||= purchase_order.purchase_request_items
   end
@@ -90,25 +94,13 @@ class Email::PoApprovalService
     WorkflowManager::Base.(user, { document: purchase_order, aasm_event: 'reject' }).workflow_output
   end
 
-  def approve_purchase_order_items
-    update_purchase_order_items_status(PurchaseRequestItemStatus.id_for(:approved))
-  end
-
-  def reject_purchase_order_items
-    update_purchase_order_items_status(PurchaseRequestItemStatus.id_for(:rejected))
-  end
-
-  def update_purchase_order_items_status(status_id)
-    purchase_order.items.update_all(status_id: status_id)
-  end
-
   def reject
     note = "purchase_order has been rejected via email by #{mail_from} on #{Time.now.strftime('%Y-%d-%m %H:%M:%S %Z')}"
     @result = Event::EPurchaseOrder::Reject.(@user, purchase_order: purchase_order, workflow_output: reject_work_flow, note: note)
 
     if @result.success?
       EmailApproval.delete_email_approval(purchase_order.id)
-      reject_purchase_order_items
+      reject_purchase_request_items
     else
       logger.error("purchase_order #{purchase_order.id} failed to reject by #{mail_from} because #{@result.inspect}")
     end

@@ -15,7 +15,8 @@ class MailApprovalMailbox < ApplicationMailbox
     else
       return if no_invoice? && log_no_invoice
       return if invoice_not_in_processing? && log_invoice_not_in_processing
-      return if non_po_invoice_disabled? && log_non_po_invoice_disabled
+
+      # return if non_po_invoice_disabled? && log_non_po_invoice_disabled
 
       aprove_or_reject
     end

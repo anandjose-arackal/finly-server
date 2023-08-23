@@ -7,7 +7,7 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
       add_message :error, 'User not found'
       return
     end
-    if params.blank? or params[:purchase_request].blank?
+    if params.blank? || params[:purchase_request].blank?
       add_message :error, 'Purchase Request not found'
       return
     end
@@ -28,6 +28,10 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
 
   def last_action
     @last_action ||= last_trail.action
+  end
+
+  def last_action_name
+    @last_action_name ||= last_action.name
   end
 
   def last_action_user
@@ -53,13 +57,29 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
   def action_name
   end
 
-  def send_mailer(user)
-    return if user.blank?
+  def taken_control?(user)
+    purchase_request.document_level_reviewer_mappings.with_level_id(purchase_request.controlling_level_id.to_i - 1)
+                    .pluck(:taken_control_by_id).include? user.id
+  end
 
-    set_presenter_params(user)
-    return unless params[:subject].present? && params[:body].present?
+  def is_approver?(user)
+    user.id == approving_user&.id
+  end
 
-    if (user.id == params[:purchase_request].creator_id && submit_or_reject) || user.id == approving_user&.id
+  def is_creator?(user)
+    user.id == purchase_request.creator_id
+  end
+
+  def approved?
+    purchase_request.approved?
+  end
+
+  def new_ui_enabled?(user)
+    PurchaseRequestToggle.new(user).enabled?
+  end  
+
+  def send_submit_mails(user)
+    if is_creator?(user) || !new_ui_enabled?(user)
       PurchaseRequestMailer.delay(queue: 'procurements_notification').send_purchase_request_mail(user.id, mail_presenter_params)
       # PurchaseRequestMailer.send_purchase_request_mail(user.id, mail_presenter_params).deliver_later
     else
@@ -68,8 +88,42 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
     end
   end
 
-  def submit_or_reject
-    ['submit', 'reject'].include? last_action.name
+  def send_retract_mails(user)
+    PurchaseRequestMailer.delay(queue: 'procurements_notification').send_purchase_request_mail(user.id, mail_presenter_params)
+    # PurchaseRequestMailer.send_purchase_request_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def send_take_control_mails(user)
+    if (is_creator?(user) || is_approver?(user)) && new_ui_enabled?(user)
+      PurchaseRequestMailer.delay(queue: 'procurements_notification').send_pr_approval_mail(user.id, mail_presenter_params)
+      # PurchaseRequestMailer.send_pr_approval_mail(user.id, mail_presenter_params).deliver_later
+    else
+      PurchaseRequestMailer.delay(queue: 'procurements_notification').send_purchase_request_mail(user.id, mail_presenter_params)
+      # PurchaseRequestMailer.send_purchase_request_mail(user.id, mail_presenter_params).deliver_later
+    end
+  end
+
+  def send_approval_mails(user)
+    send_mails(user)
+  end
+
+  def send_reject_mails(user)
+    PurchaseRequestMailer.delay(queue: 'procurements_notification').send_purchase_request_mail(user.id, mail_presenter_params)
+    # PurchaseRequestMailer.send_purchase_request_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def send_mails(user)
+    # if is_approver?(user) && taken_control?(user)
+    #   PurchaseRequestMailer.delay(queue: 'procurements_notification').send_pr_approval_mail(user.id, mail_presenter_params)
+      # PurchaseRequestMailer.send_pr_approval_mail(user.id, mail_presenter_params).deliver_later
+    # els
+    if is_approver?(user) || (is_creator?(user) && approved?) || !new_ui_enabled?(user)
+      PurchaseRequestMailer.delay(queue: 'procurements_notification').send_pr_approval_mail(user.id, mail_presenter_params)
+      # PurchaseRequestMailer.send_purchase_request_mail(user.id, mail_presenter_params).deliver_later
+    else
+      PurchaseRequestMailer.delay(queue: 'procurements_notification').send_pr_approval_mail(user.id, mail_presenter_params)
+      # PurchaseRequestMailer.send_pr_approval_mail(user.id, mail_presenter_params).deliver_later
+    end
   end
 
   def mailer_subject(user)
@@ -158,7 +212,9 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
     end
 
     def view_url
-      Constants::BASE_URL_VP + "purchase_request/#{purchase_request.id}/params={}"
+      # Constants::BASE_URL_VP + "purchase_request/#{purchase_request.id}/params={}"
+      suffix = URI.escape('{"forms_enabled":"true"}')
+      Constants::BASE_URL_VP + "purchase_request_form/#{purchase_request.id}/params=" + suffix
     end
 
     def reply_to

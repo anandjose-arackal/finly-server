@@ -4,33 +4,11 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   end
 
   def action_name
-    'Invoice Submitted' 
+    'Invoice Submitted'
   end
 
   def affected_users
-    # [self.report.user, self.report.reload.controlling_user]
-    # users = []
-    # users.push self.invoice.created_by
-
-    # level = ReviewalLevel.find_by id: workflow_output[:modified_level_id]
-
-    # if level.present?
-    #   user_selected_reviewer = invoice.document_level_reviewer_mappings.with_level_ids(level.id).last
-    #   if user_selected_reviewer.present?
-    #     self.controlling_users.push(user_selected_reviewer.reviewer)
-    #     users.push(user_selected_reviewer.reviewer)
-    #   else
-    #     amount = invoice.net_amount.value
-    #     reviewers_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
-    #     reviewers = User.with_id(reviewers_ids)
-    #     reviewers.each do |reviewer|
-    #       users.push(reviewer)
-    #       self.controlling_users.push(reviewer)
-    #     end
-    #   end
-    # end
-    # users
-    self.invoice.affected_users(:submit) 
+    self.invoice.affected_users(:submit)
   end
 
   # def get_token(user)
@@ -38,9 +16,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   #   email_authorization.token
   # end
 
-
   def notification_affected_users
-    # self.controlling_users
     self.invoice.notification_affected_users(:submit)
   end
 
@@ -56,14 +32,13 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
                                              action_type_id: NotificationActionType.id_for(:notify_submit),
                                              action_user_id: invoice.created_by.id,
                                              object_id: invoice.id,
-                                             object_type: "Invoice",
+                                             object_type: 'Invoice',
                                              path_object_id: invoice.id,
-                                             path_object_type: "Invoice",
+                                             path_object_type: 'Invoice',
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: role_id,
-                                             application: RequestStore.store[:current_app]
-    )
+                                             application: RequestStore.store[:current_app])
     notification.save
   end
 
@@ -84,11 +59,6 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   end
 
   def report_view_role(user)
-    # if user.id == report.user_id
-    #   return nil
-    # elsif user.id == report.controlling_user_id
-    #   return report.controlling_user_role_id
-    # end
     provider_name = invoice.get_invoice_provider_name
     invoice.get_reviewers(nil, provider_name).include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end

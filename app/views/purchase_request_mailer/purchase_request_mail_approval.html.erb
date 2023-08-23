@@ -35,8 +35,20 @@
                 </div>
                 <p style="margin: 5px 0 10px 0; font-size: 14px; line-height: 20px;">
                     <span style="font-size: 14px;font-weight: 600;"><%= %></span>
-                    <%= %> This invoice is waiting on your approval <a style="color: #2D9DE7;" href="<%= @data.view_url%>" target="_blank"><%= @data.purchase_request.order_number %></a> in Finly. Below is the summary for the same,
+                    <%= %> This purchase request is waiting on your approval <a style="color: #2D9DE7;" href="<%= @data.view_url%>" target="_blank"><%= @data.purchase_request.order_number %></a> in Finly. Below is the summary for the same,
                 </p>
+                <div class="email-body--invoice-details">
+                        <table style="width:100%;font-weight: 400;border-collapse: collapse;">
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">Purchase Request Initiator</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.purchase_request.creator.name%></td>
+                            </tr>
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">Purchase Request Amount</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.purchase_request.total_amount.value%></td>
+                            </tr>
+                          </table>
+                </div>
                 <div class="more-details-section" style="width:100%; margin-top: 20px;">
                     <table style="width:100%;font-weight: 400; border-collapse: collapse;">
                         <tr style="font-weight: 400;">

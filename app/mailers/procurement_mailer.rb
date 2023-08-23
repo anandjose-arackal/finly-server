@@ -96,12 +96,12 @@ class ProcurementMailer < ApplicationMailer
         ),
         dpi: '650'
       )
-      ########################################################
-      # attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-      #    render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
-      # )
+      #######################################################
+      attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+         render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
+      )
       Rails.logger.info "Presenter::SetEmail::#{presenter.inspect} "
-      if presenter.set_email_approval_mail
+      if params[:email_based_approval]
         mail to: presenter.to, subject: presenter.subject, template_name: 'email_based_approval', reply_to: @data.reply_to
       else
         mail to: presenter.to, subject: presenter.subject, template_name: 'template_invoice'
