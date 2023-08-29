@@ -41,7 +41,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
       
       # NET AMOUNT
       po_sub_total_amount: "{% assign po_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ po_sub_total_amount | default: 0 | round: 2 | at_least: 0}}",
-      po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ amount | default: 0 | round: 2 }}{% endif %}",
+      po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' or form.base_currency_id == #{Currency.id_for('INR')} %}{{ amount | default: 0 | round: 2 }}{% endif %}",
       po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2 | at_least: 0}}",
       po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2 | at_least: 0 }}",
       
@@ -396,7 +396,7 @@ class Docs::P2P::PurchaseOrders::Import::Form < Forms::API
            can_editable_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_requested_advance_amount]), hide_in_import: true
 
-    lookup :advance_tds_slab_id, label: 'Tds Rate-(%)', choices_scope: Choices[:lookup].('tds_slabs'), 
+    lookup :advance_tds_slab_id, label: 'Tds Rate', choices_scope: Choices[:lookup].('tds_slabs'),
            visible: true, editable: false
 
     number :po_advance_tds_percentage, internal: true, editable: false, visible: false,
