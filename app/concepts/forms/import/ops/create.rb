@@ -41,8 +41,8 @@ class Forms::Import::Ops::Create < Transactions::API
   end
 
   def validate_po_advance(context, params:, model:, **)
-    if model.class == PurchaseOrder && model.po_requested_advance_amount > model.po_balance_due
-      return on_error context, :purchace_order, 'Advance Amount cannot be more than Payable amount'
+    if model.instance_of?(PurchaseOrder) && (params[:po_requested_advance_amount] > params[:po_balance_due])
+      return on_error context, :purchase_order, 'Advance Amount cannot be more than Payable amount'
     end
 
     return true
