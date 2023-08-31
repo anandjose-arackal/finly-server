@@ -387,11 +387,15 @@ include Searchkick::Api
   end
 
   def self.agreement_master_roles
-    [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor]
+    [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor, :agreement_invoice_initiator,:bank_payment_request_initiator]
   end
 
   def get_default_provider
     'PaymentAgreementProvider'
+  end
+
+  def self.initiator_associated_status_ids
+    PaymentAgreementStatus.ids_for(:approved, :auto_approved, :awaiting_approval, :closed, :invoice_created, :payment_ticket_created, :terminated, :revised)
   end
 
   def self.status_ids(*statuses)
@@ -422,6 +426,14 @@ include Searchkick::Api
     PaymentAgreementStatus.ids_for(self.role_based_statuses(user))
   end
 
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
+    if UserRole.ids_for([:bank_payment_request_initiator, :agreement_invoice_initiator]).include? role_id
+      policy_ids = PolicyUserRole.select(:policy_id).where(user_id: user.id, user_role_id: role_id)
+      return user.company.payment_agreements.where(policy_id: policy_ids).where(status_id: initiator_associated_status_ids)
+    end
+    user.send("#{self.table_name}")
+  end
+
   def self.auditor_associated_status_ids
     self.status_ids(:awaiting_approval, :approved, :auto_approved, :retracted, :rejected, :closed)
   end
@@ -431,7 +443,7 @@ include Searchkick::Api
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if (UserRole.id_for(:payment_agreement_initiator) == role_id.to_i)
-          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved]
+          statuses += [:approved, :rejected, :auto_approved]
         elsif (UserRole.id_for(:payment_agreement_reviewer) == role_id.to_i)
           statuses += [:awaiting_approval, :approved, :auto_approved]
         end

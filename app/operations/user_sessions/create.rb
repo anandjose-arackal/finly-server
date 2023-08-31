@@ -41,7 +41,6 @@ class UserSessions::Create < BaseOperation
         return
       end
     end
-
     # if self.params[:username].blank?
     #   add_message :error, 'Username not found'
     #   return

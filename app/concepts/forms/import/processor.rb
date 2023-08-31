@@ -619,8 +619,9 @@ class Forms::Import::Processor
     form_data[:form] = form
     form_data[:is_import_process] = true
 
-    if form_data[:id].present?
-      form_data[:record_query] = { id: form_data[:id] }
+    record_id = form_data[:id] || form_data['id']
+    if record_id.present?
+      form_data[:record_query] = { id: record_id }
     end
 
     #ToDo: use same operation once batch saving is resolved
