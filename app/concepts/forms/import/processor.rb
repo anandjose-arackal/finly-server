@@ -317,6 +317,14 @@ class Forms::Import::Processor
           op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: user)
         elsif record.class == PurchaseOrder
           document_reviewer_mappings = policy.levels.non_deleted.with_entity_type('PurchaseOrderProvider').reorder(:level_number).map{|x| {level_id: x.id}} rescue nil
+          master = 'Docs::P2P::PurchaseOrders::Form'
+          po_form = Form.where(klass_name: master).first
+          sequence_entity = po_form.entities.where(entity_key: 'po_number').first
+          if sequence_entity.present?
+            prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(sequence_entity, self)
+            po_number = prefix + sequence
+            record.update(po_number: po_number)
+          end
           submit_params = {
             reviewal_document: record,
             policy_id: record.policy_id,
@@ -481,7 +489,7 @@ class Forms::Import::Processor
         if header_data[:entity_type] == 'lookup' && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
           params_hash = {:entity_path => header_data[:entity].entity_path, :route => "#{form.label.underscore.to_s}_import", :value => form_data[header_data[:entity_key]]}
           current_user = user
-          lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data]
+          lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data] rescue nil
           form_data = lookup_data.merge(form_data) if lookup_data.present?
         end
       else
