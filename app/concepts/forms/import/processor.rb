@@ -289,18 +289,25 @@ class Forms::Import::Processor
     return if records_to_save.empty?
 
     records_to_save.each do |record, import_record|
-      if record.is_a? Invoice
+      if [Invoice, PurchaseOrder].include? form.model
         record.items&.each do |item|
           item.id = nil
         end
         record.import_job_id = import_job.id
+        if form.model == PurchaseOrder
+          record.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
+          record.form_migrated = true
+          record.quotations.each do |quote|
+            quote.id = nil
+          end
+        end
       end
       if record.save
+        policy = record.policy
         if record.class == YesBankVendor
           submit_params = { reviewal_document: record }
           op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
         elsif record.class == Invoice
-          policy = record.policy
           document_reviewer_mappings = policy.levels.non_deleted.with_entity_type('NonPoInvoiceProvider').reorder(:level_number).map{|x| {level_id: x.id}} rescue nil
           submit_params = {
             reviewal_document: record,
@@ -308,6 +315,22 @@ class Forms::Import::Processor
             document_reviewer_mappings: document_reviewer_mappings
           }
           op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: user)
+        elsif record.class == PurchaseOrder
+          document_reviewer_mappings = policy.levels.non_deleted.with_entity_type('PurchaseOrderProvider').reorder(:level_number).map{|x| {level_id: x.id}} rescue nil
+          master = 'Docs::P2P::PurchaseOrders::Form'
+          po_form = Form.where(klass_name: master).first
+          sequence_entity = po_form.entities.where(entity_key: 'po_number').first
+          if sequence_entity.present?
+            prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(sequence_entity, self)
+            po_number = prefix + sequence
+            record.update(po_number: po_number)
+          end
+          submit_params = {
+            reviewal_document: record,
+            policy_id: record.policy_id,
+            document_reviewer_mappings: document_reviewer_mappings
+          }
+          op = Docs::I2P::PurchaseOrders::Ops::Submit.(params: submit_params, current_user: user)
         end
         if op&.success?
           import_record.update_status(true, ['Record created successfully'].to_s, '', '')
@@ -466,8 +489,8 @@ class Forms::Import::Processor
         if header_data[:entity_type] == 'lookup' && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
           params_hash = {:entity_path => header_data[:entity].entity_path, :route => "#{form.label.underscore.to_s}_import", :value => form_data[header_data[:entity_key]]}
           current_user = user
-          lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data]
-          form_data = lookup_data.merge(form_data)
+          lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data] rescue nil
+          form_data = lookup_data.merge(form_data) if lookup_data.present?
         end
       else
         if row_data[header_data[:name]].present?
@@ -512,7 +535,7 @@ class Forms::Import::Processor
             end
 
             # running lookup fetch on all lookups
-            if header_data[:entity_type] == 'lookup' && data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
+            if header_data[:entity_type] == 'lookup' && header_data[:entity].choices_scope.present? && data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
               params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
               current_user = user
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
@@ -563,7 +586,7 @@ class Forms::Import::Processor
       end
     end
 
-    form_data = perform_form_calculations(form_data) if form.model == Invoice
+    form_data = perform_form_calculations(form_data) if [Invoice, PurchaseOrder].include? form.model
 
     dropdowns = headers[form.model.name][:headers].values.select{|header_value| header_value['entity_type'] == 'dropdown'}
     dropdowns.each do |header_data|

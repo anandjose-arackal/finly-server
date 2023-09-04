@@ -43,7 +43,8 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
                                     :agreement_invoice_reviewer => 'Agreement Invoice Reviewer',
                                     :agreement_invoice_auditor => 'Agreement Invoice Auditor',
                                     :vendor_bulk_importer => 'Vendor Bulk Importer',
-                                    :invoice_bulk_importer => 'Invoice Bulk Importer'
+                                    :invoice_bulk_importer => 'Invoice Bulk Importer',
+                                    :po_bulk_importer => 'Purchase Order Bulk Importer'
               },
               "Expense Management" => {
                   :policy_name => 'Policy Name',
