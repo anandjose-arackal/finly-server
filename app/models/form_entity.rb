@@ -130,8 +130,13 @@ class FormEntity < ApplicationRecord
   serialize :filters, Rules::Adapters::Store
 
   def sync_with_import_form
-    return if ["Docs::P2P::Invoices::Import::Form", "Masters::Vendors::Form"].include? form.klass_name
-    import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.downcase}_import")&.name).first
+    return if [
+      'Docs::P2P::Invoices::Import::Form',
+      'Masters::Vendors::Form',
+      'Docs::P2P::PurchaseOrders::Import::Form'
+    ].include? form.klass_name
+
+    import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.underscore.downcase}_import")&.name).first
     return if import_form.nil?
 
     import_section = import_form.sections.where(section_id: self.section.section_id).first
@@ -391,7 +396,7 @@ class FormEntity < ApplicationRecord
       currency_entity: currency_entity
     }
     if choices_scope.present?
-      data[:choices] = choices_scope.build(params: opts[:params], user: opts[:current_user])
+      data[:choices] = choices_scope.build(params: opts[:params].merge({paginate: true}), user: opts[:current_user])
     end
 
     if entities.present?

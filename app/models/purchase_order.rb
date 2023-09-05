@@ -81,7 +81,7 @@
 #
 
 class PurchaseOrder < ApplicationRecord
-  attr_accessor :skip_callback
+  attr_accessor :skip_callback, :vendor_country_id_value
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include Concerns::ErpSyncConcern
   include LiquidDroppable
@@ -182,7 +182,6 @@ class PurchaseOrder < ApplicationRecord
   accepts_nested_attributes_for :custom_fields
   # accepts_nested_attributes_for :requested_advance_amount
   # accepts_nested_attributes_for :advance_payments
-
 
   validates :purchase_order_status_id, presence: true
 
@@ -568,21 +567,20 @@ class PurchaseOrder < ApplicationRecord
 
   # backward compatible fields
   def po_balance_due
-    forms_enabled ? self[:po_balance_due].to_f : self.balance_amount.value.to_f
+    forms_enabled ? self[:po_balance_due].to_f : self.balance_amount.value.to_f rescue 0
   end
 
   def reporting_po_balance_due
-    forms_enabled ? self[:reporting_po_balance_due].to_f : self.balance_amount.value.to_f
+    forms_enabled ? self[:reporting_po_balance_due].to_f : self.balance_amount.value.to_f rescue 0
   end
 
   def po_sub_total_amount
-    forms_enabled ? self[:po_sub_total_amount].to_f : self.total_after_tax.value.to_f
+    forms_enabled ? self[:po_sub_total_amount].to_f : self.total_after_tax.value.to_f rescue 0
   end
 
   def reporting_po_sub_total_amount
-    forms_enabled ? self[:reporting_po_sub_total_amount].to_f : self.total_after_tax.value.to_f
+    forms_enabled ? self[:reporting_po_sub_total_amount].to_f : self.total_after_tax.value.to_f rescue 0
   end
-
   
   def set_currency
     self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
@@ -1412,7 +1410,7 @@ class PurchaseOrder < ApplicationRecord
 
   def purchase_request_tasks
     parameters = RequestStore.store[:params]
-    if parameters[:associated_resource] == "purchase_request_item"
+    if self.import_job_id.blank? && parameters[:associated_resource] == "purchase_request_item"
       # Initially when PO is created from PR, then cost allocation item is line_item by default
       update_po_cost_allocation_items
       item_ids = self.filter_purchase_request_item_ids(parameters, user)

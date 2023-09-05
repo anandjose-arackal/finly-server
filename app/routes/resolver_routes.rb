@@ -256,5 +256,9 @@ Resolver::Router.draw do
     route 'default', Docs::ExpenseManagement::Budgets::Resolver
   end
 
+  scope :procurement_terms do
+    route 'default', Masters::ProcurementTerms::Resolver
+  end
+
   route 'masters.*', Masters::Schema::Records::Resolver
 end
