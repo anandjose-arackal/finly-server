@@ -88,7 +88,8 @@ class UserRole < NonTenantedApplicationRecord
       # Export Manager
       # export_manager: 52,
       vendor_bulk_importer: 52,
-      invoice_bulk_importer: 53
+      invoice_bulk_importer: 53,
+      po_bulk_importer: 54
   }
   ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
 

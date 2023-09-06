@@ -7,7 +7,7 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
 
     case document.class.name
     when 'PurchaseOrder'
-      amount = document&.reporting_po_balance_due rescue 0
+      amount = document&.po_balance_due rescue 0
     when 'MoneyRequest'
       amount = document&.total_amount
     when 'Invoice'
