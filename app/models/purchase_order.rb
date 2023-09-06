@@ -874,7 +874,7 @@ class PurchaseOrder < ApplicationRecord
 
   # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
   def as_json2
-    {
+    data={
         original_amount: precision_value(self.total_after_tax&.value),
         total_advance_amount: total_adv_amount,
         # advance_amount: precision_value(self.advance_amount&.value),
@@ -912,7 +912,24 @@ class PurchaseOrder < ApplicationRecord
         #   id: self.balance_amount&.id,
         #   currency_id: self.balance_amount&.currency&.id
         # }
-    }
+      }
+    if self.forms_enabled
+      attachment = self.form_custom_fields.where(field_key: "purchase_order_attachments").first&.attachments&.first&.attachment
+      data[:invoice_attachment] = {
+          url: attachment&.url,
+          thumb: attachment&.url(:thumb),
+          content_type: attachment&.content_type,
+          file_name: attachment&.original_filename,
+      }
+    else
+      data[:invoice_attachment] = {
+          url: self.attachments.first&.file&.url(:original, timestamp: false),
+          thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+          content_type: self.attachments.first&.file_content_type,
+          file_name: self.attachments.first&.file_file_name
+      }
+    end
+    data
   end
 
   # Public Method
