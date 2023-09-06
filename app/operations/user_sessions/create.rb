@@ -45,6 +45,14 @@ class UserSessions::Create < BaseOperation
     #   add_message :error, 'Username not found'
     #   return
     # end
+    toggle = AuthenticationToggle.new(User.find_by_id(params[:user][:id])) rescue nil
+    if toggle.present?
+      unless toggle.password_enabled?
+        add_message :error, "Please use the Single Sign-On feature to login "
+        return
+      end
+    end
+
   end
 
   def process
