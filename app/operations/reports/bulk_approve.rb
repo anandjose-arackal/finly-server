@@ -298,6 +298,7 @@ class Reports::BulkApprove < BaseOperation
 
   def success
     params[:multiple_reports] = self.multiple_reports
+    add_message :success, 'Reports Approved Successfully'
     Reports::BulkApprove::SuccessPresenter.new(user, params, messages)
   end
 

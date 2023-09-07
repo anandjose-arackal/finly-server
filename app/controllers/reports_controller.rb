@@ -77,7 +77,7 @@ class ReportsController < BaseControllers::WebBase
       # respond render: :bulk_approve_errors
       return
     end
-    # respond response: :success
+    respond response: :success, messages: @result.messages[:success]
   end
 
   def reject
