@@ -53,9 +53,9 @@ class Event::EVendors::Reject < Event::EVendors::Base
 
   def mailer_body(user)
     if user == self.rejecting_user
-      "You have rejected the Vendor : #{self.document.business_name}"
+      "You have rejected the Vendor : #{self.document.business_name} <p> Rejection Note: #{self.document.rejection_note} </p>"
     else
-      "#{rejecting_user.name} has rejected the Vendor: '#{self.document.business_name}'"
+      "#{rejecting_user.name} has rejected the Vendor: '#{self.document.business_name}' <p> Rejection Note: #{self.document.rejection_note} </p>"
     end
   end
 end
