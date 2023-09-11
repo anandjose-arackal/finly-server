@@ -15,5 +15,10 @@ class UserExposure < Exposures::API
   attribute :updated_at, record_attribute: true
   attribute :last_activity_at, record_attribute: true
   attribute :profile, record_attribute: true, exposure: true
-  attribute :active, record_attribute: true
+  attribute :active do
+    (record.active ? "Active" : "Deactivated")
+  end
+  attribute :policy_names do
+    record.policy_user_roles.joins(:policy).pluck('policies.name')&.uniq&.join(',')
+  end
 end

@@ -60,10 +60,10 @@ class Docs::P2P::PurchaseOrders::Action < ActionManager::API
 
     action :redirect,
            :import_form,
-           permissions: :purchase_order_initiator,
+           permissions: :po_bulk_importer,
            toggle: {if: [PurchaseOrderToggle, :bulk_import_enabled?]},
            label: 'Bulk Import',
-           url: 'bulk_import/params={"route":"forms.invoices"}'
+           url: 'bulk_import/params={"route":"forms.po"}'
 
   end
 
