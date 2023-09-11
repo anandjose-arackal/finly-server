@@ -150,6 +150,7 @@ class Forms::Export::Processor
       end
     else
       return {} if ['credit_note_adjustments'].include? entity.entity_key
+      return {} if entity.hide_in_import
 
       child_sheet_headers = {
         parent_sequence_number: {
@@ -240,6 +241,7 @@ class Forms::Export::Processor
     worksheets = {}
 
     self.headers.values.each do |sheet_data|
+      next if sheet_data[:hide_in_import]
       sheet_name = sheet_data[:name]
       sheet_key = sheet_data[:key]
       worksheets[sheet_key] = workbook.add_worksheet(sheet_name)

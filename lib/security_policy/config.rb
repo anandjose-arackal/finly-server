@@ -205,7 +205,8 @@ class SecurityPolicy::Config
     agreement_invoice_initiator: :low,
     agreement_invoice_reviewer: :medium,
     agreement_invoice_auditor: :high,
-    invoice_bulk_importer: :medium
+    invoice_bulk_importer: :medium,
+    po_bulk_importer: :medium
   }.with_indifferent_access.freeze
 
   # ROLE_LEVELS = {
