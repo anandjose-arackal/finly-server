@@ -700,7 +700,7 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   def self.document_status_attribute
-    'status_id'
+    'bank_payment_requests.status_id'
   end
 
   def self.finance_associated_status_ids
