@@ -408,7 +408,6 @@ class Forms::Import::Processor
             end
             data = processed_child_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] rescue nil
             column_data = data || child_data[self.headers[sheet_key][:headers][key][:name]]
-            column_data = %w[account_number vendor_bank_account_number].include? self.headers[sheet_key][:headers][key][:entity_key] ? "\t" + column_data.to_s : column_data
             if key.to_s == 'parent_id'
               if document_id.present?
                 column_data = document_id
@@ -422,6 +421,7 @@ class Forms::Import::Processor
             if self.headers[sheet_key][:headers][key][:name].include? '(Yes/No)'
               column_data = column_data == 'TRUE' ? 'Yes' : 'No'
             end
+            column_data = %w[account_number vendor_bank_account_number].include? self.headers[sheet_key][:headers][key][:entity_key] ? "\t" + column_data.to_s : column_data
             worksheets[sheet_key].write(worksheets_length[sheet_key], header_index - skipped_count, column_data)
           end
         end
