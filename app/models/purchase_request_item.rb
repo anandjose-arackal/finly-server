@@ -78,6 +78,9 @@ class PurchaseRequestItem < ApplicationRecord
   alias_attribute :items_department_id, :department_id
   alias_attribute :items_cost_center_id, :cost_center_id
 
+  alias_method :items_department, :department
+  alias_method :items_cost_center, :cost_center
+
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
