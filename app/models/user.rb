@@ -1104,12 +1104,6 @@ class User < ApplicationRecord
     self.user_roles
   end
 
-  def last_deactivated_at
-    return if active
-
-    self[:last_deactivated_at] || updated_at
-  end
-
   def expense_management_roles
     role_ids = self.role_mapping.expense_management.pluck(:user_role_id)
     UserRole.where(id: role_ids)
