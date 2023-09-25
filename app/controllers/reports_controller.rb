@@ -69,12 +69,10 @@ class ReportsController < BaseControllers::WebBase
 
   def bulk_approve
     @result = Reports::BulkApprove.(current_user, params)
-    # respond render: :show
     unless @result.success?
       respond_to do |format|
-        format.json {render :bulk_approve_errors }
+        format.json { render :bulk_approve_errors }
       end
-      # respond render: :bulk_approve_errors
       return
     end
     respond response: :success, messages: @result.messages[:success]
