@@ -34,6 +34,8 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   attribute :distance_in_km, default: false
   attribute :maps_distance_in_km, default: false
   attribute :expense_type
+  attribute :expense_checkin_date
+  attribute :expense_checkout_date
   attribute :expense_reimbursable
   attribute :expense_spent_from_account
   attribute :report_policy
@@ -278,6 +280,14 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   def conversion_rate(expense)
     sym = expense&.report&.base_currency&.country_code
     (expense&.amount.value / expense&.amount[sym] rescue 0)
+  end
+
+  def expense_checkin_date(expense)
+    expense.usage_date_start&.strftime('%d-%b-%Y')
+  end
+
+  def expense_checkout_date(expense)
+    expense.usage_date_end&.strftime('%d-%b-%Y')
   end
 
 end

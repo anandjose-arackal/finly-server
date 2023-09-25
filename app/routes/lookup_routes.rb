@@ -32,6 +32,7 @@ Lookup::Router.draw do
   route 'advance_amount_statuses', Masters::AdvanceAmountStatuses::Lookup
   route 'credit_note_statuses', Masters::CreditNoteStatuses::Lookup
   route 'credit_note_item_types', Masters::CreditNoteItemTypes::Lookup
+  route 'procurement_terms', Masters::ProcurementTerms::Lookup
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup

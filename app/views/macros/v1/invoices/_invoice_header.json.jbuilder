@@ -12,6 +12,7 @@ json.created_by do
   json.employee_id record.created_by&.profile&.employee_id
 end
 json.status record.status
+json.invoice_type record&.invoice_type&.name
 json.submitted_at record.submitted_at
 json.approved_at record.approved_at
 json.transaction_service_period_from record.transaction_service_period_from
@@ -41,6 +42,7 @@ json.payment_term exposure.payment_term&.name
 json.policy record.policy
 if record.vendor.present?
   json.vendor do
+    json.id record.vendor.id
     json.vendor_id record.vendor.vendor_id
     json.business_name record.vendor.business_name
     json.trade_name record.vendor.trade_name
