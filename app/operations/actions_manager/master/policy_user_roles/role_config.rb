@@ -8,7 +8,7 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
                     :purchase_order_auditor, :bank_payment_request_auditor, :purchase_request_auditor, :po_invoice_auditor, :vendor_auditor, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor,
                     :utility_bill_master_initiator, :utility_bill_master_reviewer, :utility_bill_initiator, :utility_bill_reviewer,
                     :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor, :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor, :non_po_reviewer, :non_po_initiator, :non_po_auditor,
-                    :vendor_bulk_importer
+                    :vendor_bulk_importer, :invoice_bulk_importer, :po_bulk_importer
   ]
 
   def purchase_request_initiator
@@ -164,6 +164,14 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def vendor_bulk_importer
-    true
+    VendorToggle.new(user).bulk_import_enabled?
+  end
+
+  def invoice_bulk_importer
+    NonPoInvoiceToggle.new(user).bulk_import_enabled?
+  end
+
+  def po_bulk_importer
+    PurchaseOrderToggle.new(user).bulk_import_enabled?
   end
 end

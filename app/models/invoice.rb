@@ -154,7 +154,7 @@
 #
 
 class Invoice < ApplicationRecord
-  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds, :net_po_advance, :prev_adjusted_advance_tds, :advance_paid
+  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds, :net_po_advance, :prev_adjusted_advance_tds, :advance_paid, :vendor_country_id_value
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -186,6 +186,11 @@ class Invoice < ApplicationRecord
   #   currency_code = Currency.find(self.base_currency)&.country_code rescue nil
   #   Currency.currency_for(currency_code || "INR")
   # end
+
+  
+  def vendor_country_id_value
+    self.vendor_country&.name
+  end
 
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
@@ -346,8 +351,8 @@ class Invoice < ApplicationRecord
   # validates :amount, presence: true
 
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&\_]*\Z/, :message => ' can only have letters, numbers, spaces, -,#,&,/ and underscore. No other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
-  validate :item_quantity_validation
-  validate :item_rate_validation
+  # validate :item_quantity_validation
+  # validate :item_rate_validation
   validate :multiple_invoice_validation
 
   before_destroy :rollback_agreement_invoice
@@ -776,7 +781,7 @@ class Invoice < ApplicationRecord
   ransack_scopes :with_status_ids
 
   def form_klass
-    invoice_type = self.invoice_type.name.to_sym
+    invoice_type = self.invoice_type&.name&.to_sym || :non_po_invoice
     Forms::Router.klass(invoice_type)&.name
   end
 
@@ -1053,7 +1058,7 @@ class Invoice < ApplicationRecord
     if options[:payment_history]
       return payment_history_json
     else
-      {
+      data = {
         id: self.id,
         invoice_type: self.invoice_type&.name,
         procurement_id: self.procurement_id,
@@ -1085,16 +1090,6 @@ class Invoice < ApplicationRecord
         tds_rate: precision_value(self.tds_rate.to_i),
         discount_rate: invoice_discount_rate,
         advance_rate: precision_value(self.advance_rate),
-        invoice_attachment: {
-          # url: self.invoice_attachments.first&.attached_file&.url,
-          # thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-          # content_type: self.invoice_attachments.first&.attached_file&.content_type,
-          # file_name: self.invoice_attachments.first&.attached_file&.original_filename
-          url: self.attachments.first&.file&.url(:original, timestamp: false),
-          thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
-          content_type: self.attachments.first&.file_content_type,
-          file_name: self.attachments.first&.file_file_name
-        },
         net_amount: precision_value(self.net_amount&.value.to_f),
         original_amount: self.include_original_amount,
         gross_amount: precision_value(self.gross_amount&.value.to_f),
@@ -1165,6 +1160,23 @@ class Invoice < ApplicationRecord
         non_po_invoice_form_enabled: self.forms_enabled,
         form_enabled: self.forms_enabled
       }
+      if self.forms_enabled
+        attachment = self.form_custom_fields.where(field_key: "invoice_attachments").first&.attachments&.first&.attachment
+        data[:invoice_attachment] = {
+            url: attachment&.url,
+            thumb: attachment&.url(:thumb),
+            content_type: attachment&.content_type,
+            file_name: attachment&.original_filename,
+        }
+      else
+        data[:invoice_attachment] = {
+            url: self.attachments.first&.file&.url(:original, timestamp: false),
+            thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+            content_type: self.attachments.first&.file_content_type,
+            file_name: self.attachments.first&.file_file_name
+        }
+      end
+      data
     end
   end
 
@@ -1749,6 +1761,10 @@ class Invoice < ApplicationRecord
   end
 
   def set_defaults
+    if self.import_job_id.present?
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:open))
+    end
+
     if self.invoice_status.blank?
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
       self.update_invoice_status
@@ -2148,27 +2164,27 @@ class Invoice < ApplicationRecord
     }
   end
 
-  def item_quantity_validation
-    flag = false
-    quantities = invoice_items.map(&:quantity).map(&:to_f)
-    quantities.each do |quantity|
-      flag = true if quantity <= 0
-      break if flag
-    end
+  # def item_quantity_validation
+  #   flag = false
+  #   quantities = invoice_items.map(&:quantity).map(&:to_f)
+  #   quantities.each do |quantity|
+  #     flag = true if quantity <= 0
+  #     break if flag
+  #   end
 
-    errors.add(:invoice_items, "quantity must be greater than 0") if flag
-  end
+  #   errors.add(:invoice_items, "quantity must be greater than 0") if flag
+  # end
 
-  def item_rate_validation
-    flag = false
-    rates = invoice_items.map(&:rate).map(&:to_f)
-    rates.each do |rate|
-      flag = true if rate <= 0
-      break if flag
-    end
+  # def item_rate_validation
+  #   flag = false
+  #   rates = invoice_items.map(&:rate).map(&:to_f)
+  #   rates.each do |rate|
+  #     flag = true if rate <= 0
+  #     break if flag
+  #   end
 
-    errors.add(:invoice_items, "rate must be greater than 0") if flag
-  end
+  #   errors.add(:invoice_items, "rate must be greater than 0") if flag
+  # end
 
   def multiple_invoice_validation
     return true if self.invoice_type_id == InwardInvoiceType.id_for(:beneficiary)

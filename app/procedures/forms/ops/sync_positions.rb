@@ -36,7 +36,9 @@ class Forms::Ops::SyncPositions < Transactions::API
 
 
         puts "************************ \n #{entity.entity_key} - #{entity.position} : #{new_position}"
-        entity.update(position: new_position) if new_position.present?
+
+        # This triggers update for all entities, using 'update_columns' to avoid callbacks
+        entity.update_columns(position: new_position) if new_position.present?
       end
     end
 

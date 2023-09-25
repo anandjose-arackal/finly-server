@@ -359,3 +359,4 @@ gem 'elastic-apm', '~> 3.13.0'
 
 gem 'prosopite', '~> 1.1.2'
 gem 'scout_apm' # Scout APM monitoring
+gem 'request_store-sidekiq', '~> 0.1' # to fetch RequestStore values and other info in the background jobs (Sidekiq)

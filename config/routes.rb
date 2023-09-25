@@ -4448,6 +4448,10 @@ Rails.application.routes.draw do
       get 'report_processor_groups/count', to: 'report_processor_groups#count'
       post 'report_processor_groups/new_sync_attempt', to: 'report_processor_groups#new_sync_attempt'
       resources :report_processor_groups, only: [:index]
+      
+      get 'budgets/count', to: 'budgets#count'
+      post 'budgets/new_sync_attempt', to: 'budgets#new_sync_attempt'
+      resources :budgets, only: [:index]
     end
   end
 
@@ -4515,4 +4519,5 @@ Rails.application.routes.draw do
   end
 
   get 'data_cards', to: "data_cards#show"
+  post 'approval_tat_reports/:route', to: "approval_tat_reports#export_reports"
 end

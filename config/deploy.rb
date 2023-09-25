@@ -11,7 +11,8 @@ end
 
 set :application, 'finly-server'
 
-set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
+# set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
+set :repo_url, 'git@ssh.dev.azure.com:v3/AnytimeCollect/Lockstep/finly-server'
 
 set :branch, ENV['REFERENCE'] || ENV['BRANCH'] || :master
 
@@ -160,8 +161,8 @@ set :sentry_organization, 'finly' # fetch(:application) by default
 set :sentry_project, 'finly-server'     # fetch(:application) by default
 set :sentry_repo, 'finlycore/finly-server' # computed from repo_url by default
 
-before 'deploy:starting', 'sentry:validate_config'
-after 'deploy:published', 'sentry:notice_deployment'
+# before 'deploy:starting', 'sentry:validate_config'
+# after 'deploy:published', 'sentry:notice_deployment'
 
 set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"

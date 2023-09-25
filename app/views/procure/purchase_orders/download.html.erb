@@ -117,6 +117,7 @@
           <th>Comment</th>
           <th class="text-center">Qty</th>
           <th class="text-center">Unit of Measurement</th>
+          <th class="text-center">HSN SAC</th>
           <th class="text-right">Rate</th>
           <th class="text-right">Discount</th>
           <th class="text-right">Tax</th>
@@ -131,6 +132,7 @@
             <td class="font-light-gray"><%= item.comment %></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
             <td class="text-center font-light-gray"><%= item.unit_of_measurement %></td>
+            <td class="text-center font-light-gray"><%= item.inventory_line_item&.hsn_sac %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.tax_amount&.value&.to_d.round(2) rescue 0 %></td>

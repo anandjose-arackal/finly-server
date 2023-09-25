@@ -74,29 +74,44 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         elsif ['lookup', 'dropdown'].include?(entity.entity_type)
-          headers[entity.entity_key.to_s] = {
-            name: "#{entity.label} ID#{entity.required ? '*' : ''}",
-            entity_key: entity.entity_key,
-            entity_type: entity.entity_type,
-            entity: entity,
-          }
-          headers["#{entity.entity_key}_value"] = {
-            name: entity.label,
-            entity_key: "#{entity.entity_key}_value",
-            entity_type: 'text',
-            import_skip: true,
-            lookup_value: true,
-            choices_array: choices_array(entity),
-            hidden: true
-          }
+          if parent_sheet_key == 'vendor'
+            headers[entity.entity_key.to_s] = {
+              name: "#{entity.label} ID#{entity.required ? '*' : ''}",
+              entity_key: entity.entity_key,
+              entity_type: entity.entity_type,
+              entity: entity,
+            }
+            headers["#{entity.entity_key}_value"] = {
+              name: entity.label,
+              entity_key: "#{entity.entity_key}_value",
+              entity_type: 'text',
+              import_skip: true,
+              lookup_value: true,
+              choices_array: choices_array(entity),
+              hidden: true,
+              entity: entity
+            }
+          else
+            headers["#{entity.entity_key.to_s}"] = {
+              name: "#{entity.label}#{entity.required ? '*' : ''}",
+              entity_key: "#{entity.entity_key}",
+              entity_type: entity.entity_type,
+              lookup_value: true,
+              choices_array: choices_array(entity),
+              hide_in_sheet: entity.hide_in_import,
+              entity: entity
+            }
+          end
         elsif entity.entity_type == 'date'
           headers[entity.entity_key.to_s] = {
             name: "#{entity.label}#{entity.required ? '*' : ''} (YYYY-MM-DD)",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         elsif entity.entity_type == 'datetime'
           headers[entity.entity_key.to_s] = {
@@ -104,13 +119,15 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         elsif entity.entity_type == 'switch'
           headers[entity.entity_key.to_s] = {
             name: "#{entity.label}#{entity.required ? '*' : ''}",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
-            entity: entity
+            entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         elsif entity.entity_type == 'attachment'
           headers[entity.entity_key.to_s] = {
@@ -118,7 +135,8 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
-            hidden: true
+            hidden: true,
+            hide_in_sheet: entity.hide_in_import
           }
         else
           headers[entity.entity_key.to_s] = {
@@ -126,13 +144,17 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         end
       end
     else
+      return {} if ['credit_note_adjustments'].include? entity.entity_key
+      return {} if entity.hide_in_import
+
       child_sheet_headers = {
         parent_sequence_number: {
-          name: "#{parent_sheet_label&.singularize} Sequence Number",
+          name: "Import Sequence Number",
           entity_key: 'parent_sequence_number',
           entity_type: 'text'
         },
@@ -157,6 +179,7 @@ class Forms::Export::Processor
       }
       entity.entities.each do |child_entity|
         next unless (child_entity.visible || child_entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
+        # next if child_entity.hide_in_import
 
         child_sheet_headers.merge!(build_headers_for_entity(sheets_headers, entity.entity_key, entity.entity_key, child_entity, user))
       end
@@ -218,10 +241,12 @@ class Forms::Export::Processor
     worksheets = {}
 
     self.headers.values.each do |sheet_data|
+      next if sheet_data[:hide_in_import]
       sheet_name = sheet_data[:name]
       sheet_key = sheet_data[:key]
       worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
-      self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
+      self.headers[sheet_key][:headers].values.select{|header| header["hide_in_sheet"] == nil}.each_with_index do |header_data, header_index|
+        next if header_data[:hide_in_sheet]
         width = (header_data[:hidden] || header_data[:entity_key] == 'status_id') ? 0 : header_data[:name].length+10
         worksheets[sheet_key].set_column(header_index, header_index, width)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
@@ -309,40 +334,60 @@ class Forms::Export::Processor
         end
       end
 
+      vendor_associations = {}
+      if content[:name] == 'Vendor'
+        vendor_ids = content[:data][:choices].map{|x| x['id']}
+        vendor_associations = YesBankVendor.where(id: vendor_ids).includes(:bank_accounts, :gstin_locations).map{|x| [x.vendor_id, [x.gstin_locations.pluck(:location).join(', ' ),x.bank_accounts.pluck(:name).join(', ' )]]}.to_h
+        begin
+          association_worksheet = workbook.add_worksheet('Vendor Associations')
+        rescue
+          next
+        end
+        ['Vendor', 'Vendor Locations', 'Vendor Accounts'].each_with_index do |title, index|
+          association_worksheet.set_column(0, index, title.length+10)
+          association_worksheet.write(0, index, title)
+        end
+        vendor_associations.keys.each_with_index do |key, row_index|
+          association_worksheet.write(1 + row_index, 0, key)
+          association_worksheet.write(1 + row_index, 1, vendor_associations[key][0])
+          association_worksheet.write(1 + row_index, 2, vendor_associations[key][1])
+        end
+      end
+
       # worksheet.hide if ['Status'].include? content[:name]
     end
   end
 
-  def add_xlookup_for_ids(workbook)
-    sections = self.headers.values.pluck(:name)
-    workbook.sheets.select {|x| sections.include? x.name }.each do |sheet|
-      sheet_name = sheet.name
-      data = self.headers[NAME_MAP[sheet_name.to_sym]]
-      next unless data.present?
-
-      data['headers'].keys.each_with_index.each do |key, index|
-        entity_type = data['headers'][key]['entity_type']
-        if %w[lookup dropdown].include?(entity_type)
-          name = data['headers'][key]['name']
-          look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
-          Rails.logger.debug "Formula::=XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)"
-          sheet.write_formula(1, index, "=XLOOKUP(#{xl_rowcol_to_cell(1, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)")
-        elsif data['headers'][key][:lookup_value]
-          # options = header_data[:choices_array] || ['True', 'False']
-          name = data['headers'][key]['name']
-          look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
-          Rails.logger.debug "ListValidation::#{name}::#{xl_rowcol_to_cell(1, index)}::#{"'#{look_up_sheet_name}'!B2:B1048576"}"
-          sheet.data_validation(1, index, 1048575, index, {
-            :validate => 'list',
-            :source => "'#{look_up_sheet_name}'!$B$2:$B$1048576"
-          })
-        elsif entity_type == 'switch'
-          sheet.data_validation(1, index, 1048575, index, {
-            :validate => 'list',
-            :source => %w[Yes No]
-          })
-        end
-      end
-    end
-  end
+  # def add_xlookup_for_ids(workbook)
+  #   sections = self.headers.values.pluck(:name)
+  #   workbook.sheets.select {|x| sections.include? x.name }.each do |sheet|
+  #     sheet_name = sheet.name
+  #     data = self.headers[NAME_MAP[sheet_name.to_sym]]
+  #     next unless data.present?
+  #
+  #     data['headers'].keys.each_with_index.each do |key, index|
+  #       entity_type = data['headers'][key]['entity_type']
+  #       if %w[lookup dropdown].include?(entity_type)
+  #         name = data['headers'][key]['name']
+  #         look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
+  #         Rails.logger.debug "Formula::=XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)"
+  #         sheet.write_formula(1, index, "=XLOOKUP(#{xl_rowcol_to_cell(1, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)")
+  #       elsif data['headers'][key][:lookup_value]
+  #         # options = header_data[:choices_array] || ['True', 'False']
+  #         name = data['headers'][key]['name']
+  #         look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
+  #         Rails.logger.debug "ListValidation::#{name}::#{xl_rowcol_to_cell(1, index)}::#{"'#{look_up_sheet_name}'!B2:B1048576"}"
+  #         sheet.data_validation(1, index, 1048575, index, {
+  #           :validate => 'list',
+  #           :source => "'#{look_up_sheet_name}'!$B$2:$B$1048576"
+  #         })
+  #       elsif entity_type == 'switch'
+  #         sheet.data_validation(1, index, 1048575, index, {
+  #           :validate => 'list',
+  #           :source => %w[Yes No]
+  #         })
+  #       end
+  #     end
+  #   end
+  # end
 end

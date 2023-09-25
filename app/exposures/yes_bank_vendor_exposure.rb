@@ -26,6 +26,13 @@ class YesBankVendorExposure < Exposures::API
   attribute :gl_name do
     record.business_name
   end
+  # Have to do this because vendor_country in vendor model is just a string. Need to do this to get the value in lookups
+  attribute :vendor_country_id do
+    record.vendor_country == 'India' ? 78 : 196
+  end
+  attribute :vendor_country_id_value do
+    record.vendor_country == 'India' ? 'India' : 'International'
+  end
   attribute :payment_term, record_attribute: true, exposure: true
   attribute :display_name, record_attribute: true
   attribute :mobile_number, record_attribute: true

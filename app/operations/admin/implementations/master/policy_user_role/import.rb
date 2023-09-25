@@ -42,7 +42,9 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
                                     :agreement_invoice_initiator => 'Agreement Invoice Initiator',
                                     :agreement_invoice_reviewer => 'Agreement Invoice Reviewer',
                                     :agreement_invoice_auditor => 'Agreement Invoice Auditor',
-                                    :vendor_bulk_importer => 'Vendor Bulk Importer'
+                                    :vendor_bulk_importer => 'Vendor Bulk Importer',
+                                    :invoice_bulk_importer => 'Invoice Bulk Importer',
+                                    :po_bulk_importer => 'Purchase Order Bulk Importer'
               },
               "Expense Management" => {
                   :policy_name => 'Policy Name',
@@ -164,7 +166,7 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
         if v == 'Y'
           case k
           when :initiator
-            existing_mapping = policy.user_mapping.where(user_id: entity_user.id).first
+            existing_mapping = policy.user_mapping.non_deleted.where(user_id: entity_user.id).first
             unless  existing_mapping
               policy.user_mapping.create(user_id: entity_user.id)
             end
@@ -183,7 +185,7 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
         elsif v == 'N'
           case k
           when :initiator
-            existing_mapping = policy.user_mapping.where(user_id: entity_user.id).first
+            existing_mapping = policy.user_mapping.non_deleted.where(user_id: entity_user.id).first
             if  existing_mapping
               existing_mapping.destroy
             end

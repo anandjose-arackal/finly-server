@@ -31,7 +31,7 @@ class ProcurementMailer < ApplicationMailer
       end
     end
 
-    mail from: "#{@user.company.name} <noreply@finlyhq.com>", :reply_to => "#{@user.email}", to: @data.email_to,
+    mail from: "#{@user.company.name} <noreply@finlyhq.com>", :reply_to => "#{@user.email}", to: @data.email_to, cc: @data.email_cc_to,
          bcc: @data.email_bcc_to, subject: @data.email_subject, template_name: 'mail_procurement'
   end
 

@@ -176,13 +176,14 @@ class InvoiceLineItem < ApplicationRecord
   accepts_nested_attributes_for :billable_amount
   # ####
 
-  validates :description, presence: true
-  validates :quantity, presence: true
-  validates :rate, presence: true
 
-  # removing for now
+  validates :quantity, presence: true, numericality: { greater_than: 0 }
+  validates :rate, presence: true, numericality: { greater_than: 0 }
+
+  # removing for now, these are not used in newer forms
   # validates_presence_of :unit_of_measurement
   # validates_presence_of :department, if: :check_outward_invoice?
+  # validates :description, presence: true
   
   # Updating this for forms, due to some unknown issue 
   before_save :set_tds_applicable
@@ -325,6 +326,8 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def tds_amount
+    #to support leagcy logic of tds amount in line item export
+    return item_tds_amount if item_tds_amount.present?
     service? ? calculate_tds(self.billable_amount&.value.to_f) : calculate_tds(self.taxable_amount&.value.to_f)
   end
 

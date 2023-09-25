@@ -105,6 +105,7 @@ Resolver::Router.draw do
 
   scope :vendors do
     route "default", Masters::Vendors::Resolver
+    route "approved_vendors", Masters::Vendors::Approved::Resolver
     scope :locations do
       route "default", Masters::Vendors::Locations::Resolver
     end
@@ -249,6 +250,14 @@ Resolver::Router.draw do
 
   scope :report_processor_groups do
     route 'default', Docs::ExpenseManagement::ReportProcessorGroups::Resolver
+  end
+
+  scope :budgets do
+    route 'default', Docs::ExpenseManagement::Budgets::Resolver
+  end
+
+  scope :procurement_terms do
+    route 'default', Masters::ProcurementTerms::Resolver
   end
 
   route 'masters.*', Masters::Schema::Records::Resolver

@@ -3,7 +3,7 @@ class Masters::Categories::Resolver < Resolver::API
   entity Category
 
   def load(params)
-    categories = user.company.categories
+    categories = user.company.categories.active
 
     if params[:scope].present?
       return categories.send(params[:scope])

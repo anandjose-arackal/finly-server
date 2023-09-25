@@ -11,7 +11,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
     self.violations_present = !!params[:violations_present]
     self.reviewal_chain_data = []
     self.dlrm_mapping_data = [] # will contain dlrm_level_data inside of it
-    self.document_amount = get_document_amount
+    self.document_amount = get_document_amount || 0
     self.reviewal_levels = ReviewalLevel.with_policy_ids(document.policy_id).with_associated_entity_type(provider_name).non_deleted.reorder(:level_number) # todo - when policy id is not present
   end
 
@@ -68,7 +68,6 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
               add_message :error, "#{document_class_name}'s amount is greater than maximum limit set in Level - #{level.level_number} (#{level.name})"
             end
           end
-
           # Check if selected reviewer is a valid reviewer
           valid_threshold_reviewer_data = level_reviewers_data.filter{|item| item['min'].to_f <= document_amount && (item['max'].blank? || item['max'].to_f >= document_amount )}
           valid_violation_reviewer_data = level_reviewers_data.filter do |item|

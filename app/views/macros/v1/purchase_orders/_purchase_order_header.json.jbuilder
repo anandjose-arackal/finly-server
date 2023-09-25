@@ -12,6 +12,8 @@ end
 
 json.status record.status
 json.submitted_at record.submitted_at
+json.updated_at record.updated_at
+json.created_at record.created_at
 json.approved_at record.approved_at
 json.due_date record.due_date
 json.policy record.policy
@@ -29,3 +31,10 @@ json.vendor_location record.gstin_location
 json.billing_location record.location
 json.shipping_location record.delivery_location
 json.beneficiary_account record.bank_account
+json.beneficiary_account_form_custom_fields do 
+  json.array! record.bank_account.form_custom_fields.each do |form_custom_field|
+    json.name form_custom_field.form_entity&.label
+    json.field_key form_custom_field.field_key
+    json.field_value form_custom_field.retrieve_text_value
+  end 
+end

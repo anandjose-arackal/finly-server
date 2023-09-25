@@ -255,6 +255,10 @@ class InvoiceExposure < Exposures::API
     utrs.compact.join(', ')
   end
 
+  attribute :payment_ids, includes: [:payments] do
+    record.payments&.pluck(:id)
+  end
+
   attribute :payments_processed_at, includes: [:payments] do
     processed_ats =[]
     record.payments.each do |payment|
@@ -296,6 +300,9 @@ class InvoiceExposure < Exposures::API
     record.display_tds_amount&.to_f
   end
 
+  attribute :payment_ticket_ids do
+    record.payments.joins(payment_order: :bank_payment_request)&.pluck('bank_payment_requests.id')&.join(', ')
+  end
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id

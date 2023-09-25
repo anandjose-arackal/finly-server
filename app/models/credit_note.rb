@@ -349,6 +349,10 @@ class CreditNote < ApplicationRecord
     end
   end
 
+  def gstin_location
+    self.invoice&.gstin_location
+  end
+
   def  tax_type_name
     case self.invoice&.gst_type_id
     when GstType.id_for(:cgst_sgst)
