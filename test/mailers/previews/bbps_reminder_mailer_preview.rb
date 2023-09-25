@@ -46,7 +46,8 @@ class BbpsReminderMailerPreview < ActionMailer::Preview
     })
 
     BbpsReminderMailer.send_bbps_reminder_mail(
-      Event::EReminders::BbpsSubscription::MailerPresenter.new(user, params)
+      # Event::EReminders::BbpsSubscription::MailerPresenter.new(user, params)
+      user&.id, params
     )
   end
 end

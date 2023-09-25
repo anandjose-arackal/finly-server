@@ -1,6 +1,11 @@
 class BbpsReminderMailer < ApplicationMailer
   
-  def send_bbps_reminder_mail(presenter)
+  def send_bbps_reminder_mail(user_id, params)
+    user = User.find_by(id: user_id)
+    return if user.blank?
+
+    presenter = Event::EReminders::BbpsSubscription::MailerPresenter.new(user, params)
+
     @data = presenter
     @host = if Rails.env.development?
               "http://localhost/"

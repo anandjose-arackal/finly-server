@@ -880,7 +880,7 @@ module Transitionable
                           when BbpsBill.name
                             self.arel_table[:status_id].eq(BbpsBillStatus.id_for(:awaiting_approval))
                           when BankPaymentRequest.name
-                            self.arel_table[:status_id].eq(BankPaymentRequestStatus.ids_for(:processing))
+                            self.arel_table[:status_id].eq(BankPaymentRequestStatus.id_for(:processing))
                           when YesBankVendor.name
                             self.arel_table[:status_id].not_eq(VendorStatus.id_for(:auto_approved))
                           when PaymentAgreement.name

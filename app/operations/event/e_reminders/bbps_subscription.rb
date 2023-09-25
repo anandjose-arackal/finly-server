@@ -32,7 +32,8 @@ class Event::EReminders::BbpsSubscription < BaseOperation
     params[:action_name] = action_name
     
     BbpsReminderMailer.delay.send_bbps_reminder_mail(
-      Event::EReminders::BbpsSubscription::MailerPresenter.new(user, params)
+      # Event::EReminders::BbpsSubscription::MailerPresenter.new(user, params)
+      user&.id, params
     )
   end
 

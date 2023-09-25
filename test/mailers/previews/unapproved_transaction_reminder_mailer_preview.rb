@@ -25,7 +25,8 @@ class UnapprovedTransactionReminderMailerPreview < ActionMailer::Preview
     }).with_indifferent_access
 
     UnapprovedTransactionReminderMailer.send_unapproved_transaction_mail(
-      Event::EReminders::UnapprovedTransaction::MailerPresenter.new(user, params)
+      # Event::EReminders::UnapprovedTransaction::MailerPresenter.new(user, params)
+      user&.id, params
     )
   end
 end
