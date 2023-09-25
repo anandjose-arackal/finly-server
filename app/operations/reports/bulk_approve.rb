@@ -122,7 +122,9 @@ class Reports::BulkApprove < BaseOperation
       if confirm_approve
         # Process reports
         if multiple_reports.count > 1
-          BulkApproveWorker.perform_async(user_id, params)
+          params['async'] = true
+          params[:async] = true
+          Reports::BulkApprove(current_user, params, async = true)
           add_message :success, 'Your reports will be approved!'
         else
           multiple_reports.each do |key, value|
