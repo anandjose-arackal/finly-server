@@ -1,6 +1,10 @@
 class UnapprovedTransactionReminderMailer < ApplicationMailer
   
-  def send_unapproved_transaction_mail(presenter)
+  def send_unapproved_transaction_mail(user_id, params)
+    user = User.find_by(id: user_id)
+    return if user.blank?
+
+    presenter = Event::EReminders::UnapprovedTransaction::MailerPresenter.new(user, params)
     @data = presenter
     @pending_items_count = @data.pending_items_count
     

@@ -32,7 +32,8 @@ class Event::EReminders::UnapprovedTransaction < BaseOperation
     params[:action_name] = action_name
     
     UnapprovedTransactionReminderMailer.delay.send_unapproved_transaction_mail(
-      Event::EReminders::UnapprovedTransaction::MailerPresenter.new(user, params)
+      # Event::EReminders::UnapprovedTransaction::MailerPresenter.new(user, params)
+      user&.id, params
     )
   end
 
