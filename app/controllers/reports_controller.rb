@@ -75,7 +75,6 @@ class ReportsController < BaseControllers::WebBase
       end
       return
     end
-    respond response: :success, messages: @result.messages[:success]
   end
 
   def reject

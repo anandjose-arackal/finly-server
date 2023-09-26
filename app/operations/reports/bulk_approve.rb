@@ -69,6 +69,7 @@ class Reports::BulkApprove < BaseOperation
 
   def validate
     return true if async
+
     self.multiple_reports.each do |key, value|
       unless value[:report].processing?
         value[:errors] << "Cannot approve this report as it is not in processing state"
@@ -121,13 +122,13 @@ class Reports::BulkApprove < BaseOperation
     if valid
       if confirm_approve
         # Process reports
-        if multiple_reports.count > 1
+        if multiple_reports.count > 5 && !async
           worker_params = {
             confirm_approve: true,
             report_ids: params[:report_ids],
             async: true
           }
-          BulkApproveWorker.perform_async(user, worker_params.stringify_keys)
+          BulkApproveWorker.perform_async(user.id, worker_params.stringify_keys)
           add_message :success, 'Your reports will be approved!'
         else
           multiple_reports.each do |key, value|
@@ -141,6 +142,9 @@ class Reports::BulkApprove < BaseOperation
               add_message :error, op.messages[:error]
               self.approved_all = false
               value[:error] += op.messages[:error]
+              self.failure_count += 1
+            else
+              self.success_count += 1
             end
           end
         end
@@ -184,13 +188,13 @@ class Reports::BulkApprove < BaseOperation
 
   def success
     params[:multiple_reports] = self.multiple_reports
-    if approved_all
-      success_message = "#{(success_count+failure_count).to_i} reports approved"
-    else
+    if approved_all && confirm_approve
+      success_message = "#{(success_count).to_i} reports approved"
+    elsif confirm_approve
       success_message = "#{success_count.to_i} reports approved out of #{(success_count+failure_count).to_i}"
     end
 
-    add_message :success, success_message
+    add_message :success, success_message if multiple_reports.count < 5
     Reports::BulkApprove::SuccessPresenter.new(user, params, messages)
   end
 
