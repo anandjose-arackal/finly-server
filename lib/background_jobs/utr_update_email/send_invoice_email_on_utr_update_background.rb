@@ -1,6 +1,6 @@
 class BackgroundJobs::UtrUpdateEmail::SendInvoiceEmailOnUtrUpdateBackground
   include Sidekiq::Worker
-  sidekiq_options queue: :payment_utr_emails, retry: 2
+  sidekiq_options retry: 2
 
   def perform(payment_id)
     # fetching a new instance from database to ensure UTR number exists within the database record while sending email
