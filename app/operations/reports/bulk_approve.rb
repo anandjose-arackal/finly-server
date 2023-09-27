@@ -122,7 +122,7 @@ class Reports::BulkApprove < BaseOperation
     if valid
       if confirm_approve
         # Process reports
-        if multiple_reports.count > 5 && !async
+        if multiple_reports.count > 10 && !async
           worker_params = {
             confirm_approve: true,
             report_ids: params[:report_ids],
@@ -194,7 +194,7 @@ class Reports::BulkApprove < BaseOperation
       success_message = "#{success_count.to_i} reports approved out of #{(success_count+failure_count).to_i}"
     end
 
-    add_message :success, success_message if multiple_reports.count < 5
+    add_message :success, success_message if multiple_reports.count <= 10
     Reports::BulkApprove::SuccessPresenter.new(user, params, messages)
   end
 
@@ -206,7 +206,7 @@ class Reports::BulkApprove < BaseOperation
   private
 
   def should_post_process?
-    return true if self.multiple_reports.count<5 || self.async
+    return true if self.multiple_reports.count <= 10 || self.async
   end
 
   class Reports::BulkApprove::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
