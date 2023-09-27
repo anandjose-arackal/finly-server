@@ -39,8 +39,6 @@ class FeatureToggle
   end
 
   def value(key, default = nil)
-    current_flags = flags
-    return default if current_flags.blank?
     flag = flags[normalize_key(key)]
     return default if flag.nil?
 
