@@ -6,6 +6,7 @@ class Forms::Import::Ops::Create < Transactions::API
   step Contract::Validate()
   step :create_procurements
   step :validate_attachments
+  step :validate_po_advance
   step Contract::Persist(method: :sync)
   # step :set_approval_workflow!
   step Transactions::Messages::SuccessMessage('Record Saved')
@@ -28,12 +29,20 @@ class Forms::Import::Ops::Create < Transactions::API
 
   def validate_attachments(context, params:, model:, **)
 
-    params['invoice_attachments'].reject! {|attachment| attachment['_destroy'] == true}
+    params['invoice_attachments'].reject! {|attachment| attachment['_destroy'] == true} if params['invoice_attachments'].present?
 
     if model.class == Invoice
       unless params['invoice_attachments'].present?
         return on_error context, :invoice,'attachments cannot be blank'
       end
+    end
+
+    return true
+  end
+
+  def validate_po_advance(context, params:, model:, **)
+    if model.instance_of?(PurchaseOrder) && (params[:po_requested_advance_amount] > params[:po_balance_due])
+      return on_error context, :purchase_order, 'Advance Amount cannot be more than Payable amount'
     end
 
     return true

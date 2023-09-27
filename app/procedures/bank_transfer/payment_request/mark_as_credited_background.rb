@@ -10,14 +10,17 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
 
   def update_payments_invoices!(options, payment_request:, current_user:, payment_order_status_id:, payment_request_status_id:, controlling_level_id:, **)
     Rails.logger.info "Trying to update payment orders in payment ticket id #{payment_request.id}"
-    payment_request.payment_order.payments.each do |payment|
-      payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-      update_agreement_beneficiary(payment)
-      update_agreement_security_deposit(payment)
-
-      invoice = payment.invoice
-      if invoice.present?
-        invoice.update_invoice_status
+    payment_request.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:completed))
+     payment_request.payment_order.payments.each do |payment|
+       update_agreement_beneficiary(payment)
+       update_agreement_security_deposit(payment)
+      case payment.parent_type
+      when 'Invoice'
+        parent_details = payment.parent
+        parent_details.update_invoice_status
+      when 'PurchaseOrder'
+        parent_details = payment.parent
+        parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
       end
     end
 

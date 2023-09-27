@@ -12,6 +12,8 @@ end
 
 json.status record.status
 json.submitted_at record.submitted_at
+json.updated_at record.updated_at
+json.created_at record.created_at
 json.approved_at record.approved_at
 json.due_date record.due_date
 json.policy record.policy
