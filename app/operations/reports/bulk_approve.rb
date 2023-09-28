@@ -157,7 +157,7 @@ class Reports::BulkApprove < BaseOperation
   def post_process
     if valid && confirm_approve && should_post_process?
       self.multiple_reports.each do |key, value|
-        if value[:errors].present?
+        unless value[:errors].present?
           report = value[:report]
           comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_approve)
           comment.save
