@@ -179,8 +179,6 @@ class Reports::BulkApprove < BaseOperation
           Event::EReport::Approve.(self.user, report: report, auto_approve: auto_approve)
 
           value[:notices].push('Report Approved!')
-        elsif async
-          # Event::EReport::ApproveFailed.(self.user, report: report)
         end
       end
     end
