@@ -18,9 +18,9 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
   step Policy::Pundit(Docs::P2P::PurchaseOrders::Policy, :update?)
   step Forms::Model::Find()
   step :validate_quotations
-  step Forms::Contracts::Build()
-  step Contract::Validate()
   step Wrap(TransactionStep){
+    step Forms::Contracts::Build()
+    step Contract::Validate()
     step :save_quotations
     step Contract::Persist()
     # step :budget_limit_validation

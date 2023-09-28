@@ -29,7 +29,7 @@ class Forms::Ops::Choices < Transactions::API
       context[:form] = Forms::Router.klass(params[:route])
       return on_error context, :base, "Invalid Route" if context[:form].blank?
 
-      context[:model] = Form.find_by(model: context[:form].model, company_id: current_user.company_id)
+      context[:model] = Form.find_by(model: context[:form].model, company_id: current_user.company_id, klass_name: context[:form])
       return false unless context[:model].present?
     end
 

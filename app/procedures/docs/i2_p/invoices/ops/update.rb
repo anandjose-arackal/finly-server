@@ -17,10 +17,10 @@ class Docs::I2P::Invoices::Ops::Update < Transactions::API
   step Model(Invoice, :find_by)
   step Policy::Pundit(Docs::I2P::Invoices::Policy, :update?)
   step Forms::Model::Find()
-  step Forms::Contracts::Build() 
-  step Contract::Validate()
-  step :validate_credit_note
   step Wrap(TransactionStep){
+    step Forms::Contracts::Build()
+    step Contract::Validate()
+    step :validate_credit_note
     step Contract::Persist()
     step :budget_limit_validation
     step :update_credit_notes_data
@@ -61,6 +61,13 @@ class Docs::I2P::Invoices::Ops::Update < Transactions::API
       return false
     end
     true
+  end
+
+  def save_custom_fields(options, params, **)
+    model = options[:model]
+    model.form_custom_fields.each do |custom_field|
+      custom_field.save
+    end
   end
 
 end
