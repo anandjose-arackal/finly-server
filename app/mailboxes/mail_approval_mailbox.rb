@@ -35,7 +35,7 @@ class MailApprovalMailbox < ApplicationMailbox
     document = @result.params['document']
 
     if @result.success? && !document.processing?
-      EmailApproval.delete_email_approval(document.id)
+      run_without_tenant { EmailApproval.delete_email_approval(document.id) }
     else
       @error_logger.error("Invoice #{document.id} failed to approve by #{mail.from} because #{@result.inspect}")
     end
@@ -46,7 +46,7 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def document
-    @document ||= email_approval.documentable
+    @document ||= run_without_tenant { email_approval.documentable }
   end
 
   def params
@@ -59,7 +59,7 @@ class MailApprovalMailbox < ApplicationMailbox
     document = @result.params['document']
 
     if @result.success? && !document.processing?
-      EmailApproval.delete_email_approval(document.id)
+      run_without_tenant { EmailApproval.delete_email_approval(document.id) }
     else
       @error_logger.error("Invoice #{document.id} failed to reject by #{mail.from} because #{@result.inspect}")
     end
@@ -94,7 +94,7 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def email_approval
-    @email_approval ||= EmailApproval.where(approval_uuid: approval_uuid)&.first
+    @email_approval ||= run_without_tenant { EmailApproval.where(approval_uuid: approval_uuid)&.first }
   end
 
   def no_email_approval_found?
@@ -155,11 +155,11 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def invoice
-    @invoice ||= Invoice.find_by_id(email_approval.documentable_id)
+    @invoice ||= run_without_tenant { Invoice.find_by_id(email_approval.documentable_id) }
   end
 
   def delete_email_approvals
-    EmailApproval.delete_email_approval(invoice.id)
+    run_without_tenant { EmailApproval.delete_email_approval(invoice.id) }
   end
 
   def can_approve
@@ -179,7 +179,9 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def ensure_user
-    @user = ActsAsTenant.without_tenant { User.find_by(email: mail.from) }
+    return if no_email_approval_found? && log_no_email_approval_found
+
+    @user = ActsAsTenant.without_tenant { User.find_by(email: mail.from, company_id: email_approval.company_id) }
     return false if @user.nil?
 
     set_current_tenant @user.company

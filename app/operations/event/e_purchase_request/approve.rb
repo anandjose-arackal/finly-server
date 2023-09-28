@@ -67,7 +67,11 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
     elsif po_initiators.present? && po_initiators.include?(user)
       "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number} and is awaiting your action in approved items"
     else
-      "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number}"
+      if user.id == purchase_request.creator_id
+        "Congratulations! Your purchase request #{purchase_request.order_number} has been approved"   
+      else
+        "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number}"
+      end
     end
   end
 
@@ -80,7 +84,11 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
       "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number} and is awaiting your action in approved items"
       # now the PR hasn't been approved yet and is waiting someone else's approval
     else
-      "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number} and is awaiting your further approval"
+      if user.id == purchase_request.creator_id
+        "Congratulations! Your purchase request #{purchase_request.order_number} has been approved"   
+      else
+        "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number} and is awaiting your further approval"
+      end
     end
   end
 end

@@ -224,9 +224,9 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def po_invoice_url
-      suffix = URI.escape("\"procurement_id\":\"#{invoice.procurement.id}\",\"procurement_type\":\"tax_invoice\",\"forms_enabled\":\"true\"}")
-      path = "procure_invoices/#{invoice.id}/params={"
-      "#{Constants::BASE_URL_VP}#{path}#{suffix}}"
+      suffix = URI.escape("{\"procurement_id\":\"#{invoice.procurement.id}\",\"procurement_type\":\"tax_invoice\",\"forms_enabled\":\"true\"}")
+      path = "procure_invoices/#{invoice.id}/params="
+      Constants::BASE_URL_VP + path + suffix
     end
 
     def validate

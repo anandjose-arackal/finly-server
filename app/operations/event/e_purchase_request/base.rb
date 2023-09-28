@@ -118,7 +118,7 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
       # PurchaseRequestMailer.send_pr_approval_mail(user.id, mail_presenter_params).deliver_later
     # els
     if is_approver?(user) || (is_creator?(user) && approved?) || !new_ui_enabled?(user)
-      PurchaseRequestMailer.delay(queue: 'procurements_notification').send_pr_approval_mail(user.id, mail_presenter_params)
+      PurchaseRequestMailer.delay(queue: 'procurements_notification').send_purchase_request_mail(user.id, mail_presenter_params)
       # PurchaseRequestMailer.send_purchase_request_mail(user.id, mail_presenter_params).deliver_later
     else
       PurchaseRequestMailer.delay(queue: 'procurements_notification').send_pr_approval_mail(user.id, mail_presenter_params)
