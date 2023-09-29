@@ -1,7 +1,7 @@
 class Docs::UtilityBills::Bills::Ops::UpdateAndSubmit < Transactions::API
 
-  step Model(BbpsBill, :find_by)
   step :update
+
   step :submit
 
   def update(options, params:, current_user:, **)
