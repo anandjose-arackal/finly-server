@@ -8,9 +8,7 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
 
   def validate
     super
-    unless self.approving_user.present?
-      add_message :error, 'User not found'
-    end
+    add_message :error, 'User not found' if approving_user.blank?
   end
 
   def event_id
@@ -24,16 +22,29 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
   def affected_users
     if purchase_request.approved? && purchase_request.company.configuration.email_purchase_order_initiator
       # If PR is approved, send email to all PO initiators in that policy
-      po_initiators_in_pr_policy = purchase_request.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:purchase_order_initiator)).pluck(:user_id) rescue []
       self.po_initiators = user.company.users.where(id: po_initiators_in_pr_policy)
-      self.purchase_request.affected_users(:approve) + po_initiators
+      purchase_request.affected_users(:approve) + po_initiators
     else
-      self.purchase_request.affected_users(:approve)
+      purchase_request.affected_users(:approve)
     end
   end
 
+  def po_initiators_in_pr_policy
+    policy_user_roles.where(user_role_id: UserRole.id_for(:purchase_order_initiator)).pluck(:user_id)
+  rescue StandardError
+    []
+  end
+
+  def policy
+    @policy ||= purchase_request.policy
+  end
+
+  def policy_user_roles
+    @policy_user_roles ||= policy.policy_user_roles
+  end
+
   def notification_affected_users
-    self.purchase_request.notification_affected_users(:approve)
+    purchase_request.notification_affected_users(:approve)
   end
 
   def set_notification(user)
@@ -41,37 +52,43 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
                                              action_type_id: NotificationActionType.id_for(:notify_approve),
                                              action_user_id: purchase_request.creator_id,
                                              object_id: purchase_request.id,
-                                             object_type: "PurchaseRequest",
+                                             object_type: 'PurchaseRequest',
                                              path_object_id: purchase_request.id,
-                                             path_object_type: "PurchaseRequest",
+                                             path_object_type: 'PurchaseRequest',
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             application: RequestStore.store[:current_app]
-    )
+                                             application: RequestStore.store[:current_app])
     notification.save
   end
 
   def mailer_subject(user)
-    if user == self.approving_user
-      "You approved the purchase request : #{self.purchase_request.order_number}"
+    if user == approving_user
+      "You approved the purchase request : #{purchase_request.order_number}"
     elsif po_initiators.present? && po_initiators.include?(user)
-      "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your action in approved items"
+      "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number} and is awaiting your action in approved items"
     else
-      "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number}"
+      if user.id == purchase_request.creator_id
+        "Congratulations! Your purchase request #{purchase_request.order_number} has been approved"   
+      else
+        "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number}"
+      end
     end
   end
 
   def mailer_body(user)
     # i.e. this is the user who approved the PR
-    if user == self.approving_user
-      "You have approved the purchase request: #{self.purchase_request.order_number}"
+    if user == approving_user
+      "You have approved the purchase request: #{purchase_request.order_number}"
       # i.e. the PR is approved and is awaiting the initiators to create a PO from it
     elsif po_initiators.present? && po_initiators.include?(user)
-      "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your action in approved items"
+      "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number} and is awaiting your action in approved items"
       # now the PR hasn't been approved yet and is waiting someone else's approval
     else
-      "#{self.approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your further approval"
+      if user.id == purchase_request.creator_id
+        "Congratulations! Your purchase request #{purchase_request.order_number} has been approved"   
+      else
+        "#{approving_user.name} has approved the purchase request: #{purchase_request.order_number} and is awaiting your further approval"
+      end
     end
   end
-
 end

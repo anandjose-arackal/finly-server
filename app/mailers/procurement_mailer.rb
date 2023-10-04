@@ -8,103 +8,101 @@ class ProcurementMailer < ApplicationMailer
     @purchase_order = presenter.document
     @user = presenter.user
     @company = @user.company
-    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id, lean_fetch_call: true })
+    @result = Procurements::PurchaseOrders::Show.(@data.user, { purchase_order_id: @data.document.id, lean_fetch_call: true })
 
     attachments["purchase_order-#{@document.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(
-             pdf: "purchase-order-#{@document.po_number}",
-             encoding: 'UTF-8',
-             template: "export/purchase_order",
-             margin: { :bottom => 12 },
-             layout: "pdf/paginated_bootstrap.html.erb",
-             # print_media_type: true
-         ),
-         footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-         dpi: '650'
+      render_to_string(
+        pdf: "purchase-order-#{@document.po_number}",
+        encoding: 'UTF-8',
+        template: 'export/purchase_order',
+        margin: { bottom: 12 },
+        layout: 'pdf/paginated_bootstrap.html.erb'
+        # print_media_type: true
+      ),
+      footer: { html: { template: 'layouts/partials/_po_footer.html.erb' } },
+      dpi: '650'
     )
     if @data.attachments.present? && @data.attachments.is_a?(Array)
       @data.attachments.each do |attachment|
         url = attachment.file.url
         attachments[attachment.file_file_name] = {
-            content: open(url).read
+          content: open(url).read
         }
       end
     end
 
-    mail from: "#{@user.company.name} <noreply@finlyhq.com>", :reply_to => "#{@user.email}", to: @data.email_to, cc: @data.email_cc_to,
+    mail from: "#{@user.company.name} <noreply@finlyhq.com>", reply_to: @user.email.to_s, to: @data.email_to, cc: @data.email_cc_to,
          bcc: @data.email_bcc_to, subject: @data.email_subject, template_name: 'mail_procurement'
   end
 
   # Automatically sent for purchase order actions
   def send_purchase_order_mail(presenter)
     return unless presenter.validate
+
     @data = presenter
     @company = @data.user.company
     @include_attachments = presenter.include_attachments
     #### variables required for the attachment pdf #########
     if @include_attachments
-    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id, skip_for_mailer: true, lean_fetch_call: true })
+      @result = Procurements::PurchaseOrders::Show.(@data.user, { purchase_order_id: @data.purchase_order.id, skip_for_mailer: true, lean_fetch_call: true })
       if @result.success?
         @purchase_order = @data.purchase_order
         @curr_user = @data.user
         attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-           render_to_string(
-               pdf: "purchase-order-#{@data.purchase_order.po_number}",
-               # dpi: '650',
-               encoding: 'UTF-8',
-               template: "export/purchase_order",
-               layout: "pdf/paginated_bootstrap.html.erb",
-               margin: { :bottom => 12 },
-               # layout: "pdf.html.erb",
-               footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-               # print_media_type: true
-           ),
-           dpi: '650'
+          render_to_string(
+            pdf: "purchase-order-#{@data.purchase_order.po_number}",
+            # dpi: '650',
+            encoding: 'UTF-8',
+            template: 'export/purchase_order',
+            layout: 'pdf/paginated_bootstrap.html.erb',
+            margin: { bottom: 12 },
+            # layout: "pdf.html.erb",
+            footer: { html: { template: 'layouts/partials/_po_footer.html.erb' } }
+            # print_media_type: true
+          ),
+          dpi: '650'
         )
       end
     end
-      mail to: presenter.to, subject: presenter.subject, template_name: 'template'
-      # mail to: 'abinash.b2@gmail.com', subject: presenter.subject, template_name: 'template'
+    mail to: presenter.to, subject: presenter.subject, template_name: 'template'
+    # mail to: 'abinash.b2@gmail.com', subject: presenter.subject, template_name: 'template'
   end
-
-  def send_purchase_request_mail(presenter)
-    @data = presenter
-    if presenter.success?
-      mail to: presenter.to, subject: presenter.subject, template_name: 'template_purchase_request'
-    end
-  end
-
 
   # Automatically sent for invoice actions
-  def send_invoice_mail(presenter)
+  def send_invoice_mail(user_id, params)
+    user = ActsAsTenant.without_tenant { User.find user_id }
+    params[:invoice] = ActsAsTenant.without_tenant { Invoice.find params[:invoice_id] }
+    presenter = Event::EInvoice::Base::MailerPresenter.new(user, params)
     return unless presenter.validate
+
     @data = presenter
     @company = @data.user.company
     #### variables required for the attachment pdf #########
-    @result = Procurements::Invoices::Show.(@data.user, {invoice_id: @data.invoice.id, lean_fetch_call: true })
+    @result = Procurements::Invoices::Show.(@data.user, { invoice_id: @data.invoice.id, lean_fetch_call: true })
+
     if @result.success?
       @invoice = @data.invoice
       @curr_user = @data.user
       attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(
-             pdf: "invoice-#{@data.invoice.invoice_number}",
-             encoding: 'UTF-8',
-             template: "export/inward_invoice",
-             layout: "pdf/paginated_bootstrap.html.erb",
-             margin: { :bottom => 12 },
-             # layout: "pdf.html.erb",
-             footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-             # print_media_type: true
-         ),
-         dpi: '650'
+        render_to_string(
+          pdf: "invoice-#{@data.invoice.invoice_number}",
+          encoding: 'UTF-8',
+          template: 'export/inward_invoice',
+          layout: 'pdf/paginated_bootstrap.html.erb',
+          margin: { bottom: 12 },
+          # layout: "pdf.html.erb",
+          footer: { html: { template: 'layouts/partials/_po_footer.html.erb' } }
+          # print_media_type: true
+        ),
+        dpi: '650'
       )
-      ########################################################
-      # attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-      #    render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
-      # )
+      #######################################################
+      attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+         render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
+      )
       Rails.logger.info "Presenter::SetEmail::#{presenter.inspect} "
-      if presenter.set_email_approval_mail
-        mail to: presenter.to, subject: presenter.subject, template_name: 'email_based_approval', :reply_to => @data.reply_to
+      if params[:email_based_approval]
+        mail to: presenter.to, subject: presenter.subject, template_name: 'email_based_approval', reply_to: @data.reply_to
       else
         mail to: presenter.to, subject: presenter.subject, template_name: 'template_invoice'
       end
@@ -145,7 +143,6 @@ class ProcurementMailer < ApplicationMailer
       mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_approval_invoices'
     end
   end
-
 
   def invoice_bulk_forward(presenter)
     @data = presenter
@@ -192,7 +189,7 @@ class ProcurementMailer < ApplicationMailer
     @data = presenter
     if presenter.success?
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_submit'
-    end    
+    end
   end
 
   def purchase_request_bulk_approval(presenter)

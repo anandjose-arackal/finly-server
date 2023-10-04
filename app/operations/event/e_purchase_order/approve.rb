@@ -52,33 +52,15 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
   end
 
   def affected_users
-    # if approved
-    #   if auto_approve
-    #     return [self.purchase_order.user]
-    #   end
-    #   [self.purchase_order.trails.last.action_user, self.purchase_order.user]
-    # else
-    #   users = [self.purchase_order.trails.last.action_user]
-    #   if controlling_users.present?
-    #     controlling_users.each do |user|
-    #       users.push(user)
-    #     end
-    #   end
-    #   users
-    # end
     affected_user = purchase_order.affected_users(:approve)
     if purchase_order.purchase_request_items.present? && purchase_request_creator.present?
       affected_user += purchase_request_creator
     end
-    return affected_user
+    
+    affected_user
   end
 
   def notification_affected_users
-    # if approved
-    #   [purchase_order.user]
-    # else
-    #   self.controlling_users
-    # end
     self.purchase_order.notification_affected_users(:approve)
   end
 

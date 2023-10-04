@@ -85,9 +85,13 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   end
 
   def post_process
-
     add_message :success, 'Successfully submitted purchase order'
-    # role_id = self.workflow_output[:role_id]
+
+    create_email_approval_for_purachse_order(purchase_order) if PurchaseOrderToggle.new(user).enabled?
     Event::EPurchaseOrder::Submit.(user, {purchase_order: purchase_order, workflow_output: workflow_output})
+  end
+
+  def create_email_approval_for_purachse_order(purchase_order)
+    EmailApproval.create_for(purchase_order)
   end
 end

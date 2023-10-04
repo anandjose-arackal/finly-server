@@ -71,9 +71,9 @@ class Docs::I2P::PurchaseOrders::Ops::Submit < Transactions::API
   end
 
   def post_process(options, reviewal_document:, current_user:, **)
-
     role_id = options[:workflow_output][:role_id]
-    Event::EPurchaseOrder::Submit.(current_user, {invoice: reviewal_document,
+    create_email_approval_for_purachse_order(reviewal_document) if PurchaseOrderToggle.new(current_user).enabled?
+    Event::EPurchaseOrder::Submit.(current_user, {purchase_order: reviewal_document, 
                                             workflow_output: options[:workflow_output], role_id: role_id})
 
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
@@ -81,5 +81,9 @@ class Docs::I2P::PurchaseOrders::Ops::Submit < Transactions::API
     add_message options, :success, :base, 'Successfully submitted purchase order'
 
     true
+  end
+
+  def create_email_approval_for_purachse_order(purchase_order)
+    EmailApproval.create_for(purchase_order)
   end
 end

@@ -67,6 +67,7 @@ class PurchaseRequest < ApplicationRecord
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
+  has_many :email_approvals, as: :documentable
 
   validates :description, :location, :policy, presence: true
 

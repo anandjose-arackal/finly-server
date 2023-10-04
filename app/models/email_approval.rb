@@ -16,6 +16,10 @@ class EmailApproval < ApplicationRecord
     new_approval
   end
 
+  def self.create_for(document)
+    EmailApproval.create!(approval_uuid: SecureRandom.uuid, documentable: document)
+  end
+
   def self.delete_email_approval(document_id)
     email_approvals = self.where(documentable_id: document_id)
     email_approvals.each do |ea|
