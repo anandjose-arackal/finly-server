@@ -96,10 +96,33 @@ class ProcurementMailer < ApplicationMailer
         ),
         dpi: '650'
       )
-      #######################################################
-      attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
-      )
+      ########################################################
+      # attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+      #    render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
+      # )
+
+      @payment = @data.payment
+      @currency_symbol = @invoice&.base_currency&.country_code
+
+      invoice_data  = if @invoice&.forms_enabled
+                        {
+                          invoice_amount: @invoice&.invoice_net_total_amount,
+                          tds: @invoice&.display_tds_amount.to_f
+                        }
+                      else
+                        {
+                          invoice_amount: @invoice&.net_amount&.value,
+                          tds: @invoice&.tds_amount&.value
+                        }
+                      end
+                      
+      @additonal_info = {
+        invoice_date: @invoice&.date,
+        payment_date: @payment&.processed_at,
+        net_paid_amount: @payment&.amount&.value,
+        utr: @payment&.utr
+      }.merge!(invoice_data)
+
       Rails.logger.info "Presenter::SetEmail::#{presenter.inspect} "
       if params[:email_based_approval]
         mail to: presenter.to, subject: presenter.subject, template_name: 'email_based_approval', reply_to: @data.reply_to

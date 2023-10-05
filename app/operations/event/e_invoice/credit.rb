@@ -67,6 +67,18 @@ class Event::EInvoice::Credit < Event::EInvoice::Base
   end
 
   def mailer_body(user)
-    "Payment of &#8377;#{payment.amount.value} has been processed by #{crediting_user.name} against your invoice number #{invoice.invoice_number}."
+    "Payment of #{invoice&.base_currency&.country_code} #{payment.amount.value} has been processed by #{crediting_user.name} against your invoice number #{invoice.invoice_number}."
   end
+
+  def allow_mailer(user, configuration, which_super: nil)
+    # using which_super so that `Event::EInvoice::UtrUpdate#allow_mailer` can call `Event::EInvoice::Base#allow_mailer` directly
+    return super(user, configuration) if which_super.present? && which_super == Event::EInvoice::Base.name
+
+    if SendInvoiceEmailOnUtrUpdateToggle.new(user).enabled? # email should be sent on UTR updation only
+      false # returning `false` so that it should not send email at the time of `mark as credited`
+    else
+      super(user, configuration) # calling `super` because email should be sent at the time of `mark as credited`
+    end
+  end
+
 end

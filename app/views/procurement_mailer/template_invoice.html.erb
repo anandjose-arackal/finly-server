@@ -6,9 +6,71 @@
   <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
     <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;"><%=@data.action_name%></p>
   </div>
-  <div style="width: 100%; height: auto; margin: auto; background-color: white;">
+  <div style="width: 100%; height: auto; margin: auto; background-color: white; padding: 0px 16px;">
     <!--<p style="font-size: 20px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">Abhinash1354@gmail.com</span> has shared 'New Expense Report' with you.</p>-->
-    <p style="font-size: 17px; margin-left: 3%;text-align: left"><%= @data.body_val.html_safe %></p>
+    <p style="font-size: 17px; text-align: left;">
+      <%= @data.body_val.html_safe %>
+      Following are the additional details of the invoice.
+    </p>
+
+    <table style="font-size: 17px; text-align: left;">
+      <tbody>
+        <% if @additonal_info[:invoice_date].present? %>
+          <tr>
+            <td>Invoice Date</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td>
+              <%= localize(@additonal_info[:invoice_date], format: "%d/%m/%Y") %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @additonal_info[:invoice_amount] %>
+          <tr>
+            <td>Invoice Amount</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @currency_symbol %> <%= @additonal_info[:invoice_amount] %></td>
+          </tr>
+        <% end %>
+
+        <% if @additonal_info[:tds] %>
+          <tr>
+            <td>TDS</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @currency_symbol %> <%= @additonal_info[:tds] %></td>
+          </tr>
+        <% end %>
+
+        <% if @additonal_info[:net_paid_amount] %>
+          <tr>
+            <td>Net (Paid) Amount</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @currency_symbol %> <%= @additonal_info[:net_paid_amount] %></td>
+          </tr>
+        <% end %>
+
+        <% if @additonal_info[:payment_date].present? %>
+          <tr>
+            <td>Payment Date</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td>
+              <%= localize(@additonal_info[:payment_date], format: "%d/%m/%Y") %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @additonal_info[:utr].present? %>
+          <tr>
+            <td>UTR No.</td>
+            <td style="min-width: 20px; text-align: center;"> : </td>
+            <td><%= @additonal_info[:utr] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <p style="font-size: 17px; margin-left: 3%; text-align: left;">
+    </p>
     <br>
 
       <div style="text-align: center;">

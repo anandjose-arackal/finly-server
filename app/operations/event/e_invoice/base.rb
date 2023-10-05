@@ -174,10 +174,11 @@ class Event::EInvoice::Base < Event::SetNotifier
   end
 
   class Event::EInvoice::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :invoice, :user, :body_val, :subject_val, :button_val, :event_id,
+    attr_accessor :payment, :invoice, :user, :body_val, :subject_val, :button_val, :event_id,
                   :action_name, :comment_body, :view_url, :company, :action_url_token, :action_url, :to_name, :reply_to, :email_approval_mail
 
     def initialize(user, params)
+      self.payment = params[:payment]
       self.invoice = params[:invoice]
       self.user = user
       self.body_val = params[:body]
