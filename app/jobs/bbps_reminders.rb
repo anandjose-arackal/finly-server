@@ -4,6 +4,12 @@ class BbpsReminders < BaseJob
     @logger = Logger.new "#{Rails.root}/log/reminders.log"
     @logger.info "#{self.name} => Job run started at #{Time.now}"
 
+    user_for_master_flag = User.unscoped.first
+    unless MasterFlagEmailRemindersAllCompanyToggle.new(user_for_master_flag).enabled?
+      @logger.info "#{self.name} => Master flag has prevented the job execution at #{Time.now}"
+      return
+    end
+
     fetch_due_bills
     find_pocs
     organize_bills_by_users

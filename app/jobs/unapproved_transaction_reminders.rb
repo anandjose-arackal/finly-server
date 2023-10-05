@@ -3,6 +3,12 @@ class UnapprovedTransactionReminders < BaseJob
     @logger = Logger.new "#{Rails.root}/log/reminders.log"
     # @logger.info "#{self.name} => Job run started at #{Time.now}"
     
+    user_for_master_flag = User.unscoped.first
+    unless MasterFlagEmailRemindersAllCompanyToggle.new(user_for_master_flag).enabled?
+      @logger.info "#{self.name} => Master flag has prevented the job execution at #{Time.now}"
+      return
+    end
+    
     # to store whether a company has enabled to send the reminders
     @reminders_enabled = Hash.new
     
