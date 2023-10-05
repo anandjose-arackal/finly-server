@@ -8,6 +8,8 @@ class MailApprovalMailbox < ApplicationMailbox
     return if no_email_approval_found? && log_no_email_approval_found
     return if no_email_body? && log_no_email_body
 
+    error_logger.info "\n\t\t\t*******\n document type #{document_type} \n\n\t\t********"
+
     if document_type == PurchaseRequest
       Email::PrApprovalService.new(@user, document, mail.from, email_body, error_logger).process
     elsif document_type == PurchaseOrder
@@ -23,10 +25,14 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def aprove_or_reject
+    error_logger.info "\n\t\t\t*******\n Reached Approve oR Reject \n\n\t\t********"
     if email_body.downcase.include?('approve') && can_approve
       approve
     elsif email_body.downcase.include?('reject') && can_reject
       reject
+    else
+      error_logger.info "\n\t\t\t*******\n no approve or reject #{can_reject} \n\n\t\t********"
+      error_logger.info "\n\t\t\t*******\n no approve or reject #{user_in_level?} \n\n\t\t********"
     end
   end
 
@@ -54,11 +60,25 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def reject
-    params[:note] = "Invoice has been rejected via email by #{mail.from&.first} on #{Time.now.strftime('%Y-%d-%m %H:%M:%S %Z')}"
-    @result = Procurements::Invoices::Reject.(@user, params)
+    reject_params = params
+
+    error_logger.info "\n\t\t\t*******\n Reached Reject \n\n\t\t********"
+    reject_params[:note] = "Invoice has been rejected via email by #{mail.from&.first} on #{Time.now.strftime('%Y-%d-%m %H:%M:%S %Z')}"
+    error_logger.info "\n\t\t\t*******\n Params: #{reject_params} \n\n\t\t********"
+
+
+    @result = Procurements::Invoices::Reject.(@user, reject_params)
     document = @result.params['document']
 
+    error_logger.info "\n\t\t\t*******\n Success: #{@result.success?} \n\n\t\t********"
+    error_logger.info "\n\t\t\t*******\n Par: #{reject_params} \n\n\t\t********"
+    error_logger.info "\n\t\t\t*******\n Document id: #{document.inspect} \n\n\t\t********"
+    error_logger.info "\n\t\t\t*******\n Success: #{document.messages} \n\n\t\t********"
+    error_logger.info "\n\t\t\t*******\n Document id: #{document.id} \n\n\t\t********"
+    error_logger.info "\n\t\t\t*******\n Document id: #{document.rejected?} \n\n\t\t********"
+
     if @result.success? && !document.processing?
+      error_logger.info "\n\t\t\t*******\n deleting mail approvals \n\n\t\t********"
       run_without_tenant { EmailApproval.delete_email_approval(document.id) }
     else
       @error_logger.error("Invoice #{document.id} failed to reject by #{mail.from} because #{@result.inspect}")
@@ -180,6 +200,7 @@ class MailApprovalMailbox < ApplicationMailbox
 
   def ensure_user
     return if no_email_approval_found? && log_no_email_approval_found
+    error_logger.info "\n\t\t\t*******\n Mail from \n#{mail.from}\n\n\t\t********"
 
     @user = ActsAsTenant.without_tenant { User.find_by(email: mail.from, company_id: email_approval.company_id) }
     return false if @user.nil?
