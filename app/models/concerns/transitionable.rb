@@ -58,7 +58,7 @@ module Transitionable
       User.where(id: user_ids)
     end
 
-    def affected_users(type=nil, options={})
+    def affected_users(type=nil, options={})    
       # Valid types [:retract, :reject, :all, :interacted, :unapprove]
       # Valid options {}
       # {ignore_reviewer: true}
@@ -956,7 +956,7 @@ module Transitionable
         policy_ids = PolicyUserRole.with_role_id(UserRole.id_for(:finance_manager)).where(user_id: user.id).pluck(:policy_id)
         # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
+            .where("#{get_document_status_attribute} in (?)", self.finance_associated_status_ids)
       end
     end
 
@@ -965,7 +965,7 @@ module Transitionable
         policy_ids = PolicyUserRole.select(:policy_id).with_role_id(UserRole.id_for(:creditor)).where(user_id: user.id)
         # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
+            .where("#{get_document_status_attribute} in (?)", self.finance_associated_status_ids)
       end
     end
 
@@ -975,7 +975,7 @@ module Transitionable
         policy_ids = PolicyUserRole.select(:policy_id).with_role_id(UserRole.id_for(:travel_manager)).where(user_id: user.id)
         # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", self.travel_associated_status_ids)
+            .where("#{get_document_status_attribute} in (?)", self.travel_associated_status_ids)
       end
     end
 
@@ -985,7 +985,7 @@ module Transitionable
       unless policy_ids.blank?
         # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", self.role_based_associated_status_ids(user))
+            .where("#{get_document_status_attribute} in (?)", self.role_based_associated_status_ids(user))
       end
     end
 
@@ -1107,13 +1107,21 @@ module Transitionable
       data
     end
 
+    def get_document_status_attribute      
+      if self.document_status_attribute.include? '.'
+        self.document_status_attribute
+      else
+        "#{self.table_name}.#{self.document_status_attribute}"
+      end
+    end
+
     def role_based_admin_associated_items(user, role_id, options={})
       admin_restricted_status_ids = options[:admin_restricted_status_ids] || []
       if user.instance_of?(User)
         if self.column_names.include? 'company_id'
           if admin_restricted_status_ids.present?
             # nosqli - Substituted values are from AR object, and not user provided input
-            self.where(company_id: user.company.id).where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", admin_restricted_status_ids)
+            self.where(company_id: user.company.id).where.not("#{get_document_status_attribute} in (?)", admin_restricted_status_ids)
           else
             self.where(company_id: user.company.id)
           end
@@ -1122,9 +1130,9 @@ module Transitionable
           user_ids = User.select(:id).where(company_id: user.company_id)
           if admin_restricted_status_ids.present?
             # nosqli - Substituted values are from AR object, and not user provided input
-            self.where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", admin_restricted_status_ids)
+            self.where("#{get_document_status_attribute}" => user_ids).where.not("#{get_document_status_attribute} in (?)", admin_restricted_status_ids)
           else
-            self.where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids)
+            self.where("#{get_document_status_attribute}" => user_ids)
           end
         end
       end
@@ -1164,7 +1172,7 @@ module Transitionable
       documents = self.status_based_associated_items(user, role_id).where("#{table_name}.id IN (#{dlrms.select('document_reviewer_mappable_id').to_sql})").where(policy_id: policy_ids)
       open_status_ids = self.open_status_ids(user)
       # nosqli - Substituted values are from AR object, and not user provided input
-      documents = documents.where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).or(documents.where("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).where("#{self.table_name}.#{self.document_owner_attribute} = ?", user.id)) rescue self.none
+      documents = documents.where.not("#{get_document_status_attribute} in (?)", open_status_ids).or(documents.where("#{get_document_status_attribute} in (?)", open_status_ids).where("#{get_document_status_attribute} = ?", user.id)) rescue self.none
       documents
     end
 
@@ -1174,7 +1182,7 @@ module Transitionable
       if policy_ids.present?
         # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
+            .where("#{get_document_status_attribute} in (?)", self.finance_associated_status_ids)
       end
     end
 
@@ -1183,7 +1191,7 @@ module Transitionable
       if policy_ids.present?
         # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", self.auditor_associated_status_ids)
+            .where("#{get_document_status_attribute} in (?)", self.auditor_associated_status_ids)
       end
     end
 

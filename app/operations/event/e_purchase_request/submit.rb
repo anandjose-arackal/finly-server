@@ -31,7 +31,7 @@ class Event::EPurchaseRequest::Submit < Event::EPurchaseRequest::Base
   end
 
   def mailer_subject(user)
-    if user.id == purchase_request.creator.id
+    if user.id == purchase_request.creator_id
       "Purchase Request submitted : #{self.purchase_request.order_number}"
     else
       "#{self.purchase_request.creator.name} has submitted Purchase Request : #{self.purchase_request.order_number}"
@@ -39,7 +39,7 @@ class Event::EPurchaseRequest::Submit < Event::EPurchaseRequest::Base
   end
 
   def mailer_body(user)
-    if user.id == purchase_request.creator.id
+    if user.id == purchase_request.creator_id
       "Congratulations, you have successfully submitted the purchase request : #{self.purchase_request.order_number}"
     else
       "#{self.purchase_request.creator.name} has submitted purchase request: #{self.purchase_request.order_number} and is currently awaiting your approval."

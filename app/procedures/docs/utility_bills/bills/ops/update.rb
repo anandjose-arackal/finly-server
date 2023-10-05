@@ -8,6 +8,7 @@ class Docs::UtilityBills::Bills::Ops::Update < Transactions::API
 
   step :setup_dlrm
   step :update_attachments
+  step :validate_presense_of_attachments
   step :create_trail
 
   fail :check
@@ -41,6 +42,17 @@ class Docs::UtilityBills::Bills::Ops::Update < Transactions::API
     Attachment.where(id: attachment_ids).update(resource_id: model.id, resource_type: model.class.name)
     model.attachments.where.not(id: attachment_ids).destroy_all
     true
+  end
+
+  def validate_presense_of_attachments(options, params:, current_user:, **)
+    op = Docs::UtilityBills::Bills::Ops::ValidateAttachment.(params: params, current_user: current_user)
+
+    op.messages.each do |key, val|
+      next if key == :errors_meta
+      add_message options, key, :base, val
+    end
+
+    op.success?
   end
 
   def create_trail(options, params:, current_user:, model:, **)

@@ -42,7 +42,7 @@ class BackgroundOperation < BaseOperation
         self.run
       end
     else
-      ActsAsTenant.with_tenant RequestStore.store[:current_company] do
+      ActsAsTenant.without_tenant do
         self.user = User.find_by_id(user_id)
         self.run
       end

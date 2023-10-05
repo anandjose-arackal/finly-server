@@ -165,7 +165,7 @@ class PurchaseOrder < ApplicationRecord
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
   has_many :quotations, dependent: :destroy
-
+  has_many :email_approvals, as: :documentable
 
   belongs_to :bank_account, optional: true
 

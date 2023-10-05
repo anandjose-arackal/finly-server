@@ -364,4 +364,7 @@ module Constants
 
   ###################### END OF Remunance ###########################
 
+  EMAIL_APPROVAL_MAIL_ID = Rails.env == 'development' ? '@dev.approval.email.finly.io' : '@approval.email.finly.io'
+  EMAIL_APPROVAL_ERROR_PATH = "#{Rails.root}/log/mail_approval_errors.log"
+
 end

@@ -3,9 +3,9 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
 
   def personalizer
     {
-        validate: {
-            after: Personalizer::Process.new([:procurements, :invoices, :submit], :validate, self)
-        }
+      validate: {
+        after: Personalizer::Process.new([:procurements, :invoices, :submit], :validate, self)
+      }
     }
   end
 
@@ -27,24 +27,22 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       return
     end
 
-    if invoice.payment_agreement_id.blank? || vendor_gstin_registered
-      if self.invoice.attachments.blank?
-        add_message :error, "Please attach an invoice document before submitting."
-        return
-      end
+    if (invoice.payment_agreement_id.blank? || vendor_gstin_registered) && self.invoice.attachments.blank?
+      add_message :error, 'Please attach an invoice document before submitting.'
+      return
     end
 
     receiving_account = self.invoice.receiving_account
     if receiving_account&.disabled
-      add_message :error, "This invoice has a bank account which is disabled. Payment can only be processed to active bank accounts."
+      add_message :error, 'This invoice has a bank account which is disabled. Payment can only be processed to active bank accounts.'
       return
     end
 
     # Set validation of DLRMs
     dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
-        reviewal_document: self.invoice,
-        provider_name: self.invoice.get_invoice_provider_name
-    })
+                                                                                reviewal_document: self.invoice,
+                                                                                provider_name: self.invoice.get_invoice_provider_name
+                                                                              })
 
     unless dlrm_validation_op.success?
       add_message :error, dlrm_validation_op.messages[:error]
@@ -76,7 +74,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
         end
       end
 
-      self.invoice.update(rejection_note: "")
+      self.invoice.update(rejection_note: '')
       self.workflow_output = op.workflow_output
 
       return if has_errors?
@@ -95,11 +93,15 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     email_based_approval = false
-    if invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice") && NonPoInvoiceToggle.new(user).enabled?
+    if invoice.invoice_type.id == InwardInvoiceType.id_for('non_po_invoice') && NonPoInvoiceToggle.new(user).enabled?
       EmailApproval.generate_email_approval(invoice.id, invoice.class.to_s)
       email_based_approval = true
+    else
+      EmailApproval.create_for(invoice)
+      email_based_approval = true
     end
-    Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id, email_based_approval: email_based_approval})
+
+    Event::EInvoice::Submit.(user, { invoice: invoice, workflow_output: workflow_output, role_id: role_id, email_based_approval: email_based_approval })
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
     # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully submitted invoice'

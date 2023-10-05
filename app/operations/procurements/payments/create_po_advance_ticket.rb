@@ -259,6 +259,10 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
 
   private
 
+  def adv_amount_currency_id
+    @adv_amount_currency_id ||= all_purchase_orders.first.base_currency_id
+  end
+
   def parse_payment_order_data
     initiating_account = retrieve_initiating_account(user.company)
     policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
@@ -269,7 +273,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         amount_requested_attributes: {
             # value: self.total_advance_amount,
             value: 0,
-            currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
+            currency_id: adv_amount_currency_id
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -277,7 +281,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
         application: "vp",
-        currency_id: (user&.company&.reporting_currency&.id || Currency.first.id),
+        currency_id: adv_amount_currency_id,
         scheduled_at: self.scheduled_at,
         api_initiated: false
     }
@@ -288,7 +292,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         requested_amount_attributes: {
             # value: self.total_advance_amount,
             value: 0,
-            currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
+            currency_id: adv_amount_currency_id
         },
         beneficiary_type_id: 2,
         # policy_id: policy&.id,
