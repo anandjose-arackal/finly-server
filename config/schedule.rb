@@ -28,10 +28,10 @@
 # elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
 #   load_secure_storage(:background_production_console)
 # end
-
 env :PATH, ENV['PATH']
 
 set :output, "#{path}/log/whenever.log"
+
 
 every 30.minutes, roles: [:whenever_cron] do
   runner "YesBankStatusChecker.perform", output: "#{path}/log/whenever/yes_bank_status_checker.log"
@@ -127,7 +127,14 @@ every :hour, roles: [:whenever_cron] do
   runner "RemoveDuplicateSequence.perform"
 end
 
+every 1.day, at: '8:00 am' roles: [:whenever_cron] do
+  runner "BbpsReminders.perform"
+end
 
 # every '0,15,30,45 * * * *', roles: [:whenever_cron] do
 #   runner 'AnalyticsDashboard::Scheduler.perform'
 # end
+
+every 1.day, at: '8:30 am', roles: [:whenever_cron] do
+  runner "UnapprovedTransactionReminders.perform"
+end

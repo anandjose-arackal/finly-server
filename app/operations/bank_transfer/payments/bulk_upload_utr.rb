@@ -1,7 +1,8 @@
 class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
-  attr_accessor :payments_data, :file, :result_array, :headers, :all_payments, :update_payments, :new_transactions, :existing_transactions,
-                :all_transactions, :bank_transaction_class, :payments
+  attr_accessor :payments_data, :file, :result_array, :headers, :all_payments, :update_payments,
+                :new_transactions, :existing_transactions,
+                :all_transactions, :bank_transaction_class, :payments, :file_payments
 
   def pre_validate
     if user.blank? || params.blank?
@@ -38,7 +39,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
     self.new_transactions = []
     self.existing_transactions = []
     self.payments = []
-    file_payments = []
+    self.file_payments = [] # it stores only successfully utr updated payments
 
     self.payments_data.each_with_index do |payment_data, index|
       self.result_array << payment_data.values
@@ -74,17 +75,21 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       payment.processed_at = credited_at
       payments << payment
       # add a success message to the result array
-      file_payments.push(payment)
+      self.file_payments.push(payment)
       self.result_array[index] << "Success!"
     end
     update_details
-    file_payments.each do |payment|
+    self.file_payments.each do |payment|
       Payment.update_payment_status( payment, user )
     end
   end
 
   def post_process
-
+    self.file_payments.each do |payment|
+      if send_email_if_valid?(payment)
+        BackgroundJobs::UtrUpdateEmail::SendInvoiceEmailOnUtrUpdateBackground.perform_async(payment&.id)
+      end
+    end
   end
 
   def success
@@ -93,6 +98,15 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
 
   private
+
+  def send_email_if_valid?(payment)
+    payment.present? and
+    payment.utr.present? and
+    payment.invoice.present? and
+    payment.invoice.created_by.present? and
+    SendInvoiceEmailOnUtrUpdateToggle.new(payment.invoice.created_by).enabled?
+    # `SendInvoiceEmailOnUtrUpdateToggle` should be enabled since we are trying to send emails after `bulk UTR upload` action
+  end
 
   def retrieve_headers
     [

@@ -65,8 +65,9 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
     begin
       params[:params][:quotations].each do |q|
         if q[:id] == ""
-          quotation_params = q.except(:collection_uuid, :collection_id, :selected_value, :_destroy, :selected_lookup_data)
-          quotation = Quotation.new(quotation_params)
+          quotation_params = q
+          quotation = Quotation.new
+          quotation.attributes = quotation_params.reject { |k,v| !quotation.attributes.keys.member?(k.to_s) }
           quotation.purchase_order_id = params[:params][:id]
           if quotation.save
             q[:id] = quotation.id

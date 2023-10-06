@@ -1,10 +1,9 @@
 class Procurements::Invoices::TakeControl < Procurements::Invoices::Base
-
   attr_accessor :invoice, :procurement
 
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
-    # todo scope it and in all similar places
+    # TODO: scope it and in all similar places
     self.invoice = user.company.inward_invoices.scope_all_except_voided.admin_associated_items(user).find_by id: invoice_id
 
     self.procurement = self.invoice&.procurement
@@ -12,16 +11,15 @@ class Procurements::Invoices::TakeControl < Procurements::Invoices::Base
 
   def validate
     unless user.vendor_payment_admin?
-      add_message :error, "Only admins can take control of an invoice."
+      add_message :error, 'Only admins can take control of an invoice.'
       return
     end
 
     unless invoice.can_take_control?
-      add_message :error, "Invoice cannot be taken control of at this stage"
+      add_message :error, 'Invoice cannot be taken control of at this stage'
       return
     end
   end
-
 
   def process
     params[:document] = self.invoice
@@ -39,10 +37,8 @@ class Procurements::Invoices::TakeControl < Procurements::Invoices::Base
   end
 
   def post_process
-    # Event::EInvoice::TakeControl.(user, invoice: invoice, workflow_output: workflow_output)
+    Event::EInvoice::TakeControl.(user, invoice: invoice, workflow_output: workflow_output)
 
-    add_message :success, "Invoice is now in your control."
+    add_message :success, 'Invoice is now in your control.'
   end
-
-
 end
