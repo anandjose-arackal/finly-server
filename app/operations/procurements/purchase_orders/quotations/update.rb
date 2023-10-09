@@ -97,7 +97,7 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 		quotation.assign_attributes(self.quotation_params)
 		if quotation.valid?
 			quotation.save
-			if quotation.selected
+			if quotation.selected == 'true'
 				other_quotations = self.purchase_order.quotations.where.not(id: quotation.id)
       			other_quotations.update_all(selected: false)
       		end

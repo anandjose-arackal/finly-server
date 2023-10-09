@@ -177,8 +177,8 @@ class InvoiceLineItem < ApplicationRecord
   # ####
 
 
-  validates :quantity, presence: true
-  validates :rate, presence: true
+  validates :quantity, presence: true, numericality: { greater_than: 0 }
+  validates :rate, presence: true, numericality: { greater_than: 0 }
 
   # removing for now, these are not used in newer forms
   # validates_presence_of :unit_of_measurement
