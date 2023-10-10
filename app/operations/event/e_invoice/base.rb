@@ -108,7 +108,7 @@ class Event::EInvoice::Base < Event::SetNotifier
   end
 
   def send_mails(user)
-    if is_approver?(user) || (is_creator?(user) && approved?) || !new_ui_enabled?(user)
+    if is_approver?(user) || is_creator?(user) || !new_ui_enabled?(user)
       params[:email_based_approval] = false
     else
       params[:email_based_approval] = true
