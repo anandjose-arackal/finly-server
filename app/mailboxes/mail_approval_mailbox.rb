@@ -122,12 +122,7 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def log_no_email_approval_found
-    # User might belong to multiple entities, and if document is from one of those other entities
-    unless ensure_document_id_matches_user
-      error_logger.error("Email approval not found for approval::uuid #{approval_uuid} under the company #{@user.company_id}")
-    else
-      error_logger.error("** approval::uuid #{approval_uuid} not found even after Multiple entities search")
-    end
+    error_logger.error("** approval::uuid #{approval_uuid} not found even after Multiple entities search")
 
     true
   end
@@ -214,20 +209,5 @@ class MailApprovalMailbox < ApplicationMailbox
 
   def run_without_tenant(&block)
     ActsAsTenant.without_tenant(&block)
-  end
-
-  def ensure_document_id_matches_user
-    ### Basically ensure Document's Company ID matches with the Company ID of the email sender ###
-    email_approval = run_without_tenant { EmailApproval.where(approval_uuid: approval_uuid)&.first }
-    user_company_ids = run_without_tenant { User.where(email: mail.from).pluck(:company_id) }
-
-    if user_company_ids.include? email_approval.company_id
-      set_current_tenant(Company.find(email_approval.company_id))
-      @user = User.find_by(email: mail.from)
-      return true unless @user.nil?
-
-      set_current_tenant(nil)
-      false
-    end
   end
 end
