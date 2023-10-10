@@ -41,7 +41,7 @@ class MailApprovalMailbox < ApplicationMailbox
     document = @result.params['document']
 
     if @result.success? && !document.processing?
-      run_without_tenant { EmailApproval.delete_email_approval(document.id) }
+      EmailApproval.delete_email_approval(document.id)
     else
       @error_logger.error("Invoice #{document.id} failed to approve by #{mail.from} because #{@result.inspect}")
     end
@@ -52,7 +52,7 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def document
-    @document ||= run_without_tenant { email_approval.documentable }
+    @document ||= email_approval.documentable
   end
 
   def params
@@ -79,7 +79,7 @@ class MailApprovalMailbox < ApplicationMailbox
 
     if @result.success? && !document.processing?
       error_logger.info "\n\t\t\t*******\n deleting mail approvals \n\n\t\t********"
-      run_without_tenant { EmailApproval.delete_email_approval(document.id) }
+      EmailApproval.delete_email_approval(document.id)
     else
       @error_logger.error("Invoice #{document.id} failed to reject by #{mail.from} because #{@result.inspect}")
     end
@@ -114,7 +114,7 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def email_approval
-    @email_approval ||= run_without_tenant { EmailApproval.where(approval_uuid: approval_uuid)&.first }
+    @email_approval ||= EmailApproval.where(approval_uuid: approval_uuid)&.first
   end
 
   def no_email_approval_found?
@@ -122,12 +122,7 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def log_no_email_approval_found
-    # User might belong to multiple entities, and if document is from one of those other entities
-    unless ensure_document_id_matches_user
-      error_logger.error("Email approval not found for approval::uuid #{approval_uuid} under the company #{@user.company_id}")
-    else
-      error_logger.error("** approval::uuid #{approval_uuid} not found even after Multiple entities search")
-    end
+    error_logger.error("** approval::uuid #{approval_uuid} not found even after Multiple entities search")
 
     true
   end
@@ -175,11 +170,11 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def invoice
-    @invoice ||= run_without_tenant { Invoice.find_by_id(email_approval.documentable_id) }
+    @invoice ||= Invoice.find_by_id(email_approval.documentable_id)
   end
 
   def delete_email_approvals
-    run_without_tenant { EmailApproval.delete_email_approval(invoice.id) }
+    EmailApproval.delete_email_approval(invoice.id)
   end
 
   def can_approve
@@ -214,20 +209,5 @@ class MailApprovalMailbox < ApplicationMailbox
 
   def run_without_tenant(&block)
     ActsAsTenant.without_tenant(&block)
-  end
-
-  def ensure_document_id_matches_user
-    ### Basically ensure Document's Company ID matches with the Company ID of the email sender ###
-    email_approval = run_without_tenant { EmailApproval.where(approval_uuid: approval_uuid)&.first }
-    user_company_ids = run_without_tenant { User.where(email: mail.from).pluck(:company_id) }
-
-    if user_company_ids.include? email_approval.company_id
-      set_current_tenant(Company.find(email_approval.company_id))
-      @user = User.find_by(email: mail.from)
-      return true unless @user.nil?
-
-      set_current_tenant(nil)
-      false
-    end
   end
 end
