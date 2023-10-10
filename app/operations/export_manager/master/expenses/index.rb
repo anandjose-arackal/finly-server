@@ -226,7 +226,12 @@ class ExportManager::Master::Expenses::Index < ExportManager::Builders::Spreadsh
 
   def conversion_rate(expense)
     sym = expense&.report&.base_currency&.country_code
+    if expense&.amount[sym] != 0
     (expense&.amount.value / expense&.amount[sym] rescue 0)
+    else
+      #retrun zero incase of divide by zero
+      0
+    end
   end
 
 
