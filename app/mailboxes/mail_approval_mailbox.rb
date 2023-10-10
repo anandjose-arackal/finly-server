@@ -41,7 +41,7 @@ class MailApprovalMailbox < ApplicationMailbox
     document = @result.params['document']
 
     if @result.success? && !document.processing?
-      run_without_tenant { EmailApproval.delete_email_approval(document.id) }
+      EmailApproval.delete_email_approval(document.id)
     else
       @error_logger.error("Invoice #{document.id} failed to approve by #{mail.from} because #{@result.inspect}")
     end
@@ -52,7 +52,7 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def document
-    @document ||= run_without_tenant { email_approval.documentable }
+    @document ||= email_approval.documentable
   end
 
   def params
@@ -79,7 +79,7 @@ class MailApprovalMailbox < ApplicationMailbox
 
     if @result.success? && !document.processing?
       error_logger.info "\n\t\t\t*******\n deleting mail approvals \n\n\t\t********"
-      run_without_tenant { EmailApproval.delete_email_approval(document.id) }
+      EmailApproval.delete_email_approval(document.id)
     else
       @error_logger.error("Invoice #{document.id} failed to reject by #{mail.from} because #{@result.inspect}")
     end
@@ -114,7 +114,7 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def email_approval
-    @email_approval ||= run_without_tenant { EmailApproval.where(approval_uuid: approval_uuid)&.first }
+    @email_approval ||= EmailApproval.where(approval_uuid: approval_uuid)&.first
   end
 
   def no_email_approval_found?
@@ -175,11 +175,11 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def invoice
-    @invoice ||= run_without_tenant { Invoice.find_by_id(email_approval.documentable_id) }
+    @invoice ||= Invoice.find_by_id(email_approval.documentable_id)
   end
 
   def delete_email_approvals
-    run_without_tenant { EmailApproval.delete_email_approval(invoice.id) }
+    EmailApproval.delete_email_approval(invoice.id)
   end
 
   def can_approve
