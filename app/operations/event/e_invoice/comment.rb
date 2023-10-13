@@ -3,6 +3,7 @@ class Event::EInvoice::Comment < Event::EInvoice::Base
 
   def init
     self.document = params[:document]
+    super
   end
 
   def validate
