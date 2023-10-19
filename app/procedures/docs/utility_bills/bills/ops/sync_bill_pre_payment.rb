@@ -123,8 +123,11 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
 
     return true unless subscription.auto_fetchable
     return true if bill.amount&.value == amount
-
-    add_message(options, :error, :base, "New Bill Available with Updated Amount") if bill.amount != amount
+    if amount == 0
+      add_message(options, :error, :base, "Current outstanding balance for this bill is 0 and hence can not be paid ") if bill.amount != amount
+    else
+     add_message(options, :error, :base, "New Bill Available with Updated Amount") if bill.amount != amount
+    end
     false
   end
 

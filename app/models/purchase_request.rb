@@ -396,7 +396,7 @@ class PurchaseRequest < ApplicationRecord
   end
 
   def self.auditor_associated_status_ids
-    self.status_ids(:awaiting_approval, :approved, :auto_approved, :retracted, :rejected, :closed, :order_initiated, :cancelled, :po_created)
+    self.status_ids(:awaiting_approval, :approved, :auto_approved, :retracted, :rejected, :closed, :order_initiated, :cancelled, :po_created, :partially_closed)
   end
 
   def self.role_based_statuses(user)

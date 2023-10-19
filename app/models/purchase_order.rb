@@ -914,7 +914,7 @@ class PurchaseOrder < ApplicationRecord
         # }
       }
     if self.forms_enabled
-      attachment = self.form_custom_fields.where(field_key: "purchase_order_attachments").first&.attachments&.first&.attachment
+      attachment = self.form_custom_fields.where(field_key: "attachments").first&.attachments&.first&.attachment
       data[:invoice_attachment] = {
           url: attachment&.url,
           thumb: attachment&.url(:thumb),
