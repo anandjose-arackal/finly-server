@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_21_090506) do
+ActiveRecord::Schema.define(version: 2023_09_15_043855) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -10334,6 +10334,8 @@ ActiveRecord::Schema.define(version: 2022_01_21_090506) do
     t.datetime "erp_sync_attempted_at"
     t.date "start_date"
     t.date "end_date"
+    t.datetime "last_activated_at"
+    t.datetime "last_deactivated_at"
     t.string "finbox_email"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
