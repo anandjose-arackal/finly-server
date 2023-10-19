@@ -115,8 +115,8 @@ class Expense::Base < BaseOperation
         balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
         # if the expense is continuing to be from COH, and only the amount is changing
         if expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) && params&.dig(:amount_attributes, :value).present?
-          # If amount is not changed but only the Spent From, then the difference should not be calculated. So assign the whole amount to difference.
-          difference = if params&.dig(:amount_attributes, :value)&.to_f == expense.amount_value&.to_f
+          # If Spent From has changed then the difference should not be calculated. So assign the whole amount as the difference.
+          difference = if params&.dig(:spent_from_id) != expense.spent_from_id
             params&.dig(:amount_attributes, :value)&.to_f
           else
             params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
