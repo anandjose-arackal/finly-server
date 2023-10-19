@@ -1,0 +1,67 @@
+<% content_for :body do %>
+  <head>
+    <title>@data.action_name</title>
+  </head>
+  <body style="background-color: #f3f3f3; height: auto;">
+    <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table; margin-bottom: 20px;">
+      <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;">
+        <%=@data.action_name%>
+      </p>
+    </div>
+    <div style="font-size: 18px; height: auto; margin: auto; background-color: white; text-align: left; padding: 14px;">
+      <p style="margin-top: 0;">Dear <%= @data.user.name %>,</p>
+      
+      <p>
+        Following transactions are waiting for your approval.
+        Request you to please check and do the needful.
+        <a href="<%= @url %>" target="_blank" style="text-decoration: none; color: #1aa44e;">Click Here</a> to login.
+      </p>
+
+      <p>
+        <% if @data.pending_items_count[:purchase_requests].present? && @data.pending_items_count[:purchase_requests] > 0 %>
+          <span>Purchase Requests : <%= @data.pending_items_count[:purchase_requests] %></span>
+          <br>
+        <% end %>
+
+        <% if @data.pending_items_count[:purchase_orders].present? && @data.pending_items_count[:purchase_orders] > 0 %>
+          <span>Purchase Orders : <%= @data.pending_items_count[:purchase_orders] %></span>
+          <br>
+        <% end %>
+
+        <% if @data.pending_items_count[:invoices].present? && @data.pending_items_count[:invoices] > 0 %>
+          <span>Invoices : <%= @data.pending_items_count[:invoices] %> (All type of invoices I2P, P2P, ABP, Utility etc.)</span>
+          <br>
+        <% end %>
+
+        <% if @data.pending_items_count[:utility_bills].present? && @data.pending_items_count[:utility_bills] > 0 %>
+          <span>Utility Bills : <%= @data.pending_items_count[:utility_bills] %></span>
+          <br>
+        <% end %>
+
+        <% if @data.pending_items_count[:payment_tickets].present? && @data.pending_items_count[:payment_tickets] > 0 %>
+          <span>Payment tickets : <%= @data.pending_items_count[:payment_tickets] %></span>
+          <br>
+        <% end %>
+
+        <% if @data.pending_items_count[:vendors].present? && @data.pending_items_count[:vendors] > 0 %>
+          <span>Vendors : <%= @data.pending_items_count[:vendors] %></span>
+          <br>
+        <% end %>
+
+        <% if @data.pending_items_count[:agreements].present? && @data.pending_items_count[:agreements] > 0 %>
+          <span>Agreements : <%= @data.pending_items_count[:agreements] %></span>
+          <br>
+        <% end %>
+
+        <% if @data.pending_items_count[:utility_subscriptions].present? && @data.pending_items_count[:utility_subscriptions] > 0 %>
+          <span>Utility Bill Subscriptions : <%= @data.pending_items_count[:utility_subscriptions] %></span>
+          <br>
+        <% end %>
+      </p>
+
+      <p style="margin-bottom: 0;">Kindly ignore the email if the same is already approved.</p>
+    </div>
+  </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>

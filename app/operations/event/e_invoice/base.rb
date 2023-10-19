@@ -6,7 +6,7 @@ class Event::EInvoice::Base < Event::SetNotifier
       add_message :error, 'User not found'
       return
     end
-    if params.blank? or params[:invoice].blank?
+    if params.blank? || params[:invoice].blank?
       add_message :error, 'Invoice not found'
       return
     end
@@ -16,7 +16,6 @@ class Event::EInvoice::Base < Event::SetNotifier
   end
 
   def action_name
-
   end
 
   def init
@@ -33,15 +32,102 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
   end
 
-  # def get_token(user)
-  #
-  # end
+  def last_trail
+    @last_trail ||= invoice.trails.last
+  end
 
-  def send_mailer(user)
-    return if user.blank?
-    set_presenter_params(user)
-    return unless params[:subject].present? and params[:body].present?
-    ProcurementMailer.delay(queue: 'procurements_notification').send_invoice_mail(Event::EInvoice::Base::MailerPresenter.new(user, params))
+  def last_action
+    @last_action ||= last_trail.action
+  end
+
+  def last_action_name
+    @last_action_name ||= last_action.name
+  end
+
+  def last_action_user
+    @last_action_user ||= last_trail.action_user
+  end
+
+  def approving_user
+    return nil if last_action.name == 'submit'
+
+    last_action_user
+  end
+
+  def is_approver?(user)
+    user.id == approving_user&.id
+  end
+
+  def is_creator?(user)
+    user.id == invoice.created_by_id
+  end
+
+  def approved?
+    invoice.approved?
+  end
+
+  def new_ui_enabled?(user)
+    return NonPoInvoiceToggle.new(user).enabled? if invoice.invoice_type.id == InwardInvoiceType.id_for('non_po_invoice')
+    return PoInvoiceToggle.new(user).enabled? if invoice.invoice_type.id == InwardInvoiceType.id_for('tax_invoice')
+  end
+
+  def send_submit_mails(user)
+    if is_creator?(user) || !new_ui_enabled?(user)
+      params[:email_based_approval] = false
+    else
+      params[:email_based_approval] = true
+    end
+    ProcurementMailer.delay(queue: 'procurements_notification').send_invoice_mail(user.id, mail_presenter_params)
+    # ProcurementMailer.send_invoice_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def send_retract_mails(user)
+    params[:email_based_approval] = false
+    ProcurementMailer.delay(queue: 'procurements_notification').send_invoice_mail(user.id, mail_presenter_params)
+    # ProcurementMailer.send_invoice_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def send_take_control_mails(user)
+    if (is_creator?(user) || is_approver?(user)) && new_ui_enabled?(user)
+      params[:email_based_approval] = true
+    else
+      params[:email_based_approval] = false
+    end
+    ProcurementMailer.delay(queue: 'procurements_notification').send_invoice_mail(user.id, mail_presenter_params)
+    # ProcurementMailer.send_invoice_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def send_reject_mails(user)
+    params[:email_based_approval] = false
+    ProcurementMailer.delay(queue: 'procurements_notification').send_invoice_mail(user.id, mail_presenter_params)
+    # ProcurementMailer.send_invoice_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def send_approval_mails(user)
+    send_mails(user)
+  end
+
+  def send_mails(user)
+    if is_approver?(user) || (is_creator?(user) && approved?) || !new_ui_enabled?(user)
+      params[:email_based_approval] = false
+    else
+      params[:email_based_approval] = true
+    end
+    ProcurementMailer.delay(queue: 'procurements_notification').send_invoice_mail(user.id, mail_presenter_params)
+    # ProcurementMailer.send_invoice_mail(user.id, mail_presenter_params).deliver_later
+  end
+
+  def mail_presenter_params
+    {
+      invoice_id: params[:invoice].id,
+      body: params[:body],
+      subject: params[:subject],
+      button_name: params[:button_name],
+      event_id: params[:event_id],
+      action_name: params[:action_name],
+      comment_body: params[:comment_body],
+      email_based_approval: params[:email_based_approval]
+    }
   end
 
   def mailer_subject(user)
@@ -51,16 +137,8 @@ class Event::EInvoice::Base < Event::SetNotifier
   end
 
   def mailer_button_name(user)
-    # if report.controlling_user_id.present? and
-    #     user.id == invoice.controlling_user_id and not user.id == report.user.id
-    #   'Review Invoice'
-    # else
     'View Invoice'
-    # end
   end
-
-  # def report_view_role(user)
-  # end
 
   def set_presenter_params(user)
     params[:subject] = self.mailer_subject(user)
@@ -68,59 +146,39 @@ class Event::EInvoice::Base < Event::SetNotifier
     params[:button_name] = self.mailer_button_name(user)
     params[:event_id] = event_id
     params[:action_name] = action_name
-    # params[:role_id] = report_view_role(user)
-    # if params[:email_authorization]
-    #   params[:action_url_token] = get_token(user)
-    # end
   end
 
   def allow_mailer(user, configuration)
-    # val = super(user, configuration)
-    # val and (user.manager_summary_mail_configs.reports.blank? or report.user == user)
-    # todo clarify what this is
     true
   end
 
   def process
-    # sending mailers
-    users = mailer_affected_users
-    if users.present?
-      users.each do |user|
-        next if user.blank? # or not user.is_a?(User)
-        user_event_configuration = load_configuration(user)
-        if allow_mailer(user, user_event_configuration) && user.email.present?
-          send_mailer(user)
-        end
-      end
+    send_mails_to_users
+    send_notifications_to_users
+  end
+
+  def send_mails_to_users
+    (mailer_affected_users || []).each do |user|
+      next if user.blank?
+
+      send_mailer(user) if user.email.present?
     end
+  end
 
-    # sending push notifications
-    # users = push_notification_affected_users
-    # if users.present?
-    #   users.each do |user|
-    #     next if user.blank?# or not user.is_a?(User)
-    #     user_event_configuration = load_configuration(user)
-    #     if allow_push_notification(user, user_event_configuration)
-    #       send_push_notification(user)
-    #     end
-    #   end
-    # end
+  def send_notifications_to_users
+    (notification_affected_users || []).each do |user|
+      next if user.blank?
 
-    # sending notifications
-    users = notification_affected_users
-    if users.present?
-      users.each do |user|
-        next if user.blank? # or not user.is_a?(User)
-        set_notification(user)
-      end
+      set_notification(user)
     end
   end
 
   class Event::EInvoice::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :invoice, :user, :body_val, :subject_val, :button_val, :event_id,
+    attr_accessor :payment, :invoice, :user, :body_val, :subject_val, :button_val, :event_id,
                   :action_name, :comment_body, :view_url, :company, :action_url_token, :action_url, :to_name, :reply_to, :email_approval_mail
 
     def initialize(user, params)
+      self.payment = params[:payment]
       self.invoice = params[:invoice]
       self.user = user
       self.body_val = params[:body]
@@ -133,7 +191,7 @@ class Event::EInvoice::Base < Event::SetNotifier
       self.company = user.company
       self.to_name = user.name
       self.email_approval_mail = params[:email_based_approval]
-      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || "") + "@approval.email.finly.io"
+      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || '') + Constants::EMAIL_APPROVAL_MAIL_ID # EMAIL_APPROVAL_MAIL_ID = '@approval.email.finly.io'
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
       #   action_url = generate_action_url(user, role_id)
@@ -143,50 +201,34 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def generate_url
-      #Determine view - Temporary, as views will be eliminated
+      # Determine view - Temporary, as views will be eliminated
 
-      if invoice.created_by.id == user.id
-        view = 'initiator'
+      # view = invoice.created_by_id == user.id ? 'initiator' : 'reviewer'
+      if invoice.invoice_type.id == InwardInvoiceType.id_for('non_po_invoice')
+        non_po_invoice_url
       else
-        view = 'reviewer'
+        po_invoice_url
       end
+    end
+
+    def non_po_invoice_url
       if NonPoInvoiceToggle.new(user).enabled?
         suffix = URI.escape("\"procurement_id\":\"#{invoice.procurement.id}\",\"procurement_type\":\"non_po_invoice\"")
         path = "procure_invoices/#{invoice.id}/params={"
-        url = Constants::BASE_URL_VP + path + suffix + "}"
+        "#{Constants::BASE_URL_VP}#{path}#{suffix}}"
       else
         suffix = URI.escape("{\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}")
         # path = "reports/#{report.id}"
         path = "procurements/#{invoice.procurement.id}/params="
-        url = Constants::BASE_URL_VP + path + suffix
+        Constants::BASE_URL_VP + path + suffix
       end
     end
 
-    # def generate_action_url(user, role_id)
-    #   view = ""
-    #   case role_id
-    #     when 3
-    #       view = "\"manager\""
-    #     when 2
-    #       view = "\"finance_manager\""
-    #     when 1
-    #       view = "\"admin\""
-    #     else
-    #       view = "\"personal\""
-    #   end
-    #
-    #   url = nil
-    #   if report.controlling_user_id == user.id
-    #     # token = params[:email_authorization]
-    #
-    #     # suffix = "/params={\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}"
-    #     path = "report/#{report.id}"
-    #     path = "payments#procurements/#{invoice.procurement.id}"
-    #
-    #     url = Constants::BASE_URL_AUTHORIZER + path + suffix
-    #   end
-    #   url
-    # end
+    def po_invoice_url
+      suffix = URI.escape("{\"procurement_id\":\"#{invoice.procurement.id}\",\"procurement_type\":\"tax_invoice\",\"forms_enabled\":\"true\"}")
+      path = "procure_invoices/#{invoice.id}/params="
+      Constants::BASE_URL_VP + path + suffix
+    end
 
     def validate
       self.user.present? and self.invoice.present?
@@ -201,7 +243,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def set_email_approval_mail
-      self.email_approval_mail && invoice.status.processing? && self.body_val.include?("awaiting your approval") && invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice") && NonPoInvoiceToggle.new(user).enabled?
+      self.email_approval_mail && invoice.status.processing? && self.body_val.include?('awaiting your approval') && invoice.invoice_type.id == InwardInvoiceType.id_for('non_po_invoice') && NonPoInvoiceToggle.new(user).enabled?
     end
 
     def body
@@ -211,7 +253,5 @@ class Event::EInvoice::Base < Event::SetNotifier
     def button_name
       self.button_val
     end
-
   end
-
 end

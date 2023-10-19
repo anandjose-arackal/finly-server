@@ -3,6 +3,7 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
   step :init
   step Model(BbpsBill, :find_by)
   step :verify_policy
+  step :validate_presense_of_attachments
   # step :set_default_params
   step :transition
   step :post_process
@@ -24,6 +25,17 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
     end
 
     true
+  end
+
+  def validate_presense_of_attachments(options, params:, current_user:, **)
+    op = Docs::UtilityBills::Bills::Ops::ValidateAttachment.(params: params, current_user: current_user)
+
+    op.messages.each do |key, val|
+      next if key == :errors_meta
+      add_message options, key, :base, val
+    end
+
+    op.success?
   end
 
   def transition(options, params:, current_user:, model:, **)
