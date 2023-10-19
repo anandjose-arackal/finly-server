@@ -63,22 +63,26 @@ class PaymentAgreements::Update < PaymentAgreements::Base
          rental_invoice.set_creator_and_company(user)
         end
       end
-      if payment_agreement.valid?
-        # Set validation of DLRMs
-        if PaymentAgreement.status_ids(:draft, :retracted, :rejected).include?(payment_agreement.status_id) && payment_agreement.creator_id == user.id
-          if payment_agreement.dlrms.present?
-            dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
-                reviewal_document: self.payment_agreement,
-                document_reviewer_mappings_params: document_reviewer_mappings_params
-            })
-            unless dlrm_validation_op.success?
-              add_message :error, dlrm_validation_op.messages[:error]
-              raise ActiveRecord::Rollback
-              return
-            end
-          end
-        end
-      end
+      
+      # previously, it was not allowing to change the approval workflow when an agreement is retracted, rejected or drafted
+      # but, now commenting this code so that it can allow the change in approval workflow for the same
+
+      # if payment_agreement.valid?
+      #   # Set validation of DLRMs
+      #   if PaymentAgreement.status_ids(:draft, :retracted, :rejected).include?(payment_agreement.status_id) && payment_agreement.creator_id == user.id
+      #     if payment_agreement.dlrms.present?
+      #       dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+      #           reviewal_document: self.payment_agreement,
+      #           document_reviewer_mappings_params: document_reviewer_mappings_params
+      #       })
+      #       unless dlrm_validation_op.success?
+      #         add_message :error, dlrm_validation_op.messages[:error]
+      #         raise ActiveRecord::Rollback
+      #         return
+      #       end
+      #     end
+      #   end
+      # end
 
       if self.payment_agreement.save && self.payment_agreement.reload
         update_item_attributes
