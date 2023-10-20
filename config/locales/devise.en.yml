@@ -62,3 +62,4 @@ en:
         one: "1 error prohibited this %{resource} from being saved:"
         other: "%{count} errors prohibited this %{resource} from being saved:"
       pwned_password: "is a commonly used password and susceptible to data breach. Please try another password"
+      weak_password: "not strong enough. Consider adding more numbers, symbols or uppercase letters to make it stronger"

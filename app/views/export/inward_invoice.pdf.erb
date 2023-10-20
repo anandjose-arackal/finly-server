@@ -156,7 +156,9 @@
           </tr>
           <tr>
             <td class="font-light-gray text-left">Tax</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.tax&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i>
+              <%= @result.invoice.invoice_tax_amount&.to_d.round(2) rescue 0 %>
+            </td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>

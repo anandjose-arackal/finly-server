@@ -909,6 +909,7 @@ class User < ApplicationRecord
   }
 
   before_save :strip_whitespace
+  before_save :set_last_activation_deactivation_dates
 
   around_update :set_passwords_for_linked_users
   after_save :generate_finly_id
@@ -959,6 +960,16 @@ class User < ApplicationRecord
   def strip_whitespace
     self.first_name = self.first_name.strip unless self.first_name.nil?
     self.last_name = self.last_name.strip unless self.last_name.nil?
+  end
+
+  def set_last_activation_deactivation_dates
+    return unless active_changed?
+
+    if active_was
+      self.last_deactivated_at = DateTime.now
+    else
+      self.last_activated_at = DateTime.now
+    end
   end
 
   def password_complexity
@@ -1865,7 +1876,7 @@ class User < ApplicationRecord
     feature_flag_enabled = NonPoInvoiceToggle.new(self || RequestStoreUtil.current_user).enabled?
     feature_flag_enabled
   end
-  
+
   def po_form_enabled
     feature_flag_enabled = PurchaseOrderToggle.new(self || RequestStoreUtil.current_user).enabled?
     feature_flag_enabled

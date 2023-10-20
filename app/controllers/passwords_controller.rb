@@ -52,7 +52,7 @@ class PasswordsController < Devise::PasswordsController
                 }
             )
           end
-          if resource.respond_to?(:mobile_number) and resource.mobile_number.present?
+          if Rails.env.production? and resource.respond_to?(:mobile_number) and resource.mobile_number.present?
             # Send SMS
             Sms::UserPasswordChange.(resource, {})
           end
