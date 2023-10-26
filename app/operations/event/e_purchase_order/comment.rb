@@ -2,6 +2,7 @@ class Event::EPurchaseOrder::Comment < Event::EPurchaseOrder::Base
   attr_accessor :document
 
   def init
+    super
     self.document = params[:document]
   end
 

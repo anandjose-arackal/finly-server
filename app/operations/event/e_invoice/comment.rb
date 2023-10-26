@@ -2,6 +2,7 @@ class Event::EInvoice::Comment < Event::EInvoice::Base
   attr_accessor :document
 
   def init
+    super
     self.document = params[:document]
   end
 
