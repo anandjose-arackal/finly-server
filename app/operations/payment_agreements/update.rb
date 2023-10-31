@@ -91,11 +91,13 @@ class PaymentAgreements::Update < PaymentAgreements::Base
         update_total_amount
         params[:reviewal_document] = self.payment_agreement.reload
         params[:document_reviewer_mappings] = document_reviewer_mappings_params
-        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-        unless document_reviewer_mappings_op.success?
-          add_message :error, document_reviewer_mappings_op.messages[:error]
-          raise ActiveRecord::Rollback
-          return
+        if PaymentAgreement.status_ids(:draft, :retracted, :rejected).include?(payment_agreement.status_id) && payment_agreement.creator_id == user.id
+          document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+          unless document_reviewer_mappings_op.success?
+            add_message :error, document_reviewer_mappings_op.messages[:error]
+            raise ActiveRecord::Rollback
+            return
+          end
         end
       else
         add_message :error, payment_agreement.errors.full_messages
