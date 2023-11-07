@@ -12,6 +12,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.original_purchase_order = self.procurement.purchase_order
     self.klass = PurchaseOrder.reflect_on_all_associations(:has_many).map(&:name)
     self.klass.delete(:dlrms)
+    self.klass.delete(:dlrm_with_level)
     self.klass.delete(:trails)
     self.klass.delete(:advance_payments)
     self.klass.delete(:payments)
