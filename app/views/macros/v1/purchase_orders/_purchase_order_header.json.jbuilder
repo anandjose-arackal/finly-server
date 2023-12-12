@@ -29,12 +29,12 @@ if record&.advance_amount_required
         json.gross_po_advance_amount record&.total_adv_amount
         json.net_po_advance_amount record&.po_advance_amount
         json.po_advance_tds_percentage record&.advance_tds_slab&.tds
-        json.po_advance_tds_amount record&.total_adv_amount*(record&.advance_tds_slab&.tds&.to_f/100)
+        json.po_advance_tds_amount (record&.total_adv_amount * ((record&.advance_tds_slab&.tds&.to_f/100) rescue 0))
     else
       json.gross_po_advance_amount record&.advance_amount&.value
-      json.net_po_advance_amount record&.advance_amount&.value - record&.advance_amount&.value*(record&.advance_tds_slab&.tds&.to_f/100)
+      json.net_po_advance_amount (record&.advance_amount&.value - (record&.advance_amount&.value * ((record&.advance_tds_slab&.tds&.to_f/100) rescue 0)))
       json.po_advance_tds_percentage record&.advance_tds_slab&.tds
-      json.po_advance_tds_amount (record&.advance_amount&.value * (record&.advance_tds_slab&.tds&.to_f/100))
+      json.po_advance_tds_amount (record&.advance_amount&.value * ((record&.advance_tds_slab&.tds&.to_f/100) rescue 0))
     end
   end
 end
