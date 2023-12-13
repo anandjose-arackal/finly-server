@@ -4,6 +4,7 @@ json.business_name record.business_name
 json.trade_name record.trade_name
 json.gst_registered !!record.gst_registered
 json.vendor_type record.vendor_type&.as_json
+json.status record.status.name
 json.payment_term record.payment_term
 json.policy record.policy
 json.rcm_enabled record.rcm_enabled
