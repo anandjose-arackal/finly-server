@@ -21,15 +21,17 @@ json.gross_amount record&.total_before_tax&.value.to_f + record&.discount_amount
 json.tax_amount record&.tax_amount&.value
 json.net_amount record&.total_after_tax&.value
 json.round_off record&.roundoff_amount
-json.po_balance_payable record&.balance_due
+json.po_balance_payable (record&.forms_enabled ? record&.po_balance_due : record&.balance_amount&.value)
+
+po_gross_amount = record&.forms_enabled ? record&.po_requested_advance_amount : ((record&.advance_amount&.value + record&.advance_tds_amount&.value) rescue 0)
 
 if record&.advance_amount_required
   json&.advance_details do
     if record&.forms_enabled
-        json.gross_po_advance_amount record&.total_adv_amount
+        json.gross_po_advance_amount po_gross_amount
         json.net_po_advance_amount record&.po_advance_amount
         json.po_advance_tds_percentage record&.advance_tds_slab&.tds
-        json.po_advance_tds_amount (record&.total_adv_amount * ((record&.advance_tds_slab&.tds&.to_f/100) rescue 0))
+        json.po_advance_tds_amount (po_gross_amount * ((record&.advance_tds_slab&.tds&.to_f/100) rescue 0))
     else
       json.gross_po_advance_amount record&.advance_amount&.value
       json.net_po_advance_amount (record&.advance_amount&.value - (record&.advance_amount&.value * ((record&.advance_tds_slab&.tds&.to_f/100) rescue 0)))
