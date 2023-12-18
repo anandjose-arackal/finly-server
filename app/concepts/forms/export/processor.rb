@@ -249,7 +249,7 @@ class Forms::Export::Processor
         next if header_data[:hide_in_sheet]
         width = (header_data[:hidden] || header_data[:entity_key] == 'status_id') ? 0 : header_data[:name].length+10
         worksheets[sheet_key].set_column(header_index, header_index, width)
-        worksheets[sheet_key].write(0, header_index, header_data[:name])
+        worksheets[sheet_key].write(0, header_index, "\t" + header_data[:name])
       end
     end
 
