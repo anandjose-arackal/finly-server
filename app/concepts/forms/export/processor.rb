@@ -249,7 +249,7 @@ class Forms::Export::Processor
         next if header_data[:hide_in_sheet]
         width = (header_data[:hidden] || header_data[:entity_key] == 'status_id') ? 0 : header_data[:name].length+10
         worksheets[sheet_key].set_column(header_index, header_index, width)
-        worksheets[sheet_key].write(0, header_index, "\t" + header_data[:name])
+        worksheets[sheet_key].write(0, header_index, "\t" + header_data[:name].to_s)
       end
     end
 
@@ -278,7 +278,7 @@ class Forms::Export::Processor
             if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
               column_data = (column_data.map { |d| d[:url] }).join("\n")
             end
-            worksheets[sheet_key].write(1 + row_index, header_index, "\t" + column_data)
+            worksheets[sheet_key].write(1 + row_index, header_index, "\t" + column_data.to_s)
           end
         else
           parent_data = form_data
@@ -295,7 +295,7 @@ class Forms::Export::Processor
               if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
                 column_data = (column_data.map { |d| d[:url] }).join("\n")
               end
-              worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, "\t" + column_data)
+              worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, "\t" + column_data.to_s)
             end
           end
         end
@@ -318,7 +318,7 @@ class Forms::Export::Processor
         content[:data][:headers].each_with_index do |key_value, index|
           sheet_header_keys << key_value[0]
           worksheet.set_column(index, index, key_value[1][:label].length+10)
-          worksheet.write(0, index, "\t" + key_value[1][:label])
+          worksheet.write(0, index, "\t" + key_value[1][:label].to_s)
         end
       elsif content[:data][:choices].first.present?
         content[:data][:choices].first.each_with_index do |key_value, index|
@@ -330,7 +330,7 @@ class Forms::Export::Processor
 
       content[:data][:choices].each_with_index do |row, row_index|
         sheet_header_keys.each_with_index do |header_key, header_index|
-          worksheet.write(1 + row_index, header_index, "\t" + row[header_key.to_sym])
+          worksheet.write(1 + row_index, header_index, "\t" + row[header_key.to_sym].to_s)
         end
       end
 
