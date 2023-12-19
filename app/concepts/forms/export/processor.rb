@@ -278,7 +278,7 @@ class Forms::Export::Processor
             if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
               column_data = (column_data.map { |d| d[:url] }).join("\n")
             end
-            worksheets[sheet_key].write(1 + row_index, header_index, column_data)
+            worksheets[sheet_key].write(1 + row_index, header_index, "\t" + column_data)
           end
         else
           parent_data = form_data
@@ -295,7 +295,7 @@ class Forms::Export::Processor
               if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
                 column_data = (column_data.map { |d| d[:url] }).join("\n")
               end
-              worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
+              worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, "\t" + column_data)
             end
           end
         end
@@ -318,19 +318,19 @@ class Forms::Export::Processor
         content[:data][:headers].each_with_index do |key_value, index|
           sheet_header_keys << key_value[0]
           worksheet.set_column(index, index, key_value[1][:label].length+10)
-          worksheet.write(0, index, key_value[1][:label])
+          worksheet.write(0, index, "\t" + key_value[1][:label])
         end
       elsif content[:data][:choices].first.present?
         content[:data][:choices].first.each_with_index do |key_value, index|
           sheet_header_keys << key_value[0]
           worksheet.set_column(index, index, key_value[0].titleize.length+10)
-          worksheet.write(0, index, key_value[0].titleize)
+          worksheet.write(0, index, "\t" + key_value[0].titleize)
         end
       end
 
       content[:data][:choices].each_with_index do |row, row_index|
         sheet_header_keys.each_with_index do |header_key, header_index|
-          worksheet.write(1 + row_index, header_index, row[header_key.to_sym])
+          worksheet.write(1 + row_index, header_index, "\t" + row[header_key.to_sym])
         end
       end
 
