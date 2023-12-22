@@ -66,6 +66,13 @@ class Expense::SplitExisting < Expense::Manual::Split
       add_message :error, "Split amount is not matching the expense total. Split Total: #{total}, Expense Total: #{self.existing_expense.amount&.value}"
       return
     end
+
+    # If Parent category is selected while having children, then the children (subcategory) needs to be selected
+    parent_categories_selected = self.expenses.map { |expense| expense.category.name if expense.category.child_ids.present? }.compact
+    unless parent_categories_selected.blank?
+      add_message :error, "Sub Categories not selected. Please select a subcategory for #{parent_categories_selected.join(', ')}"
+      return
+    end
   end
 
   def post_process
