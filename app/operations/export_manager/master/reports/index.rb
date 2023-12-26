@@ -279,8 +279,17 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
 
   def conversion_rate(expense)
     sym = expense&.report&.base_currency&.country_code
-    (expense&.amount.value / expense&.amount[sym] rescue 0)
-  end
+    if sym.present?
+      if expense&.amount.present? && expense&.amount[sym].present?
+        if expense&.amount[sym] != 0
+          return (expense&.amount.value / expense&.amount[sym] rescue 0)
+        else
+          #retrun zero incase of divide by zero
+          0
+        end
+      end
+    end
+    end
 
   def expense_checkin_date(expense)
     expense.usage_date_start&.strftime('%d-%b-%Y')
