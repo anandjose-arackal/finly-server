@@ -24,6 +24,11 @@ class Docs::I2P::Invoices::Ops::SaveAndSubmit < Transactions::API
         policy_id: params[:policy_id]
     }
 
+    if model.processing?
+      add_message options, :error, :base, "Invoice already under processing"
+      return
+    end
+
     op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: current_user)
 
     unless op.success?
