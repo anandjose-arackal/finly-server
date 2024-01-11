@@ -83,6 +83,7 @@ class WorkflowManager::Base < BaseOperation
     # Check if it can run
     # doable events are all the events which are possible at the current state; provided by AASM
     doable_events = self.aasm_document.aasm.events.map(&:name)
+    doable_events.delete(:submit) if document.processing?
     unless doable_events.include?(self.aasm_event.to_sym)
       add_message :error, 'Cannot perform this action at this state'
       return
