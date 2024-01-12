@@ -31,7 +31,7 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
 
   def model_status_validation(options, params, **)
     if options[:model].processing?
-      add_message options, :error, :base, "Invoice already under processing"
+      add_message options, :error, :base, "Document already under processing"
       return false
     end
 
