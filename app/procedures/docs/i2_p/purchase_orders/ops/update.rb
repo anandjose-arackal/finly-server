@@ -17,6 +17,7 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
   step Model(PurchaseOrder, :find_by)
   step Policy::Pundit(Docs::P2P::PurchaseOrders::Policy, :update?)
   step Forms::Model::Find()
+  step :model_status_validation
   step :validate_quotations
   step Wrap(TransactionStep){
     step Forms::Contracts::Build()
@@ -27,6 +28,15 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
     fail RollbackStep
   }
   step Transactions::Messages::SuccessMessage('Purchase Order Updated')
+
+  def model_status_validation(options, params, **)
+    if options[:model].processing?
+      add_message options, :error, :base, "Invoice already under processing"
+      return false
+    end
+
+    return true
+  end
 
   def validate_quotations(options, params, ** )
     quotations_params = params[:params][:quotations].reject {|param| param[:_destroy] && param[:id] == "" } rescue nil

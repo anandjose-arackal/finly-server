@@ -17,6 +17,7 @@ class Docs::I2P::PurchaseRequests::Ops::Update < Transactions::API
   step Model(PurchaseRequest, :find_by)
   step Policy::Pundit(Docs::I2P::PurchaseRequests::Policy, :update?)
   step Forms::Model::Find()
+  step :model_status_validation
   step Wrap(TransactionStep){
     step Forms::Contracts::Build()
     step Contract::Validate()
@@ -25,6 +26,15 @@ class Docs::I2P::PurchaseRequests::Ops::Update < Transactions::API
     fail RollbackStep
   }
   step Transactions::Messages::SuccessMessage('Purchase Request Updated')
+
+  def model_status_validation(options, params, **)
+    if options[:model].processing?
+      add_message options, :error, :base, "Invoice already under processing"
+      return false
+    end
+
+    return true
+  end
 
   def budget_limit_validation(options, params, ** )
     current_user = options[:current_user]

@@ -17,6 +17,7 @@ class Docs::I2P::Invoices::Ops::Update < Transactions::API
   step Model(Invoice, :find_by)
   step Policy::Pundit(Docs::I2P::Invoices::Policy, :update?)
   step Forms::Model::Find()
+  step :model_status_validation
   step Wrap(TransactionStep){
     step Forms::Contracts::Build()
     step Contract::Validate()
@@ -28,6 +29,14 @@ class Docs::I2P::Invoices::Ops::Update < Transactions::API
   }
   step Transactions::Messages::SuccessMessage('Invoice Updated')
 
+  def model_status_validation(options, params, **)
+    if options[:model].processing?
+      add_message options, :error, :base, "Invoice already under processing"
+      return false
+    end
+
+    return true
+  end
 
   def budget_limit_validation(options, params, ** )
     current_user = options[:current_user]
