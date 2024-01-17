@@ -28,7 +28,7 @@ class Docs::I2P::PurchaseRequests::Ops::Update < Transactions::API
   step Transactions::Messages::SuccessMessage('Purchase Request Updated')
 
   def model_status_validation(options, params, **)
-    if options[:model].processing?
+    if options[:model].purchase_request_status_id == PurchaseRequestStatus.id_for(:awaiting_approval)
       add_message options, :error, :base, "Document already under processing"
       return false
     end
