@@ -1,5 +1,5 @@
 class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperation
-  sidekiq_options queue: :critical_workflow_queue
+  sidekiq_options queue: :payments_critical_queue
 
   attr_accessor :payment_requests, :options, :initiating_user, :processing_payment_requests
 

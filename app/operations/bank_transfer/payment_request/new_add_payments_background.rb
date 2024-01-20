@@ -4,7 +4,7 @@
 # # DEPRECATED OPERATION, NOT BEING USED
 
 class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperation
-  sidekiq_options queue: :payments_creation
+  sidekiq_options queue: :payments
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params, :purchase_orders, :ticket_type
