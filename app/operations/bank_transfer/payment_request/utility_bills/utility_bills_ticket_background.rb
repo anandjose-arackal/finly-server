@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground < BackgroundOperation
 
-  sidekiq_options queue: :payments
+  sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params, :bbps_bills, :company,
