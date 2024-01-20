@@ -1,5 +1,5 @@
 class Procurements::PurchaseOrders::BulkTakeControlProcessor < BackgroundOperation
-  sidekiq_options queue: :critical_workflow_queue
+  sidekiq_options queue: :payments_critical_queue
 
   attr_accessor :purchase_order_ids, :result
 

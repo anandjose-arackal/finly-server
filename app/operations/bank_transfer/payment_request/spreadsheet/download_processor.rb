@@ -1,5 +1,5 @@
 class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundOperation
-  sidekiq_options queue: :payments_creation
+  sidekiq_options queue: :payments
 
   attr_accessor :view_role, :bank_payment_requests,
                 :headers, :field_configurations, :include_attachments, :download_url, :file_name, :sheets
