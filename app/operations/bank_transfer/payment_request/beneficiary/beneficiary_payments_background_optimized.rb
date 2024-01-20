@@ -15,7 +15,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOp
 # add index in field_text, custom_fields, field_drop_down_selection
 # beautify
 
-sidekiq_options queue: :payments
+sidekiq_options queue: :payments_queue
 
 attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
               :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit, 

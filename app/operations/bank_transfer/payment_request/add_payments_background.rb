@@ -2,7 +2,7 @@
 # This would create multiple individual payments for payment ticket/bankpaymentrequest in the background
 
 class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
-  sidekiq_options queue: :payments
+  sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params
