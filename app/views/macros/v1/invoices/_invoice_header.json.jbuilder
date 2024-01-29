@@ -71,3 +71,16 @@ if record.advance_amount_required
   json.po_prev_adjusted_advance record.po_prev_adjusted_advance
   json.po_advance_paid_at record.procurement&.purchase_order&.payments&.last&.date&.strftime("%d-%b-%y")
 end
+
+if record.advance_amount_required
+  json.new_po_advance_details do 
+    json.po_advance (record.po_advance.to_f + record.po_advance_tds.to_f)
+    json.po_prev_adjusted_advance record.po_prev_adjusted_advance
+    json.prev_adjusted_advance_tds record.prev_adjusted_advance_tds
+    json.current_po_adjustment (record.forms_enabled ? record.adjusted_po_advance_payable_amount&.to_f : record.po_adjusted_advance&.value)
+    json.current_po_tds_adjustment record.adjusted_advance_tds
+    json.remaining_adjustable_advance (record.forms_enabled ? record&.remaining_adjustable_advance : "")
+    json.remaining_adjustable_tds (record.forms_enabled ? record&.remaining_adjustable_tds : "")
+    json.po_advance_paid_at record.procurement&.purchase_order&.payments&.last&.date&.strftime("%d-%b-%y")
+  end
+end
