@@ -6,6 +6,10 @@ class Invoicing::Company::PaymentTerms::Create < Invoicing::Company::PaymentTerm
     self.payment_term_parameters = payment_term_params
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def pre_process
     if payment_term_parameters[:default] == '1'
       self.set_default_payment_term = true

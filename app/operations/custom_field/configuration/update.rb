@@ -1,6 +1,10 @@
 class CustomField::Configuration::Update < CustomField::Configuration::Base
   attr_accessor :field_configuration, :update_params, :default_value
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'

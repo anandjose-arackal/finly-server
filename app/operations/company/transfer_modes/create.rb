@@ -6,6 +6,10 @@ class Company::TransferModes::Create < Company::TransferModes::Base
     self.transfer_mode_id = params[:id] || params[:mode_id] || params[:transfer_mode_id]
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     mode = self.company.transfer_modes.find_by mode_id: self.transfer_mode_id
     if mode.present?

@@ -5,6 +5,10 @@ class BankTransfer::VendorTypes::Create < BankTransfer::VendorTypes::Base
     self.vendor_type_params = vendor_type_parameters
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def process
     self.vendor_type = user.company.vendor_types.new(vendor_type_params)
     if self.vendor_type.valid?

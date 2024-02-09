@@ -7,6 +7,9 @@ class Categories::Destroy < Categories::Base
       messages[:error] << 'Category ID not found'
     end
   end
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
 
   def init
     super

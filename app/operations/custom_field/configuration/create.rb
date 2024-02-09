@@ -2,6 +2,9 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   attr_accessor :config_params, :default_value
 
   # todo: Policy admins are permitted to create only for their policy and users within the policy
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
 
   def pre_validate
     if user.blank?

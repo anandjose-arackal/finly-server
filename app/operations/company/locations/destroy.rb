@@ -7,6 +7,10 @@ class Company::Locations::Destroy < Company::Locations::Base
     self.location = user.company.locations.find_by id: location_id
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.location.blank?
       add_message :error, "Location not found."

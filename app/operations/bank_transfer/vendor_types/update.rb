@@ -6,6 +6,10 @@ class BankTransfer::VendorTypes::Update < BankTransfer::VendorTypes::Base
     self.vendor_type_params = vendor_type_parameters
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     unless self.vendor_type.present?
       add_message :error, 'Vendor Type not found'

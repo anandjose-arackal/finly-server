@@ -5,6 +5,10 @@ class BankTransfer::VendorTypes::Index < BankTransfer::VendorTypes::Base
     self.vendor_types = user.company.vendor_types
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def success
     params[:vendor_types] = self.vendor_types
     BankTransfer::VendorTypes::Index::IndexPresenter.new(user, params, messages)

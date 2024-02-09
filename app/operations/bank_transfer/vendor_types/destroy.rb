@@ -6,6 +6,10 @@ class BankTransfer::VendorTypes::Destroy < BankTransfer::VendorTypes::Base
     self.vendor_type = user.company.vendor_types.find_by id: vendor_type_id
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     unless self.vendor_type.present?
       add_message :error, 'Vendor Type not found'

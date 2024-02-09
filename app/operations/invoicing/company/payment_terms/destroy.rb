@@ -7,6 +7,10 @@ class Invoicing::Company::PaymentTerms::Destroy < Invoicing::Company::PaymentTer
     self.payment_term = user.company.payment_terms.find_by(id: id)
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.payment_term.blank?
       add_message :error, "Payment term not found"

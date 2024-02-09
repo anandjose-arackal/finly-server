@@ -8,6 +8,10 @@ class TdsSlabs::Update < TdsSlabs::Base
     self.tds_slab_parameters = tds_slab_params
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.tds_slab.blank?
       add_message :error, "TDS Slab not found"

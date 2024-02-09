@@ -7,6 +7,10 @@ class Company::TransferModes::Destroy < Company::TransferModes::Base
     self.transfer_mode = user.company.transfer_modes.find_by mode_id: transfer_mode_id
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.transfer_mode.blank?
       add_message :error, "Transfer Mode not found."

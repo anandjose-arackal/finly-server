@@ -8,6 +8,10 @@ class Company::Departments::Update < Company::Departments::Base
     self.department = user.company.departments.find_by id: department_id
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def process
     self.department.assign_attributes(department_params)
     if department.valid?

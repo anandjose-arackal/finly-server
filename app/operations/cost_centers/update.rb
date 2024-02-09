@@ -8,6 +8,10 @@ class CostCenters::Update < CostCenters::Base
     self.cost_center_parameters = cost_center_params
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.cost_center.blank?
       add_message :error, "Cost center not found"

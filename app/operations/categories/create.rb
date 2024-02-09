@@ -7,6 +7,10 @@ class Categories::Create < Categories::Base
     end
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def init
     super
     # here we need all categories, not just inactive ones

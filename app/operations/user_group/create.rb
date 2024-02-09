@@ -2,7 +2,7 @@ class UserGroup::Create < UserGroup::Base
   attr_accessor :name, :items, :application
 
   def authorized_user_types
-    :company_admin
+    [:company_admin, :vendor_payments_admin]
   end
 
   def pre_validate
