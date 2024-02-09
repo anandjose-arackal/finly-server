@@ -8,6 +8,10 @@ class Invoicing::Company::PaymentTerms::Update < Invoicing::Company::PaymentTerm
     self.payment_term_parameters = payment_term_params
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.payment_term.blank?
       add_message :error, "Payment term not found"

@@ -6,6 +6,10 @@ class Procurements::Configs::Terms::Destroy < Procurements::Configs::Terms::Base
     self.procurement_term = op.terms.find_by id: params[:id]
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     unless self.procurement_term.present?
       add_message :error, 'Unable to find procurement term'

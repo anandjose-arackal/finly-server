@@ -8,6 +8,10 @@ class TaxRates::Destroy < TaxRates::Base
     self.tax_rate = self.company.tax_rates.find_by(id: id)
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def process
     unless self.tax_rate.destroy
       add_message :error, self.tax_rate.errors.full_messages

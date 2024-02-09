@@ -8,6 +8,10 @@ class Categories::Update < Categories::Base
     end
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def init
     super
     id = params[:id] || params[:category_id]

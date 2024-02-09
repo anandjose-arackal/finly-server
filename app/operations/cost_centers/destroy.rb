@@ -6,6 +6,9 @@ class CostCenters::Destroy < CostCenters::Base
     id = params[:id] || params[:cost_center_id]
     self.cost_center = user.company.cost_centers.find_by(id: id)
   end
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
 
   def validate
     if self.cost_center.blank?

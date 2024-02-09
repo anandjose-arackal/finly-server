@@ -6,6 +6,10 @@ class Company::Departments::Create < Company::Departments::Base
     self.department_params = department_attributes
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def process
     self.department = user.company.departments.new(department_params)
     if department.valid?

@@ -7,6 +7,10 @@ class TdsSlabs::Destroy < TdsSlabs::Base
     self.tds_slab = user.company.tds_slabs.find_by(id: id)
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.tds_slab.blank?
       add_message :error, "TDS slabs not found"

@@ -7,6 +7,10 @@ class Company::Departments::Destroy < Company::Departments::Base
     self.department = user.company.departments.find_by id: department_id
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.department.blank?
       add_message :error, "Department not found."

@@ -7,6 +7,10 @@ class TaxRates::Create < TaxRates::Base
     self.tax_params = tax_rate_params
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.tax_rate_params[:rate]&.to_i < 0
       add_message :error, 'Tax value should not be negative'

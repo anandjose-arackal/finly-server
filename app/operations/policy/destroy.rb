@@ -7,7 +7,7 @@ class Policy::Destroy < Policy::Base
   attr_accessor :view
 
   def authorized_user_types
-    [:admin, :policy_admin]
+    [:admin, :policy_admin,:vendor_payments_admin]
   end
 
   def init

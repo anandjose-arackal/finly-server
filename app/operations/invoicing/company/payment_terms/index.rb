@@ -16,6 +16,10 @@ class Invoicing::Company::PaymentTerms::Index < Invoicing::Company::PaymentTerms
     self.payment_terms = user.company.payment_terms
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def success
     params[:payment_terms] = self.payment_terms
     Invoicing::Company::PaymentTerms::Index::PaymentTermsPresenter.new(user, params, messages)

@@ -9,6 +9,10 @@ class Company::Locations::Update < Company::Locations::Base
     self.location_parameters = location_params
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     unless self.location.present?
       add_message :error, "Cannnot find Location"

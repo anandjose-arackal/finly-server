@@ -1,5 +1,10 @@
 class Procurements::Configs::Terms::Create < Procurements::Configs::Terms::Base
   attr_accessor :procurement_term, :procurement_term_params, :default_term
+
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def init
     self.procurement_term_params = procurement_term_parameters
     self.default_term = Procurements::Configs::Terms::Index.(user, params).terms.with_default.first rescue nil

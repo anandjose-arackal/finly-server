@@ -15,6 +15,10 @@ class TaxRates::Index < TaxRates::Base
     self.company = user.company
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def process
     self.tax_rates = self.company.tax_rates
   end

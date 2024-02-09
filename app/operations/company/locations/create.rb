@@ -6,6 +6,10 @@ class Company::Locations::Create < Company::Locations::Base
     self.location_parameters = location_params
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if ( self.company.locations.non_deleted.where(name: location_parameters[:name]).count > 0 )
       add_message :error, 'Location with the given name already present'

@@ -7,6 +7,10 @@ class UniqueIdentifier::Index < BaseOperation
       self.unique_identifiers = params[:unique_identifiers]&.include_for_index
     end
 
+    def authorized_user_types
+      [:company_admin, :vendor_payments_admin]
+    end
+
     def get(purpose_name)
       self.unique_identifiers.each do |unique_identifier|
         return unique_identifier if unique_identifier.purpose.name.to_s == purpose_name.to_s
