@@ -18,6 +18,10 @@ class PolicyUserRoles::Create < PolicyUserRoles::Base
     self.added_users = user.company.users.with_id(user_ids)
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     unless self.role_id.present?
       add_message :error, 'Role not found'

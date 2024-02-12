@@ -10,6 +10,10 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
 
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     unless self.policy_user_role.present?
       add_message :error, 'Record not found'

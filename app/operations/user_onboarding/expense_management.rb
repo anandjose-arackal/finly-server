@@ -8,6 +8,10 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
                 :urm_user_role_ids, :pur_user_role_ids,
                 :pum_unassignable_roles, :pum_columns, :pum_values
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.bulk_assign[:policy_ids].present? and self.policy_ids.blank?
       add_message(:error, "No Policy found for this company.")

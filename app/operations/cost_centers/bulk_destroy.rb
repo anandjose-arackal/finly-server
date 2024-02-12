@@ -6,6 +6,10 @@ class CostCenters::BulkDestroy < CostCenters::Base
     self.cost_centers = user.company.cost_centers.where id: cost_center_ids
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.cost_centers.blank?
       add_message :error, "No cost centers found."
