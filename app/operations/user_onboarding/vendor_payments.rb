@@ -7,6 +7,10 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
                 :urm_user_role_ids, :pur_user_role_ids,
                 :pur_unassignable_roles
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.policy_ids.blank?
       add_message(:error, "No Policy found for this company.")

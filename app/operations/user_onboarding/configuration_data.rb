@@ -22,6 +22,10 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.policies.blank?
       add_message :error, 'Policy not configured. Please configure the policies for your company before inviting users.'

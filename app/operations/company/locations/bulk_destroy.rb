@@ -6,6 +6,10 @@ class Company::Locations::BulkDestroy < Company::Locations::Base
     self.locations = user.company.locations.where id: location_ids
   end
 
+  def authorized_user_types
+    [:company_admin, :vendor_payments_admin]
+  end
+
   def validate
     if self.locations.blank?
       add_message :error, "No locations found."
