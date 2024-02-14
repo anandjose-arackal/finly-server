@@ -17,7 +17,6 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
   step Model(PurchaseOrder, :find_by)
   step Policy::Pundit(Docs::P2P::PurchaseOrders::Policy, :update?)
   step Forms::Model::Find()
-  step :model_status_validation
   step :validate_quotations
   step Wrap(TransactionStep){
     step Forms::Contracts::Build()
