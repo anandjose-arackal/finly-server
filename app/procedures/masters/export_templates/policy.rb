@@ -4,7 +4,7 @@ class Masters::ExportTemplates::Policy < ApplicationPolicy
   end
 
   def create?
-    true
+    @user.admin?
   end
 
   def update?

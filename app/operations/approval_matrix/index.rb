@@ -47,6 +47,9 @@ class ApprovalMatrix::Index < BaseOperation
     end
   end
 
+  def authorized_user_types
+    [:admin,:vendor_payments_admin]
+  end
   def validate
     add_message(:error, "Invalid Document Type") unless document_type.present?
   end

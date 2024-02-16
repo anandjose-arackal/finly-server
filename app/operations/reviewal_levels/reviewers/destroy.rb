@@ -12,6 +12,10 @@ class ReviewalLevels::Reviewers::Destroy < ReviewalLevels::Reviewers::Base
     self.level_reviewer_mapping = reviewal_level.level_reviewer_mappings.find_by id: id
   end
 
+  def authorized_user_types
+    [:admin,:vendor_payments_admin]
+  end
+
   def validate
     unless reviewal_level.present?
       add_message :error, 'Level not found'

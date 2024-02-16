@@ -11,6 +11,10 @@ class ReviewalLevels::Update < ReviewalLevels::Base
     self.level = reviewal_levels.find_by id: id
   end
 
+  def authorized_user_types
+    [:admin,:vendor_payments_admin]
+  end
+
   def validate
     if self.level.blank?
       add_message :error, "Reviewal Level not found"

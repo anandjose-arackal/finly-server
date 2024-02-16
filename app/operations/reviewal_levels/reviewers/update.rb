@@ -21,6 +21,10 @@ class ReviewalLevels::Reviewers::Update < ReviewalLevels::Reviewers::Base
     end
   end
 
+  def authorized_user_types
+    [:admin,:vendor_payments_admin]
+  end
+
   def validate
     unless reviewal_level.present?
       add_message :error, 'Level not found'

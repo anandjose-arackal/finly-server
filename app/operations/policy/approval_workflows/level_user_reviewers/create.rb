@@ -16,6 +16,10 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Create < Policy::ApprovalWo
     end
   end
 
+  def authorized_user_types
+    [:admin,:vendor_payments_admin]
+  end
+
   def validate
     unless self.level.present?
       add_message :error, "Invalid Level Details"
