@@ -3,7 +3,7 @@ class Policy::Update < Policy::Base
   attr_accessor :update_resource_type
 
   def authorized_user_types
-    [:admin, :policy_admin, :vendor_payments_admin]
+    [:admin, :vendor_payments_admin]
   end
 
   def pre_validate

@@ -18,6 +18,10 @@ class ReviewalLevels::Create < ReviewalLevels::Base
     self.reviewal_level_params.delete(:policy_id)
   end
 
+  def authorized_user_types
+    [:admin,:vendor_payments_admin]
+  end
+
   def validate
     unless self.policy.present?
       add_message :error, 'Policy not found'

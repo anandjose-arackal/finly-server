@@ -14,6 +14,10 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Update < Policy::ApprovalWo
     end
   end
 
+  def authorized_user_types
+    [:admin,:vendor_payments_admin]
+  end
+
   def validate
     unless self.lurm.present?
       add_message :error, "Record not found "

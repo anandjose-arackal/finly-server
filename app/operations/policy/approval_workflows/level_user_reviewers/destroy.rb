@@ -6,6 +6,10 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Destroy < Policy::ApprovalW
     self.lurm = Policy::ApprovalWorkflows::LevelUserReviewers::Index.(user, params).lurms.with_id(id).first rescue nil
   end
 
+  def authorized_user_types
+    [:admin,:vendor_payments_admin]
+  end
+
   def validate
     unless lurm.present?
       add_message :error, "Record not found"
