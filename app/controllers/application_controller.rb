@@ -33,6 +33,8 @@ class ApplicationController < ActionController::Base
 
   before_action :set_raven_context
 
+  before_action :sample_requests_for_scout
+
   around_action :set_not_tenant_skip_authorize
 
   # after_action :track_request
@@ -635,6 +637,17 @@ class ApplicationController < ActionController::Base
       cache_key << "#{k}:#{v}"
     end
     Digest::SHA1.hexdigest(normalized)
+  end
+
+  def sample_requests_for_scout
+
+    # Sample rate should range from 0-1:  # * 0: captures no requests  # * 0.9: captures 90% of # requests  # * 1: captures all requests
+
+    sample_rate = 0.7
+    if rand > sample_rate
+      Rails.logger.debug("[Scout] Ignoring request: #{request.original_url}")
+      ScoutApm::Transaction.ignore!
+    end
   end
 
 
