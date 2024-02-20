@@ -656,7 +656,7 @@ class Forms::Import::Processor
   end
 
   def get_id_from_value(raw_value, entity)
-    value_id_map[entity.gsub('*', '')][raw_value.to_s] rescue nil
+    value_id_map[entity.gsub('*', '')][raw_value.to_s.strip] rescue nil
   end
 
   def get_dropdown_entity_value(raw_value, entity)
