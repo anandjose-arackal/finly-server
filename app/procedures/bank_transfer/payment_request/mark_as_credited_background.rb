@@ -3,6 +3,7 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
   include Transactions::BackgroundWorker
 
   sidekiq_options queue: :payments_queue, retry: 0
+  sidekiq_options log_level: :warn
 
   step :update_payments_invoices!
   step :send_credit_mail
