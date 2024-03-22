@@ -59,6 +59,9 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
 
       op = WorkflowManager::Base.(user, workflow_input)
       if op.success?
+        # setting forwarded to user as the controlling user for this invoice
+        invoice.update(controlling_user_id: forwarded_to_user.id)
+
         data_success[:invoice_id] = invoice&.invoice_id
         data_success[:invoice_number] = invoice&.invoice_number
         data_success[:sub_department] = invoice&.sub_department&.name
