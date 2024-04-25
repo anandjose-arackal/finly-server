@@ -333,7 +333,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
-    if (billable_amount.to_f + inward_document_item.previously_billed_amount.to_f) > inward_document_item.order_amount.to_f
+    if (billable_amount.to_f + inward_document_item.previously_billed_amount.to_f) > (inward_document_item.order_amount.to_f + 1)
       add_message :error, "For item - #{inward_document_item.description}, billable amount has exceeded the order amount"
       return
     end
