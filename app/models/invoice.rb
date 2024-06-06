@@ -930,6 +930,10 @@ class Invoice < ApplicationRecord
   # payments made against this particular invoice
   def update_invoice_status
     balance_due = self.forms_enabled ? self.invoice_balance_due.to_f : self.balance_due&.value.to_f
+    # if forms is enabled, invoice_balance_due should be populated but in some cases it's not so balance due becomes 0
+    if balance_due == 0 && self.balance_due&.value.to_f > 0
+      balance_due = self.balance_due&.value.to_f
+    end
     paid_amount = self.payments.successful.joins(:amount).sum(:value)
 
     if paid_amount == 0
