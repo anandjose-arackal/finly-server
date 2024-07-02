@@ -1,0 +1,64 @@
+name: $(Build.SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+parameters:
+- name: 'dirs'
+  type: object
+  default: [
+    # Connectors
+    "."
+    #!! Remember to add Key Vault webhooks secrets to Dev and Prod (proda and prodb)
+  ]
+
+jobs:
+  - job: apiBuild
+    displayName: API build
+    pool:
+      vmImage: "ubuntu-latest"
+    continueOnError: false
+    # variables:
+    #   trivyVersion: 0.32.0
+    #   pythonVersion: 3.x
+    
+
+    steps:
+
+    - task: AzureKeyVault@2
+      inputs:
+        azureSubscription: 'Payables Subscription'
+        KeyVaultName: 'Dev-Payables-Devops'
+        SecretsFilter: 'meterianApiKey'
+        RunAsPreJob: false
+    - task: AzureKeyVault@2
+      inputs:
+        azureSubscription: 'Payables Subscription'
+        KeyVaultName: 'Dev-Payables-Devops'
+        SecretsFilter: 'armorCodeUpload'
+        RunAsPreJob: false
+
+    - task: AzureKeyVault@2
+      inputs:
+        azureSubscription: 'Payables Subscription'
+        KeyVaultName: 'Dev-Payables-Devops'
+        SecretsFilter: 'armorCodePayablesCreate'
+        RunAsPreJob: false
+        
+    # remove sudos
+    - script: |
+        curl https://www.meterian.io/downloads/meterian-cli.jar > ~/meterian-cli.jar
+        java -jar ~/meterian-cli.jar --version
+
+      displayName: 'Download and install Meterian'
+      
+    - ${{ each path in parameters.dirs }}:
+      - task: CmdLine@2
+        inputs:
+          script: |
+            java -jar ~/meterian-cli.jar --report-json=report.json --scan-ruby=false
+            python pipelines/armorcode_upload.py ${{path}} payables-server
+            
+        displayName: 'Running Meterian against Payables Web'
+        env:
+          METERIAN_API_TOKEN: $(meterianApiKey)
+          ARMORCODE_REPORT_UPLOAD_TOKEN: $(armorCodeUpload)
+          ARMORCODE_SUBPRODUCT_CREATE: $(armorCodePayablesCreate)
+      
