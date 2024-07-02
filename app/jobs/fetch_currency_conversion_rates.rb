@@ -10,6 +10,7 @@ class FetchCurrencyConversionRates < BaseJob
       date: DateUtils.yesterday_local_date.strftime("%Y-%m-%d")
     }
     @result = Currency::FetchData.(nil, params)
+    @result.currency_data[:USD] = 1.0
     CurrencyConversionRate.create(@result.currency_data) rescue
 
     puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
