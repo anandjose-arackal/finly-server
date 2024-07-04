@@ -33,12 +33,12 @@ env :PATH, ENV['PATH']
 set :output, "#{path}/log/whenever.log"
 
 
-every 30.minutes, roles: [:whenever_cron] do
-  runner "YesBankStatusChecker.perform", output: "#{path}/log/whenever/yes_bank_status_checker.log"
-  runner "IciciStatusChecker.perform", output: "#{path}/log/whenever/icici_status_checker.log"
-  runner "KotakBankTransferStatusChecker.perform", output: "#{path}/log/whenever/kotak_status_checker.log"
-  runner "BbpsBillStatusChecker.perform", output: "#{path}/log/whenever/bbps_bill_status_checker.log"
-end
+# every 30.minutes, roles: [:whenever_cron] do
+#   runner "YesBankStatusChecker.perform", output: "#{path}/log/whenever/yes_bank_status_checker.log"
+#   runner "IciciStatusChecker.perform", output: "#{path}/log/whenever/icici_status_checker.log"
+#   runner "KotakBankTransferStatusChecker.perform", output: "#{path}/log/whenever/kotak_status_checker.log"
+#   runner "BbpsBillStatusChecker.perform", output: "#{path}/log/whenever/bbps_bill_status_checker.log"
+# end
 
 every 30.minutes, roles: [:whenever_cron] do
   # runner "BankTransferProcessRetry.perform", output: "#{path}/log/whenever/bank_transfer_process_retry.log"
@@ -82,17 +82,17 @@ every 1.day, at: "9:30 am", roles: [:whenever_cron] do
   runner "CompanyAccountScheduledTransfer.perform"
 end
 
-every 1.day, at: "8:00 am", roles: [:whenever_cron] do
-  runner "BbpsBillsFetch.perform", output: "#{path}/log/whenever/bbps_bill_fetch.log"
-end
+# every 1.day, at: "8:00 am", roles: [:whenever_cron] do
+#   runner "BbpsBillsFetch.perform", output: "#{path}/log/whenever/bbps_bill_fetch.log"
+# end
 
 every 1.day, at: "6:00 pm", roles: [:whenever_cron] do
   runner "ReminderAwaitingApproval.perform"
 end
-
-every 1.day, at: "12:10 am", roles: [:whenever_cron] do
-  runner "BbpsBillerSync.perform", output: "#{path}/log/whenever/bbps_biller_sync.log"
-end
+#
+# every 1.day, at: "12:10 am", roles: [:whenever_cron] do
+#   runner "BbpsBillerSync.perform", output: "#{path}/log/whenever/bbps_biller_sync.log"
+# end
 
 every 1.minute, roles: [:whenever_cron] do
   runner 'SearchkickProcessQueueJob.delay.perform'
