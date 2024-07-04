@@ -131,6 +131,10 @@ every 1.day, at: '8:00 am', roles: [:whenever_cron] do
   runner "BbpsReminders.perform"
 end
 
+every 1.day, at: '10:00 pm', roles: [:whenever_cron] do
+  runner "PwInvoiceFixer.perform"
+end
+
 # every '0,15,30,45 * * * *', roles: [:whenever_cron] do
 #   runner 'AnalyticsDashboard::Scheduler.perform'
 # end
