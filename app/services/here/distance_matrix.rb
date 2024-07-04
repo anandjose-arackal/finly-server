@@ -47,7 +47,7 @@ class Here::DistanceMatrix < ServiceApi
   end
 
   def key
-    "QLC0vE_7iq1YtMVa7ppEh7QCIgySagaDhJ6-8mzF77g"
+    "pFCIx7LcJV9VmPsJGtPsAkbD9PGu9v9ryvLUSMsDP-g"
   end
 
   def mode
