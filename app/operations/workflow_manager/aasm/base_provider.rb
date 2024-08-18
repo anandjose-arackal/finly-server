@@ -295,7 +295,7 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def broadcast_event
-    Events::Publisher::Record::Transition(document, user, user.company, aasm.current_event, aasm.current_state)
+    #Events::Publisher::Record::Transition(document, user, user.company, aasm.current_event, aasm.current_state)
   end
 
   def update_paper_trail_event
