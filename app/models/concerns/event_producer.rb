@@ -28,7 +28,7 @@ module EventProducer
     end
       # if previous_changes['created_at'].present?
       # New record
-      # Events::Publisher::Record::Create(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || cmp))
+       Events::Publisher::Record::Create(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || cmp))
       #else
       # Old record
       # Events::Publisher::Record::Update(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || cmp), previous_changes)
