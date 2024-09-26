@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'bgg.finly.io', user: 'ubuntu', roles: %w{sidekiq_app email_tracker_role db}
+server 'bgg.finly.io', user: 'ubuntu', roles: %w{sidekiq_app email_tracker_role db whenever_cron}
 
 set :stage, 'production'
 set :use_sudo, false
