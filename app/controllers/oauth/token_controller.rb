@@ -9,6 +9,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
   # around_action :save_request_impression
   around_action :set_non_tenant
   before_action :load_global_variables
+
   def set_non_tenant
     ActsAsTenant.without_tenant_if_not_set do
       yield
@@ -39,7 +40,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
       response_message = {message: params[:message]}
 
       #Session block for inactive users
-      if User.where(id: @user.id)&.active == false
+      if User.where(id: @user.id)&.first&.active == false
         error_message = "Invalid request"
         error_message = response_message[:message] if response_message.is_a?(Hash) and response_message[:message].present?
         json_string = {
@@ -86,10 +87,6 @@ class Oauth::TokenController < Doorkeeper::TokensController
   end
 
   protected
-
-  def check_user_active
-
-  end
 
   def verify_company_status(user)
     company = user&.company rescue nil 
