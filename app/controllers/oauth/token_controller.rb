@@ -39,6 +39,18 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
       response_message = {message: params[:message]}
 
+      #Session block for inactive users
+      if User.where(id: @user.id)&.first&.active == false
+        error_message = "Invalid request"
+        error_message = response_message[:message] if response_message.is_a?(Hash) and response_message[:message].present?
+        json_string = {
+            error: "invalid_grant",
+            error_description: error_message
+        }
+        render json: json_string.to_json, status: 401
+        return
+      end
+
       if create_user_sessions && response_message[:message].blank?
         response_message = on_session_create
         if response_message == true or (response_message.is_a?(Hash) and response_message[:success])
@@ -77,7 +89,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
   protected
 
   def verify_company_status(user)
-    company = user&.company rescue nil
+    company = user&.company rescue nil 
 
     if company.present?
       case company.status_id
@@ -97,7 +109,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
           render json: json_string.to_json, status: 401
           return false
         end
-        # when CompanyStatus.id_for(:active), CompanyStatus.id_for(:hidden)
+        # when CompanyStatus.id_for(:active),   CompanyStatus.id_for(:hidden)
         # Nothing to do
       end
     end
